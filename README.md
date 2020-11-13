@@ -25,7 +25,22 @@ install.packages("devtools")
 
 # Usage and installation
 
-`darthtools` can be used as:
+1.  Install the development version of `darthtools` from
+    [GitHub](https://github.com) with:
+
+<!-- end list -->
+
+``` r
+devtools::install_github("DARTH-git/darthtools")
+```
+
+2.  Load all the functions and data from the repository by typing
+
+<!-- end list -->
+
+``` r
+library(darthtools)
+```
 
 The main website of the package could be found in:
 <https://darth-git.github.io/darthtools/>
