@@ -1,17 +1,11 @@
-
 #' Vectorized categorical distribution
 #'
 #' \code{samplev} sample states for multiple individuals simultaneously.
 #'
-#' @param p probability
-#' @param t time/ frequency
-#' @return a number - converted rate
+#' @param m.Probs matrix with probabilities (n.i * n.s)
+#' @return n.i x 1 matrix filled with sampled health state(s) per individual
 #' @export
 samplev <- function(m.Probs) {
-  # Arguments
-  # m.Probs: matrix with probabilities (n.i * n.s)
-  # Return
-  # ran: n.i x m matrix filled with sampled health state(s) per individual
   d <- dim(m.Probs) # dimensions of the matrix filled with the multinomical probabilities for the health states
   n <- d[1] # first dimension - number of rows (number of individuals to sample for)
   k <- d[2] # second dimension - number of columns (number of health states considered)

@@ -1,6 +1,8 @@
 Package: darthtools
 Type: Package
-Title: What the Package Does (Title Case)
+Title: darthtools is an R package that contains tools developed by the 
+       Decision Analysis in R for Technologies in Health (DARTH) workgroup to 
+       construct model-based cost-effectiveness analysis in R.
 Version: 0.1.0
 Authors@R: 
     c(person(given = "Fernando",

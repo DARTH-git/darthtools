@@ -7,12 +7,10 @@
 samplev(m.Probs)
 }
 \arguments{
-\item{p}{probability}
-
-\item{t}{time/ frequency}
+\item{m.Probs}{matrix with probabilities (n.i * n.s)}
 }
 \value{
-a number - converted rate
+n.i x 1 matrix filled with sampled health state(s) per individual
 }
 \description{
 \code{samplev} sample states for multiple individuals simultaneously.

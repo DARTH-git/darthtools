@@ -1,7 +1,4 @@
-#----------------------------------------------------------------------------#
-####                     Function to format CEA table                     ####
-#----------------------------------------------------------------------------#
-#' Format CEA table
+#' Format table of cost-effectiveness analysis results
 #'
 #' \code{format_table_cea} formats the CEA table.
 #'

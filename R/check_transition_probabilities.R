@@ -1,6 +1,3 @@
-#----------------------------------------------------------------------------#
-####   Function to check if transition probability array/matrix  is valid ####
-#----------------------------------------------------------------------------#
 #' Check if transition array is valid
 #'
 #' \code{check_transition_probability} checks if transition probabilities are in \[0, 1\].
@@ -54,9 +51,6 @@ check_transition_probability <- function(a_P,
   }
 }
 
-#----------------------------------------------------------------------------#
-####   Function to check if sum of transition probabilities equal to one  ####
-#----------------------------------------------------------------------------#
 #' Check if the sum of transition probabilities equal to one.
 #'
 #' \code{check_sum_of_transition_array} checks if each of the rows of the

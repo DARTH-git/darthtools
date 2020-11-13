@@ -1,6 +1,3 @@
-#----------------------------------------------------------------------------#
-####                    Function to get DARTH colors                      ####
-#----------------------------------------------------------------------------#
 #' Get DARTH colors
 #'
 #' \code{get_DARTH_cols} retrieves the color codes for DARTH colors.
