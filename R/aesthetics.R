@@ -6,7 +6,7 @@
 #' \code{get_DARTH_cols} retrieves the color codes for DARTH colors.
 #'
 #' @return a string containing DARTH color codes
-#'
+#' @export
 get_DARTH_cols <- function() {
   # DARTH colors
   DARTHgreen      <- '#009999'

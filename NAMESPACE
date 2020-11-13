@@ -2,8 +2,11 @@
 
 export(check_sum_of_transition_array)
 export(check_transition_probability)
+export(format_table_cea)
+export(get_DARTH_cols)
 export(prob_to_prob)
 export(prob_to_rate)
 export(rate_to_prob)
+export(samplev)
 import(dplyr)
 import(utils)

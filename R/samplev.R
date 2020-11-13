@@ -1,23 +1,12 @@
 
-#---------------------------------------------------------------------------#
-#### R function to sample states for multiple individuals simultaneously ####
-#---------------------------------------------------------------------------#
-
-# Krijkamp EM, Alarid-Escudero F, Enns EA, Jalal HJ, Hunink MGM, Pechlivanoglou P.
-# Microsimulation modeling for health decision sciences using R: A tutorial.
-# Med Decis Making. 2018;38(3):400–22. https://www.ncbi.nlm.nih.gov/pubmed/29587047
-
-################################################################################
-# Copyright 2017, THE HOSPITAL FOR SICK CHILDREN AND THE COLLABORATING INSTITUTIONS.
-# All rights reserved in Canada, the United States and worldwide.
-# Copyright, trademarks, trade names and any and all associated intellectual property
-# are exclusively owned by THE HOSPITAL FOR SICK CHILDREN and the collaborating
-# institutions and may not be used, reproduced, modified, distributed or adapted
-# in any way without appropriate citation.
-
-################################################################################
-# Developed by Petros Pechlivanoglou
-
+#' Vectorized categorical distribution
+#'
+#' \code{samplev} sample states for multiple individuals simultaneously.
+#'
+#' @param p probability
+#' @param t time/ frequency
+#' @return a number - converted rate
+#' @export
 samplev <- function(m.Probs) {
   # Arguments
   # m.Probs: matrix with probabilities (n.i * n.s)
@@ -41,3 +30,4 @@ samplev <- function(m.Probs) {
   ran <- lev[1 + colSums(un > U)] # store the health state at the jth column of the U matrix
   ran # return the new health state per individual n.i x m
 } # close the function
+

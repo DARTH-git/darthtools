@@ -7,7 +7,7 @@
 #'
 #' @param table_cea a dataframe object - table with CEA results
 #' @return a dataframe object - formatted CEA table
-#'
+#' @export
 format_table_cea <- function(table_cea) {
   colnames(table_cea)[colnames(table_cea)
                       %in% c("Cost",
