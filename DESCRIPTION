@@ -43,8 +43,6 @@ License: file LICENSE
 Depends:
     R (>= 3.5.0)
 Imports:
-    utils,
-    dplyr
 Suggests: 
 VignetteBuilder: 
     knitr

@@ -13,7 +13,6 @@
 #' @return
 #' This function stops if transition probability array is not valid and shows
 #' what are the entries that are not valid
-#' @import utils
 #' @export
 check_transition_probability <- function(a_P,
                                          err_stop = FALSE,
@@ -72,7 +71,6 @@ check_transition_probability <- function(a_P,
 #' Default = TRUE
 #' @return
 #' The transition probability array and the cohort trace matrix.
-#' @import dplyr
 #' @export
 check_sum_of_transition_array <- function(a_P,
                                           n_states,
