@@ -46,7 +46,7 @@ rate_to_prob <- function(r, t = 1){
 #' @return a number - converted probability
 #' 
 # Function to convert probabilities to probabilities with a different frequency
-ProbProb <- function(p, t = 1){
+prob_to_prob <- function(p, t = 1){
   p_new <- RateProb(ProbRate(p, t))
   return(p_new)
 }
