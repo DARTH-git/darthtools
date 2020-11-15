@@ -3,6 +3,7 @@
 export(check_sum_of_transition_array)
 export(check_transition_probability)
 export(format_table_cea)
+export(gen_wcc)
 export(get_DARTH_cols)
 export(plot_m_TR)
 export(plot_m_TR_shiny)
