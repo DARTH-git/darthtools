@@ -9,11 +9,17 @@ prob_to_rate(p, t = 1)
 \arguments{
 \item{p}{probability}
 
-\item{t}{time/ frequency}
+\item{t}{time/frequency}
 }
 \value{
-a number - converted rate
+a scalar or vector with rates
 }
 \description{
 \code{prob_to_rate} checks if a probability is between 0 and 1 and convert it to a rate.
+}
+\examples{
+# Annual probability to monthly rate
+p_year  <- 0.3
+r_month <- prob_to_rate(p = p_year, t = 1/12)
+r_month
 }

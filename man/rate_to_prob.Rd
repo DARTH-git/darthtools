@@ -12,8 +12,14 @@ rate_to_prob(r, t = 1)
 \item{t}{time/ frequency}
 }
 \value{
-a number - converted probability
+a scalar or vector with probabilities
 }
 \description{
 \code{rate_to_prob} convert a rate to a probability.
+}
+\examples{
+# Annual rate to monthly probability
+r_year  <- 0.3
+r_month <- rate_to_prob(r = r_year, t = 1/12)
+r_month
 }
