@@ -7,7 +7,7 @@
 check_sum_of_transition_array(
   a_P,
   n_states,
-  n_t,
+  n_cycles,
   err_stop = TRUE,
   verbose = TRUE
 )
@@ -17,7 +17,7 @@ check_sum_of_transition_array(
 
 \item{n_states}{Number of health states.}
 
-\item{n_t}{Number of cycles.}
+\item{n_cycles}{Number of cycles.}
 
 \item{err_stop}{Logical variable to stop model run if set up as TRUE.
 Default = TRUE.}
