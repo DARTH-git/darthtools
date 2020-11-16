@@ -4,15 +4,15 @@
 \alias{gen_wcc}
 \title{Within-cycle correction (WCC)}
 \usage{
-gen_wcc(n_t, method = c("Simpson1/3", "half-cycle", "none"))
+gen_wcc(n_cycles, method = c("Simpson1/3", "half-cycle", "none"))
 }
 \arguments{
-\item{n_t}{number of cycles}
+\item{n_cycles}{number of cycles}
 
 \item{method}{The method to be used for within-cycle correction.}
 }
 \value{
-A vector of length \code{n_t + 1} with within-cycle corrections
+A vector of length \code{n_cycles + 1} with within-cycle corrections
 }
 \description{
 \code{gen_wcc} generates a vector of within-cycle corrections (WCC).
@@ -31,10 +31,10 @@ generates a vector with ones.
 }
 \examples{
 # Number of cycles
-n_t <- 10
-gen_wcc(n_t = n_t, method = "Simpson1/3")
-gen_wcc(n_t = n_t, method = "half-cycle")
-gen_wcc(n_t = n_t, method = "none")
+n_cycles <- 10
+gen_wcc(n_cycles = n_cycles, method = "Simpson1/3")
+gen_wcc(n_cycles = n_cycles, method = "half-cycle")
+gen_wcc(n_cycles = n_cycles, method = "none")
 
 }
 \references{
