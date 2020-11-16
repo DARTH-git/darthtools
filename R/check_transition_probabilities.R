@@ -58,7 +58,7 @@ check_transition_probability <- function(a_P,
 #'
 #' @param a_P A transition probability array.
 #' @param n_states Number of health states.
-#' @param n_t Number of cycles.
+#' @param n_cycles Number of cycles.
 #' @param err_stop Logical variable to stop model run if set up as TRUE.
 #' Default = TRUE.
 #' @param verbose Logical variable to indicate print out of messages.
@@ -68,7 +68,7 @@ check_transition_probability <- function(a_P,
 #' @export
 check_sum_of_transition_array <- function(a_P,
                                           n_states,
-                                          n_t,
+                                          n_cycles,
                                           err_stop = TRUE,
                                           verbose  = TRUE) {
 
@@ -89,7 +89,7 @@ check_sum_of_transition_array <- function(a_P,
   } else {
     # For array
     valid <- (apply(a_P, d, function(x) sum(rowSums(x))) == n_states)
-    if (!isTRUE(all.equal(as.numeric(sum(valid)), as.numeric(n_t)))) {
+    if (!isTRUE(all.equal(as.numeric(sum(valid)), as.numeric(n_cycles)))) {
       if(err_stop) {
         stop("This is not a valid transition Matrix")
       }
