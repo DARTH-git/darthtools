@@ -2,10 +2,10 @@
 #'
 #' \code{gen_wcc} generates a vector of within-cycle corrections (WCC).
 #'
-#' @param n_t number of cycles
+#' @param n_cycles number of cycles
 #' @param method The method to be used for within-cycle correction.
 #'
-#' @return A vector of length \code{n_t + 1} with within-cycle corrections
+#' @return A vector of length \code{n_cycles + 1} with within-cycle corrections
 #'
 #' @details
 #' The default method is an implementation of Simpson's 1/3rd rule that
@@ -31,38 +31,38 @@
 #'
 #' @examples
 #' # Number of cycles
-#' n_t <- 10
-#' gen_wcc(n_t = n_t, method = "Simpson1/3")
-#' gen_wcc(n_t = n_t, method = "half-cycle")
-#' gen_wcc(n_t = n_t, method = "none")
+#' n_cycles <- 10
+#' gen_wcc(n_cycles = n_cycles, method = "Simpson1/3")
+#' gen_wcc(n_cycles = n_cycles, method = "half-cycle")
+#' gen_wcc(n_cycles = n_cycles, method = "none")
 #'
 #' @export
-gen_wcc <- function(n_t, method = c("Simpson1/3", "half-cycle", "none")){
-  if(n_t <= 0){
+gen_wcc <- function(n_cycles, method = c("Simpson1/3", "half-cycle", "none")){
+  if(n_cycles <= 0){
     stop("Number of cycles should be positive")
   }
 
   method <- match.arg(method)
 
-  n_t <- as.integer(n_t)
+  n_cycles <- as.integer(n_cycles)
 
   if (method == "Simpson1/3"){
     ## Vector with cycles
-    v_cycles <- seq(1, n_t + 1)
+    v_cycles <- seq(1, n_cycles + 1)
     ## Generate 2/3 and 4/3 multipliers for even and odd entries, respectively
     v_wcc <- ((v_cycles %% 2)==0)*(2/3) + ((v_cycles %% 2)!=0)*(4/3)
     ## Substitute 1/3 in first and last entries
-    v_wcc[1] <- v_wcc[n_t + 1] <- 1/3
+    v_wcc[1] <- v_wcc[n_cycles + 1] <- 1/3
   }
   if (method == "half-cycle"){
     ## Initialize within-cycle correction vector
-    v_wcc <- rep(1, n_t + 1)
+    v_wcc <- rep(1, n_cycles + 1)
     ## Within-cycle correction weights for first and last cycle
-    v_wcc[1] <- v_wcc[n_t + 1] <- 0.5
+    v_wcc[1] <- v_wcc[n_cycles + 1] <- 0.5
   }
   if (method == "none"){
     ## Initialize within-cycle correction vector
-    v_wcc <- rep(1, n_t + 1)
+    v_wcc <- rep(1, n_cycles + 1)
   }
   return(v_wcc)
 }
