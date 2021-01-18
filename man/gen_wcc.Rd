@@ -20,7 +20,7 @@ A vector of length \code{n_cycles + 1} with within-cycle corrections
 \details{
 The default method is an implementation of Simpson's 1/3rd rule that
 generates a vector with the first and last entry with 1/3 and the odd and
-even wntries with 4/3 and 2/3, respectively.
+even entries with 4/3 and 2/3, respectively.
 
 Method "\code{half-cycle}" is the half-cycle correction method that
 generates a vector with the first and last entry with 1/2 and the rest equal

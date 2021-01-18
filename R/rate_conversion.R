@@ -15,7 +15,7 @@ prob_to_rate <- function(p, t = 1){
   if ((sum(p > 1) > 0) | (sum(p < 0) > 0)){
     stop("probability not between 0 and 1")
   }
-  r <- -log(1-p)/ t
+  r = -(1/t)*log(1 - p)
   return(r)
 }
 
