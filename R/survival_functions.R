@@ -111,7 +111,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) 
   lines(fit.survcure$`log-Logistic Cure`,  t = plot.times, col = 6, ci = F)
   lines(fit.survcure$`Gompertz Cure`,      t = plot.times, col = 7, ci = F)
   # add a legend
-  legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survHE$models), "Spline"), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
+  legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survcure$models), "Spline"), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
 
   # Compare AIC values
   AIC <- unlist(lapply(fit.survcure, function(x) AIC(x)))  # cure models
