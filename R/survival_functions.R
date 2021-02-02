@@ -101,7 +101,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) 
   fit.survcure <- lapply(mods, function(x) flexsurvcure(formula = Surv(time, status) ~ 1, data = data, dist = x, mixture = T))
   names(fit.survcure) <- paste(c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal", "log-Logistic", "Gompertz"), "Cure", sep = " ")
 
-  # Extrapolate all models beyond the KM curve and plot - cure models and spline models
+  # Extrapolate all models beyond the KM curve and plot - cure models
   KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
   plot(KM.fit, ylab = "Survival", xlab = "Time", ylim = c(0,1), xlim = c(0, max(plot.times)), conf.int = F, mark.time = T)
   lines(fit.survcure$`Exponential Cure`,   t = plot.times, col = 2, ci = F)
@@ -111,7 +111,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) 
   lines(fit.survcure$`log-Logistic Cure`,  t = plot.times, col = 6, ci = F)
   lines(fit.survcure$`Gompertz Cure`,      t = plot.times, col = 7, ci = F)
   # add a legend
-  legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survcure), "Spline"), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
+  legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survcure)), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
 
   # Compare AIC values
   AIC <- unlist(lapply(fit.survcure, function(x) AIC(x)))  # cure models
