@@ -27,6 +27,8 @@ partsurv(
 
 \item{time}{numeric vector of time to estimate probabilities.}
 
+\item{v_n}{vector of state names}
+
 \item{PA}{run probabilistic analysis.
 Default = FALSE.}
 
