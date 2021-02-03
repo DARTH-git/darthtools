@@ -139,7 +139,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) 
 #' @param choose_PFS preferred PFS distribution.
 #' @param choose_OS preferred OS distribution.
 #' @param time numeric vector of time to estimate probabilities.
-#' @param v_n vector of state names
+#' @param v_n vector of state names.
 #' @param PA run probabilistic analysis.
 #' Default = FALSE.
 #' @param n_sim number of PA simulations.
