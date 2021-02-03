@@ -335,7 +335,7 @@ all_partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = ti
                           os_survHE  = os_survHE,
                           choose_PFS = model_names[i],
                           choose_OS  = model_names[j],
-                          time = time, PA = PA, n_sim = n_sim, seed = seed)
+                          time = time, PA = PA, v_n = v_n, n_sim = n_sim, seed = seed)
       # store model outputs
       all_m_M_PSM <- list.append(all_m_M_PSM, m_M_PSM)
     }
