@@ -148,7 +148,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) 
 #' @return
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
 #' @export
-partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times, PA = FALSE, n_sim = 100, seed = 421){
+partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times, v_n, PA = FALSE, n_sim = 100, seed = 421){
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
   chosen_models <- paste0("PFS: ", choose_PFS, ", ", "OS: ", choose_OS) # chosen model names
@@ -207,10 +207,10 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
     mean.trace <- apply(trace, 1:2, mean)       # average Markov trace across simulations
     CI         <- apply(trace, 1:2, quantile, probs = c(0.025, 0.975)) # trace confidence intervals
     CI         <- aperm(CI, perm = c(2,3,1))
-    dimnames(mean.trace)[[2]] <- c("Healthy", "Sick", "Dead")
+    dimnames(mean.trace)[[2]] <- v_n
     dimnames(CI)[[3]] <- c("low", "high")
-    dimnames(CI)[[2]] <- c("Healthy", "Sick", "Dead")
-    dimnames(trace)[[2]] <- c("Healthy", "Sick", "Dead")
+    dimnames(CI)[[2]] <- v_n
+    dimnames(trace)[[2]] <- v_n
 
     # List of items to return
     res <- list(trace = trace, CI = CI, Mean = mean.trace, # Markov trace
@@ -220,7 +220,7 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
                 chosen_models = chosen_models # chosen model names
     )
   } else { # deterministic
-    dimnames(trace)[[2]] <- c("Healthy", "Sick",  "Dead")
+    dimnames(trace)[[2]] <- v_n
 
     # List of items to return
     res <- list(trace = trace, # Markov trace
@@ -357,7 +357,7 @@ all_partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = ti
 #' @export
 gen_data <- function(n_pat, n_years){
   # specification of hazard functions to generate data from
-  hazardf <- gems::generateHazardMatrix(n_s)
+  hazardf <- gems::generateHazardMatrix(n_states)
   colnames(hazardf@list.matrix) <-
     rownames(hazardf@list.matrix) <- v_n
 
@@ -400,7 +400,7 @@ gen_data <- function(n_pat, n_years){
   true_data$Sick[is.na(true_data$Sick)] <- true_data$Dead[is.na(true_data$Sick)]
 
   # create a status variable that will capture the transition events
-  true_status         <- matrix(NA, nrow = n_pat, ncol = n_s, dimnames = list(1:n_pat,v_n))
+  true_status         <- matrix(NA, nrow = n_pat, ncol = n_states, dimnames = list(1:n_pat,v_n))
   true_status         <- as.data.frame(true_status)
   true_status$Healthy <- ifelse(is.na(true_data$Healthy),0,1)
   true_status$Dead    <- ifelse(true_data$Dead == n_years, 0, 1)
