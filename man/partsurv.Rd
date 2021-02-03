@@ -10,6 +10,7 @@ partsurv(
   choose_PFS,
   choose_OS,
   time = times,
+  v_n,
   PA = FALSE,
   n_sim = 100,
   seed = 421
