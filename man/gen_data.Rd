@@ -9,7 +9,7 @@ gen_data(n_pat, n_years)
 \arguments{
 \item{n_pat}{number of patients.}
 
-\item{n_years}{follow-up period.}
+\item{n_years}{follow-up period in years.}
 }
 \value{
 generated survival data.

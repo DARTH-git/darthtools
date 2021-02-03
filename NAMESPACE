@@ -3,6 +3,7 @@
 export(all_partsurv)
 export(check_sum_of_transition_array)
 export(check_transition_probability)
+export(cumhaz_to_haz)
 export(expected_surv)
 export(fit.fun)
 export(fit.fun.cure)
