@@ -351,7 +351,7 @@ all_partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = ti
 #' \code{gen_data} generates survival data for overall survival (OS) and progression-free survival (PFS).
 #'
 #' @param n_pat number of patients.
-#' @param n_years follow-up period.
+#' @param n_years follow-up period in years.
 #' @return
 #' generated survival data.
 #' @export
@@ -399,7 +399,6 @@ gen_data <- function(n_pat, n_years){
   true_data$Dead[is.na(true_data$Dead)] <- n_years
   true_data$Sick[is.na(true_data$Sick)] <- true_data$Dead[is.na(true_data$Sick)]
 
-
   # create a status variable that will capture the transition events
   true_status         <- matrix(NA, nrow = n_pat, ncol = n_s, dimnames = list(1:n_pat,v_n))
   true_status         <- as.data.frame(true_status)
@@ -407,36 +406,35 @@ gen_data <- function(n_pat, n_years){
   true_status$Dead    <- ifelse(true_data$Dead == n_years, 0, 1)
   true_status$Sick    <- ifelse(true_data$Dead == true_data$Sick, 0, 1)
 
-
   censtime <- runif(n = n_pat, 0, n_years)
 
-  censored_Sick <- ifelse(censtime      <= true_data$Sick |
+  censored_Sick <- ifelse(censtime <= true_data$Sick |
                             true_data$Sick >  5, 1, 0)
   censored_Dead <- ifelse(censtime <= true_data$Dead|
                             true_data$Dead >5, 1, 0)
 
   sim_data <- true_data
 
-  sim_data$Sick[censored_Sick == 1] <-  censtime[censored_Sick == 1]
-  sim_data$Sick[sim_data$Sick >5 ]  <-  5
+  sim_data$Sick[censored_Sick == 1] <- censtime[censored_Sick == 1]
+  sim_data$Sick[sim_data$Sick > 5 ] <- 5
 
-  sim_data$Dead[censored_Dead == 1] <-  censtime[censored_Dead == 1]
-  sim_data$Dead[sim_data$Dead >5] <-  5
+  sim_data$Dead[censored_Dead == 1] <- censtime[censored_Dead == 1]
+  sim_data$Dead[sim_data$Dead > 5] <- 5
 
   status <- true_status
 
-  status$Sick[censored_Sick == 1] = 0
-  status$Dead[censored_Dead == 1] = 0
+  status$Sick[censored_Sick == 1] <- 0
+  status$Dead[censored_Dead == 1] <- 0
 
   # Usually trials report OS/PFS outcomes so we will recreate those
 
   OS_PFS_data <- data.frame(row.names = 1:n_pat)
 
-  OS_PFS_data$PFS_time        <- apply(sim_data[, c("Sick","Dead")], 1, min)
-  OS_PFS_data$PFS_status      <- ifelse(status$Dead == 1 | status$Sick == 1, 1, 0 )
+  OS_PFS_data$PFS_time   <- apply(sim_data[, c("Sick","Dead")], 1, min)
+  OS_PFS_data$PFS_status <- ifelse(status$Dead == 1 | status$Sick == 1, 1, 0 )
 
-  OS_PFS_data$OS_time         <- sim_data$Dead
-  OS_PFS_data$OS_status       <- status$Dead
+  OS_PFS_data$OS_time    <- sim_data$Dead
+  OS_PFS_data$OS_status  <- status$Dead
   list(cohort = cohort, true_data = true_data, true_status = true_status,
        sim_data =  sim_data, status = status, OS_PFS_data = OS_PFS_data)
 }
@@ -563,4 +561,16 @@ plot_trace_microsim <- function(m_M) {
   legend("topright", v_n, col = 1:n_s,    # add a legend to current plot
          lty = rep(1, 3), bty = "n", cex = 0.65)
 
+}
+
+#' Converts cumulative hazards to hazard rates
+#'
+#' \code{cumhaz_to_haz} converts cumulative hazards to hazard rates across time points.
+#'
+#' @param cumhaz vector of cumulative hazards
+#' @return
+#' vector of hazard rates
+#' @export
+cumhaz_to_haz <- function(cumhaz) {
+  c(cumhaz[1], diff(cumhaz))
 }
