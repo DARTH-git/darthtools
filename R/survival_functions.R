@@ -31,38 +31,41 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times) {
   fit.survHE <- fit.models(formula = Surv(time, status) ~ 1, data = data, distr = mods)
 
   # Run spline model via flexsurvspline
-  fit.survspline <- flexsurvspline(formula = Surv(time, status) ~ 1, data = data, k = 2)
+  fit.survHE.spline <- fit.models(formula =  Surv(time, status) ~ 1, data = data, distr = "rps", k = 2)
 
   # Extrapolate all models beyond the KM curve and plot
   # print(plot(fit.survHE, add.km = T, t = plot.times))
   KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
-  plot(KM.fit, ylab = "Survival", xlab = "Time", ylim = c(0,1), xlim = c(0, max(plot.times)), conf.int = F, mark.time = T)
+  plot(KM.fit, ylab = "Survival", xlab = "Time", ylim = c(0,1), xlim = c(0, max(plot.times)), conf.int = F,
+       mark.time = T)
   lines(fit.survHE$models$Exponential,     t = plot.times, col = 2, ci = F)
   lines(fit.survHE$models$`Weibull (AFT)`, t = plot.times, col = 3, ci = F)
   lines(fit.survHE$models$Gamma,           t = plot.times, col = 4, ci = F)
   lines(fit.survHE$models$`log-Normal`,    t = plot.times, col = 5, ci = F)
   lines(fit.survHE$models$`log-Logistic`,  t = plot.times, col = 6, ci = F)
   lines(fit.survHE$models$Gompertz,        t = plot.times, col = 7, ci = F)
-  lines(fit.survspline,                    t = plot.times, col = 8, ci = F)
+  lines(fit.survHE.spline$models$`Royston-Parmar`, t = plot.times, col = 8, ci = F)
   # add a legend
-  legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survHE$models), "Spline"), col = 1:(length(mods)+2), lty = rep(1, (length(mods)+2)), bty="n")
+  legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survHE$models), "Splines"),
+         col = 1:(length(mods)+2),
+         lty = rep(1, (length(mods)+2)), bty="n")
 
   # Compare AIC values
-  AIC <- c(fit.survHE$model.fitting$aic,  # parametric models
-           AIC(fit.survspline))           # spline model
+  AIC <- c(fit.survHE$model.fitting$aic,         # parametric models
+           fit.survHE.spline$model.fitting$aic)  # spline model
   AIC <- round(AIC,3)
 
   # Compare BIC values
-  BIC <- c(fit.survHE$model.fitting$bic,  # parametric models
-           BIC(fit.survspline))           # spline model
+  BIC <- c(fit.survHE$model.fitting$bic,         # parametric models
+           fit.survHE.spline$model.fitting$bic)  # spline model
   BIC <- round(BIC,3)
 
-  names(AIC) <- names(BIC) <- c(names(fit.survHE$models),
-                                "Spline")
+  names(AIC) <- names(BIC) <- c(names(fit.survHE$models), "Splines")
 
   # Store and return results
-  res <- list(fit.survHE = fit.survHE,
-              models     = append(fit.survHE$models, c("Spline" = list(fit.survspline))),
+  res <- list(fit.survHE        = fit.survHE,
+              fit.survHE.spline = fit.survHE.spline,
+              models     = append(fit.survHE$models, c("Splines" = list(fit.survHE.spline))),
               AIC        = AIC,
               BIC        = BIC)
   return(res)
