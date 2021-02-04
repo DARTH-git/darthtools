@@ -158,13 +158,15 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
   chosen_models <- paste0("PFS: ", choose_PFS, ", ", "OS: ", choose_OS) # chosen model names
 
+  mod.pfs  <- names(pfs_survHE$models)
+  mod.os  <- names(os_survHE$models)
+
   # Model-setup
   if (choose_PFS == "Royston-Parmar") { # fit spline model
     fit.pfs  <- pfs_survHE$fit.survHE.spline
     mod.pfs.chosen <- 1
   } else {  # fit parametric survival models
     fit.pfs  <- pfs_survHE$fit.survHE
-    mod.pfs  <- names(pfs_survHE$models)
     mod.pfs.chosen <- which(mod.pfs == choose_PFS)
   }
 
@@ -173,7 +175,6 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
     mod.os.chosen <- 1
   } else {  # fit parametric survival models
     fit.os  <- os_survHE$fit.survHE
-    mod.os  <- names(os_survHE$models)
     mod.os.chosen <- which(mod.os == choose_OS)
   }
 
