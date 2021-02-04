@@ -299,13 +299,13 @@ plot_trace_PSM <- function(time, partsurv.model, PA=F, v_n) {
     title(main = partsurv.model$chosen_models)
     matlines(time, partsurv.model$CI[,,1], lty = 2)
     matlines(time, partsurv.model$CI[,,2], lty = 2)
-    legend("right", v_n,
-           col = 1:length(v_n), lty = rep(1,length(v_n)), bty= "n")
+    legend("topright", v_n,
+           col = 1:length(v_n), lty = rep(1,length(v_n)), bty = "n")
   } else {
     matplot(time, partsurv.model$trace, type = "l", lty = 1, ylab = "Markov trace")
     title(main = partsurv.model$chosen_models)
-    legend("right", v_n,
-           col = 1:length(v_n), lty = rep(1,length(v_n)), bty= "n")
+    legend("topright", v_n,
+           col = 1:length(v_n), lty = rep(1,length(v_n)), bty = "n")
   }
 }
 
