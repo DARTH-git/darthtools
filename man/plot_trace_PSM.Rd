@@ -4,14 +4,16 @@
 \alias{plot_trace_PSM}
 \title{Plot Markov trace from a partitioned survival model.}
 \usage{
-plot_trace_PSM(time, partsurv.model, PA = F)
+plot_trace_PSM(time, partsurv.model, PA = F, v_n)
 }
 \arguments{
 \item{time}{numeric vector of time to estimate probabilities.}
 
 \item{partsurv.model}{partitioned survival model.}
 
-\item{PA}{run probabilistic analysis.
+\item{PA}{run probabilistic analysis.}
+
+\item{v_n}{vector of state names
 Default = FALSE.}
 }
 \value{

@@ -155,8 +155,8 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
   chosen_models <- paste0("PFS: ", choose_PFS, ", ", "OS: ", choose_OS) # chosen model names
 
   # fit parametric survival models for PFS and OS
-  mod.pfs <- names(pfs_survHE$fit.survHE$models)
-  mod.os  <- names(os_survHE$fit.survHE$models)
+  mod.pfs <- names(pfs_survHE$models)
+  mod.os  <- names( os_survHE$models)
 
   # Calculate survival probabilities
   if (deter == 0) { # probabilistic
@@ -288,19 +288,24 @@ expected_surv <- function(time, surv) {
 #' @param time numeric vector of time to estimate probabilities.
 #' @param partsurv.model partitioned survival model.
 #' @param PA run probabilistic analysis.
+#' @param v_n vector of state names
 #' Default = FALSE.
 #' @return
 #' a plot of the cohort trace.
 #' @export
-plot_trace_PSM <- function(time, partsurv.model, PA=F) {
+plot_trace_PSM <- function(time, partsurv.model, PA=F, v_n) {
   if (PA) {
     matplot(time, partsurv.model$Mean, type = 'l', lty = 1, ylab = "Markov trace")
     title(main = partsurv.model$chosen_models)
     matlines(time, partsurv.model$CI[,,1], lty = 2)
     matlines(time, partsurv.model$CI[,,2], lty = 2)
+    legend("right", v_n,
+           col = 1:length(v_n), lty = rep(1,length(v_n)), bty= "n")
   } else {
     matplot(time, partsurv.model$trace, type = "l", lty = 1, ylab = "Markov trace")
     title(main = partsurv.model$chosen_models)
+    legend("right", v_n,
+           col = 1:length(v_n), lty = rep(1,length(v_n)), bty= "n")
   }
 }
 
@@ -546,10 +551,11 @@ trace.DES <- function(msm_sim = des_sim, tmat, n_i, times) {
 #' \code{plot_trace_microsim} computes Markov trace out of a multi-state model using DES.
 #'
 #' @param m_M cohort trace array from microsimulation model.
+#' @param v_n vector of state names
 #' @return
 #' Plot of the cohort trace.
 #' @export
-plot_trace_microsim <- function(m_M) {
+plot_trace_microsim <- function(m_M, v_n) {
   # plot the distribution of the population across health states over time (trace)
   # count the number of individuals in each health state at each cycle
   m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_n, ordered = TRUE))))
@@ -559,8 +565,8 @@ plot_trace_microsim <- function(m_M) {
   # Plot trace of first health state
   matplot(m_TR, type = "l", main = "Health state trace", col= 1:n_s,
           ylim = c(0, 1), ylab = "Proportion of cohort", xlab = "Cycle")
-  legend("topright", v_n, col = 1:n_s,    # add a legend to current plot
-         lty = rep(1, 3), bty = "n", cex = 0.65)
+  legend("topright", v_n, col = 1:length(v_n),    # add a legend to current plot
+         lty = rep(1, length(v_n)), bty = "n", cex = 0.65)
 
 }
 
