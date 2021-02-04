@@ -65,7 +65,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times) {
   # Store and return results
   res <- list(fit.survHE        = fit.survHE,
               fit.survHE.spline = fit.survHE.spline,
-              models     = append(fit.survHE$models, c("Royston-Parmar" = list(fit.survHE.spline))),
+              models     = append(fit.survHE$models, c("Royston-Parmar" = list(fit.survHE.spline$models))),
               AIC        = AIC,
               BIC        = BIC)
   return(res)
