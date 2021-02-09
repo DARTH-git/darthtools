@@ -12,6 +12,7 @@
 #' a list containing all survival model fits and a plot of superimposed survival curves.
 #' @export
 fit.fun <- function(time, status, data = data, extrapolate = FALSE, times) {
+  # *TASK: use ggsurv*
   require(survHE)
   # Extract the right data columns
   data$time   <- data[,   time]
@@ -28,9 +29,9 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times) {
   # Define the vector of models to be used
   mods <- c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz")
   # Run the models using MLE via flexsurv
-  fit.survHE <- fit.models(formula = Surv(time, status) ~ 1, data = data, distr = mods)
+  fit.survHE <- fit.models(formula = Surv(time, status) ~ 1, data = data, distr = mods, k = k)
 
-  # Run spline model via flexsurvspline
+  # Run spline model via flexsurvspline TASK: make knots an user-argument; one function: add rps to mods, k = NULL except for rps, make vector k and have the same names and have k[mods]
   fit.survHE.spline <- fit.models(formula =  Surv(time, status) ~ 1, data = data, distr = "rps", k = 2)
 
   # Extrapolate all models beyond the KM curve and plot
@@ -128,7 +129,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) 
   names(AIC) <- names(BIC) <- names(fit.survcure)
 
   # Store and return results
-  res <- list(fit.survcure = fit.survcure,
+  res <- list(models = fit.survcure,
               AIC          = AIC,
               BIC          = BIC)
   return(res)
