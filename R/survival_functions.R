@@ -50,7 +50,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
   BIC <- fit.survHE$model.fitting$bic
   BIC <- round(BIC,3)
 
-  names(AIC) <- names(BIC) <- fit.survHE$models
+  names(AIC) <- names(BIC) <- names(fit.survHE$models)
 
   # Store and return results
   res <- list(model.objects = fit.survHE,
