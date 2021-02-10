@@ -32,7 +32,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
   fit.survHE <- fit.models(formula = Surv(time, status) ~ 1, data = data, distr = mods, k = k)
 
   # Extrapolate all models beyond the KM curve and plot
-  plot(fit.survHE.RFS,
+  plot(fit.survHE,
        t               = plot.times,
        add.km          = T,
        legend.position = c(0.75, 0.6),
