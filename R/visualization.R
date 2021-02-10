@@ -32,18 +32,18 @@ plot_te <- function(te) {
 plot_m_TR <- function(m_M) {
   # plot the distribution of the population across health states over time (trace)
   # count the number of individuals in each health state at each cycle
-  m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_n, ordered = TRUE))))
+  m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_names_states, ordered = TRUE))))
   m_TR <- m_TR / n_i                                 # calculate the proportion of individuals
-  colnames(m_TR) <- v_n                              # name the rows of the matrix
+  colnames(m_TR) <- v_names_states                   # name the rows of the matrix
   rownames(m_TR) <- paste("Cycle", 0:n_t, sep = " ") # name the columns of the matrix
   # Plot trace of first health state
   plot(0:n_t, m_TR[, 1], type = "l", main = "Health state trace",
        ylim = c(0, 1), ylab = "Proportion of cohort", xlab = "Cycle")
   # add a line for each additional state
-  for (n_states in 2:length(v_n)) {
+  for (n_states in 2:length(v_names_statesames_states)) {
     lines(0:n_t, m_TR[, n_states], col = n_states)   # adds a line to current plot
   }
-  legend("topright", v_n, col = 1:4,                 # add a legend to current plot
+  legend("topright", v_names_states, col = 1:4,      # add a legend to current plot
          lty = rep(1, 3), bty = "n", cex = 0.65)
 
 }
@@ -59,14 +59,14 @@ plot_m_TR_shiny <- function(m_M, input_list = NULL) {
   with(input_list,{
     # plot the distribution of the population across health states over time (trace)
     # count the number of individuals in each health state at each cycle
-    m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_n, ordered = TRUE))))
+    m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_names_states, ordered = TRUE))))
     m_TR <- m_TR / n_i                                 # calculate the proportion of individuals
-    colnames(m_TR) <- v_n                              # name the rows of the matrix
+    colnames(m_TR) <- v_names_states                   # name the rows of the matrix
     rownames(m_TR) <- paste("Cycle", 0:n_t, sep = " ") # name the columns of the matrix
     # Plot trace of first health state
     matplot(m_TR, type = "l", main = "Health state trace", col= 1:n_states,
             ylim = c(0, 1), ylab = "Proportion of cohort", xlab = "Cycle")
-    legend("topright", v_n, col = 1:n_states,          # add a legend to current plot
+    legend("topright", v_names_states, col = 1:n_states,  # add a legend to current plot
            lty = rep(1, 3), bty = "n", cex = 0.65)
   })
 }

@@ -10,7 +10,7 @@ partsurv(
   choose_PFS,
   choose_OS,
   time = times,
-  v_n,
+  v_names_states,
   PA = FALSE,
   n_sim = 100,
   seed = 421
@@ -27,7 +27,7 @@ partsurv(
 
 \item{time}{numeric vector of time to estimate probabilities.}
 
-\item{v_n}{vector of state names.}
+\item{v_names_states}{vector of state names.}
 
 \item{PA}{run probabilistic analysis.
 Default = FALSE.}

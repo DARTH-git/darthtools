@@ -4,12 +4,12 @@
 \alias{plot_trace_microsim}
 \title{Plot cohort trace from microsimulation model}
 \usage{
-plot_trace_microsim(m_M, v_n)
+plot_trace_microsim(m_M, v_names_states)
 }
 \arguments{
 \item{m_M}{cohort trace array from microsimulation model.}
 
-\item{v_n}{vector of state names}
+\item{v_names_states}{vector of state names}
 }
 \value{
 Plot of the cohort trace.

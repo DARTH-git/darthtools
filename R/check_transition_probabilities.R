@@ -2,7 +2,7 @@
 #'
 #' \code{check_transition_probability} checks if transition probabilities are in \[0, 1\].
 #'
-#' @param a_P A transition probability array.
+#' @param a_P A transition probability array/ matrix.
 #' @param err_stop Logical variable to stop model run if set up as TRUE. Default = FALSE.
 #' @param verbose Logical variable to indicate print out of messages.
 #' Default = FALSE
@@ -56,8 +56,8 @@ check_transition_probability <- function(a_P,
 #' \code{check_sum_of_transition_array} checks if each of the rows of the
 #' transition matrices sum to one.
 #'
-#' @param a_P A transition probability array.
-#' @param n_states Number of health states.
+#' @param a_P A transition probability array/ matrix.
+#' @param n_row Number of rows. Typically, it is the number of states in a Markov model and the number of individuals in a microsimulation model.
 #' @param n_cycles Number of cycles.
 #' @param err_stop Logical variable to stop model run if set up as TRUE.
 #' Default = TRUE.
@@ -67,7 +67,7 @@ check_transition_probability <- function(a_P,
 #' The transition probability array and the cohort trace matrix.
 #' @export
 check_sum_of_transition_array <- function(a_P,
-                                          n_states,
+                                          n_row,
                                           n_cycles,
                                           err_stop = TRUE,
                                           verbose  = TRUE) {
@@ -77,7 +77,7 @@ check_sum_of_transition_array <- function(a_P,
   # For matrix
   if (d == 2) {
     valid <- sum(rowSums(a_P))
-    if (valid != n_states) {
+    if (valid != n_row) {
       if(err_stop) {
         stop("This is not a valid transition Matrix")
       }
@@ -88,7 +88,7 @@ check_sum_of_transition_array <- function(a_P,
     }
   } else {
     # For array
-    valid <- (apply(a_P, d, function(x) sum(rowSums(x))) == n_states)
+    valid <- (apply(a_P, d, function(x) sum(rowSums(x))) == n_row)
     if (!isTRUE(all.equal(as.numeric(sum(valid)), as.numeric(n_cycles)))) {
       if(err_stop) {
         stop("This is not a valid transition Matrix")

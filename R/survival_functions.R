@@ -1,6 +1,6 @@
 #' Fit multiple survival models survival data
 #'
-#' \code{fit.fun} fits multiple survival models to survival data using flexsurv.
+#' \code{fit.fun} fits multiple survival models to survival data using survHE.
 #'
 #' @param time numeric vector of time to estimate probabilities.
 #' @param status numeric vector of event status.
@@ -9,9 +9,9 @@
 #' Default = FALSE.
 #' @param times time horizon the extrapolation is done over.
 #' @return
-#' a list containing all survival model fits and a plot of superimposed survival curves.
+#' a list containing all survival model objects.
 #' @export
-fit.fun <- function(time, status, data = data, extrapolate = FALSE, times) {
+fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2) {
   # *TASK: use ggsurv*
   require(survHE)
   # Extract the right data columns
@@ -27,49 +27,35 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times) {
 
   # Fit parametric survival models
   # Define the vector of models to be used
-  mods <- c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz")
+  mods <- c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps")
   # Run the models using MLE via flexsurv
   fit.survHE <- fit.models(formula = Surv(time, status) ~ 1, data = data, distr = mods, k = k)
 
-  # Run spline model via flexsurvspline TASK: make knots an user-argument; one function: add rps to mods, k = NULL except for rps, make vector k and have the same names and have k[mods]
-  fit.survHE.spline <- fit.models(formula =  Surv(time, status) ~ 1, data = data, distr = "rps", k = 2)
-
   # Extrapolate all models beyond the KM curve and plot
-  # print(plot(fit.survHE, add.km = T, t = plot.times))
-  KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
-  plot(KM.fit, ylab = "Survival", xlab = "Time", ylim = c(0,1), xlim = c(0, max(plot.times)), conf.int = F,
-       mark.time = T)
-  lines(fit.survHE$models$Exponential,     t = plot.times, col = 2, ci = F)
-  lines(fit.survHE$models$`Weibull (AFT)`, t = plot.times, col = 3, ci = F)
-  lines(fit.survHE$models$Gamma,           t = plot.times, col = 4, ci = F)
-  lines(fit.survHE$models$`log-Normal`,    t = plot.times, col = 5, ci = F)
-  lines(fit.survHE$models$`log-Logistic`,  t = plot.times, col = 6, ci = F)
-  lines(fit.survHE$models$Gompertz,        t = plot.times, col = 7, ci = F)
-  lines(fit.survHE.spline$models$`Royston-Parmar`, t = plot.times, col = 8, ci = F)
-  # add a legend
-  legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survHE$models), names(fit.survHE.spline$models)),
-         col = 1:(length(mods)+2),
-         lty = rep(1, (length(mods)+2)), bty="n")
+  plot(fit.survHE.RFS,
+       t               = plot.times,
+       add.km          = T,
+       legend.position = c(0.75, 0.6),
+       legend.text     = element_text(size = 9),
+       legend.title    = element_text(size = 11)) +
+       theme(plot.margin = unit(c(1,3.5,0.5,0.5), "cm")) + # top, right, bottom, left
+       theme(legend.position = c(1.14,0.5)) +
+       labs(title      = "Fitted survival curves")
 
   # Compare AIC values
-  AIC <- c(fit.survHE$model.fitting$aic,         # parametric models
-           fit.survHE.spline$model.fitting$aic)  # spline model
+  AIC <- fit.survHE$model.fitting$aic
   AIC <- round(AIC,3)
 
   # Compare BIC values
-  BIC <- c(fit.survHE$model.fitting$bic,         # parametric models
-           fit.survHE.spline$model.fitting$bic)  # spline model
+  BIC <- fit.survHE$model.fitting$bic
   BIC <- round(BIC,3)
 
-  names(AIC) <- names(BIC) <- c(names(fit.survHE$models), names(fit.survHE.spline$models))
+  names(AIC) <- names(BIC) <- fit.survHE$models
 
   # Store and return results
-  res <- list(fit.survHE        = fit.survHE,
-              fit.survHE.spline = fit.survHE.spline,
-              models     = append(fit.survHE$models,
-                                  c("Royston-Parmar" = list(fit.survHE.spline$models$`Royston-Parmar`))),
-              AIC        = AIC,
-              BIC        = BIC)
+  res <- list(models = fit.survHE,
+              AIC    = AIC,
+              BIC    = BIC)
   return(res)
 }
 
@@ -83,7 +69,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times) {
 #' @param extrapolate extrapolate beyond model time horizon.
 #' @param times time horizon the extrapolation is done over.
 #' @return
-#' a list containing all survival model fits and a plot of superimposed survival curves.
+#' a list containing all survival model objects.
 #' @export
 fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) {
   require(survHE)
@@ -130,8 +116,8 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) 
 
   # Store and return results
   res <- list(models = fit.survcure,
-              AIC          = AIC,
-              BIC          = BIC)
+              AIC    = AIC,
+              BIC    = BIC)
   return(res)
 }
 
@@ -144,7 +130,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) 
 #' @param choose_PFS preferred PFS distribution.
 #' @param choose_OS preferred OS distribution.
 #' @param time numeric vector of time to estimate probabilities.
-#' @param v_n vector of state names.
+#' @param v_names_states vector of state names.
 #' @param PA run probabilistic analysis.
 #' Default = FALSE.
 #' @param n_sim number of PA simulations.
@@ -154,12 +140,12 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) 
 #' @return
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
 #' @export
-partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times, v_n, PA = FALSE, n_sim = 100, seed = 421){
+partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421){
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
   chosen_models <- paste0("PFS: ", choose_PFS, ", ", "OS: ", choose_OS) # chosen model names
 
-  mod.pfs  <- names(pfs_survHE$models)
+  mod.pfs <- names(pfs_survHE$models)
   mod.os  <- names(os_survHE$models)
 
   # Model-setup
@@ -229,10 +215,10 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
     mean.trace <- apply(trace, 1:2, mean)       # average Markov trace across simulations
     CI         <- apply(trace, 1:2, quantile, probs = c(0.025, 0.975)) # trace confidence intervals
     CI         <- aperm(CI, perm = c(2,3,1))
-    dimnames(mean.trace)[[2]] <- v_n
+    dimnames(mean.trace)[[2]] <- v_names_states
     dimnames(CI)[[3]] <- c("low", "high")
-    dimnames(CI)[[2]] <- v_n
-    dimnames(trace)[[2]] <- v_n
+    dimnames(CI)[[2]] <- v_names_states
+    dimnames(trace)[[2]] <- v_names_states
 
     # List of items to return
     res <- list(trace = trace, CI = CI, Mean = mean.trace, # Markov trace
@@ -242,7 +228,7 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
                 chosen_models = chosen_models # chosen model names
     )
   } else { # deterministic
-    dimnames(trace)[[2]] <- v_n
+    dimnames(trace)[[2]] <- v_names_states
 
     # List of items to return
     res <- list(trace = trace, # Markov trace
@@ -309,24 +295,24 @@ expected_surv <- function(time, surv) {
 #' @param time numeric vector of time to estimate probabilities.
 #' @param partsurv.model partitioned survival model.
 #' @param PA run probabilistic analysis.
-#' @param v_n vector of state names
+#' @param v_names_states vector of state names
 #' Default = FALSE.
 #' @return
 #' a plot of the cohort trace.
 #' @export
-plot_trace_PSM <- function(time, partsurv.model, PA=F, v_n) {
+plot_trace_PSM <- function(time, partsurv.model, PA=F, v_names_states) {
   if (PA) {
     matplot(time, partsurv.model$Mean, type = 'l', lty = 1, ylab = "Markov trace")
     title(main = partsurv.model$chosen_models)
     matlines(time, partsurv.model$CI[,,1], lty = 2)
     matlines(time, partsurv.model$CI[,,2], lty = 2)
-    legend("topright", v_n,
-           col = 1:length(v_n), lty = rep(1,length(v_n)), bty = "n")
+    legend("topright", v_names_states,
+           col = 1:length(v_names_states), lty = rep(1,length(v_names_states)), bty = "n")
   } else {
     matplot(time, partsurv.model$trace, type = "l", lty = 1, ylab = "Markov trace")
     title(main = partsurv.model$chosen_models)
-    legend("topright", v_n,
-           col = 1:length(v_n), lty = rep(1,length(v_n)), bty = "n")
+    legend("topright", v_names_states,
+           col = 1:length(v_names_states), lty = rep(1,length(v_names_states)), bty = "n")
   }
 }
 
@@ -361,7 +347,7 @@ all_partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = ti
                           os_survHE  = os_survHE,
                           choose_PFS = model_names[i],
                           choose_OS  = model_names[j],
-                          time = time, PA = PA, v_n = v_n, n_sim = n_sim, seed = seed)
+                          time = time, PA = PA, v_names_states = v_names_states, n_sim = n_sim, seed = seed)
       # store model outputs
       all_m_M_PSM <- list.append(all_m_M_PSM, m_M_PSM)
     }
@@ -386,7 +372,7 @@ gen_data <- function(n_pat, n_years){
   # specification of hazard functions to generate data from
   hazardf <- gems::generateHazardMatrix(n_states)
   colnames(hazardf@list.matrix) <-
-    rownames(hazardf@list.matrix) <- v_n
+    rownames(hazardf@list.matrix) <- v_names_states
 
   # specifying the transition hazard from Healthy -> Sick
   hazardf[["Healthy","Sick"]] <- function (t, r1, r2){
@@ -406,7 +392,7 @@ gen_data <- function(n_pat, n_years){
   # list of parameters for the hazard functions defined above
   mu        <- gems::generateParameterMatrix(hazardf)
   rownames(mu@list.matrix) <-
-    colnames(mu@list.matrix) <- v_n
+    colnames(mu@list.matrix) <- v_names_states
 
   mu[["Healthy", "Sick"]] <- list(1.5, 6)      # the Weibull parameters for H -> S
   mu[["Healthy", "Dead"]] <- list(0.25, 0.08)  # the Gompertz params for H -> D
@@ -421,13 +407,13 @@ gen_data <- function(n_pat, n_years){
 
   # extract the simulated true data
   true_data <- cohort@time.to.state
-  colnames(true_data) <- v_n
+  colnames(true_data) <- v_names_states
 
   true_data$Dead[is.na(true_data$Dead)] <- n_years
   true_data$Sick[is.na(true_data$Sick)] <- true_data$Dead[is.na(true_data$Sick)]
 
   # create a status variable that will capture the transition events
-  true_status         <- matrix(NA, nrow = n_pat, ncol = n_states, dimnames = list(1:n_pat,v_n))
+  true_status         <- matrix(NA, nrow = n_pat, ncol = n_states, dimnames = list(1:n_pat,v_names_states))
   true_status         <- as.data.frame(true_status)
   true_status$Healthy <- ifelse(is.na(true_data$Healthy),0,1)
   true_status$Dead    <- ifelse(true_data$Dead == n_years, 0, 1)
@@ -572,22 +558,22 @@ trace.DES <- function(msm_sim = des_sim, tmat, n_i, times) {
 #' \code{plot_trace_microsim} computes Markov trace out of a multi-state model using DES.
 #'
 #' @param m_M cohort trace array from microsimulation model.
-#' @param v_n vector of state names
+#' @param v_names_states vector of state names
 #' @return
 #' Plot of the cohort trace.
 #' @export
-plot_trace_microsim <- function(m_M, v_n) {
+plot_trace_microsim <- function(m_M, v_names_states) {
   # plot the distribution of the population across health states over time (trace)
   # count the number of individuals in each health state at each cycle
-  m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_n, ordered = TRUE))))
-  m_TR <- m_TR / n_i                                       # calculate the proportion of individuals
-  colnames(m_TR) <- v_n                                    # name the rows of the matrix
-  rownames(m_TR) <- paste("Cycle", 0:n_t, sep = " ")       # name the columns of the matrix
+  m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_names_states, ordered = TRUE))))
+  m_TR <- m_TR / n_i                                  # calculate the proportion of individuals
+  colnames(m_TR) <- v_names_states                    # name the rows of the matrix
+  rownames(m_TR) <- paste("Cycle", 0:n_t, sep = " ")  # name the columns of the matrix
   # Plot trace of first health state
   matplot(m_TR, type = "l", main = "Health state trace", col= 1:n_s,
           ylim = c(0, 1), ylab = "Proportion of cohort", xlab = "Cycle")
-  legend("topright", v_n, col = 1:length(v_n),    # add a legend to current plot
-         lty = rep(1, length(v_n)), bty = "n", cex = 0.65)
+  legend("topright", v_names_states, col = 1:length(v_names_states),  # add a legend to current plot
+         lty = rep(1, length(v_names_states)), bty = "n", cex = 0.65)
 
 }
 

@@ -7,7 +7,7 @@
 check_transition_probability(a_P, err_stop = FALSE, verbose = FALSE)
 }
 \arguments{
-\item{a_P}{A transition probability array.}
+\item{a_P}{A transition probability array/ matrix.}
 
 \item{err_stop}{Logical variable to stop model run if set up as TRUE. Default = FALSE.}
 

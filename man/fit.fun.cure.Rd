@@ -18,7 +18,7 @@ fit.fun.cure(time, status, data = data, extrapolate = FALSE, times)
 \item{times}{time horizon the extrapolation is done over.}
 }
 \value{
-a list containing all survival model fits and a plot of superimposed survival curves.
+a list containing all survival model objects.
 }
 \description{
 \code{fit.fun.cure} fits multiple mixure cure models to survival data using flexsurv.

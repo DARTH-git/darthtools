@@ -4,7 +4,7 @@
 \alias{fit.fun}
 \title{Fit multiple survival models survival data}
 \usage{
-fit.fun(time, status, data = data, extrapolate = FALSE, times)
+fit.fun(time, status, data = data, extrapolate = FALSE, times, k = 2)
 }
 \arguments{
 \item{time}{numeric vector of time to estimate probabilities.}
@@ -19,8 +19,8 @@ Default = FALSE.}
 \item{times}{time horizon the extrapolation is done over.}
 }
 \value{
-a list containing all survival model fits and a plot of superimposed survival curves.
+a list containing all survival model objects.
 }
 \description{
-\code{fit.fun} fits multiple survival models to survival data using flexsurv.
+\code{fit.fun} fits multiple survival models to survival data using survHE.
 }

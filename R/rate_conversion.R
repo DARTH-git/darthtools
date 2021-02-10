@@ -61,3 +61,27 @@ prob_to_prob <- function(p, t = 1){
   return(p_new)
 }
 
+#' Convert a odds to a probability
+#'
+#' \code{odds_to_prob} convert an odds to a probability.
+#'
+#' @param odds a scalar of vector of odds
+#' @return a scalar or vector of probabilities
+#' @export
+odds_to_prob <- function(odds){
+  p <- odds / (odds + 1)
+  return(p)
+}
+
+#' Convert a probability to an odds
+#'
+#' \code{prob_to_odds} convert a probability to an odds.
+#'
+#' @param p a scalar of vector of probabilities
+#' @return a scalar or vector of odds
+#' @export
+prob_to_odds <- function(p){
+  odds <- p / (1 - p)
+  return(odds)
+}
+
