@@ -57,7 +57,7 @@ check_transition_probability <- function(a_P,
 #' transition matrices sum to one.
 #'
 #' @param a_P A transition probability array/ matrix.
-#' @param n_row Number of rows. Typically, it is the number of states in a Markov model and the number of individuals in a microsimulation model.
+#' @param n_rows Number of rows. Typically, it is the number of states in a Markov model and the number of individuals in a microsimulation model.
 #' @param n_cycles Number of cycles.
 #' @param err_stop Logical variable to stop model run if set up as TRUE.
 #' Default = TRUE.
@@ -67,7 +67,7 @@ check_transition_probability <- function(a_P,
 #' The transition probability array and the cohort trace matrix.
 #' @export
 check_sum_of_transition_array <- function(a_P,
-                                          n_row,
+                                          n_rows,
                                           n_cycles,
                                           err_stop = TRUE,
                                           verbose  = TRUE) {
@@ -77,7 +77,7 @@ check_sum_of_transition_array <- function(a_P,
   # For matrix
   if (d == 2) {
     valid <- sum(rowSums(a_P))
-    if (valid != n_row) {
+    if (valid != n_rows) {
       if(err_stop) {
         stop("This is not a valid transition Matrix")
       }
@@ -88,7 +88,7 @@ check_sum_of_transition_array <- function(a_P,
     }
   } else {
     # For array
-    valid <- (apply(a_P, d, function(x) sum(rowSums(x))) == n_row)
+    valid <- (apply(a_P, d, function(x) sum(rowSums(x))) == n_rows)
     if (!isTRUE(all.equal(as.numeric(sum(valid)), as.numeric(n_cycles)))) {
       if(err_stop) {
         stop("This is not a valid transition Matrix")
