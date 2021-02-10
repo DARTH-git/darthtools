@@ -32,7 +32,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
   fit.survHE <- fit.models(formula = Surv(time, status) ~ 1, data = data, distr = mods, k = k)
 
   # Extrapolate all models beyond the KM curve and plot
-  plot(fit.survHE,
+  print(plot(fit.survHE,
        t               = plot.times,
        add.km          = T,
        legend.position = c(0.75, 0.6),
@@ -40,7 +40,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
        legend.title    = element_text(size = 11)) +
        theme(plot.margin = unit(c(1,3.5,0.5,0.5), "cm")) + # top, right, bottom, left
        theme(legend.position = c(1.14,0.5)) +
-       labs(title      = "Fitted survival curves")
+       labs(title      = "Fitted survival curves"))
 
   # Compare AIC values
   AIC <- fit.survHE$model.fitting$aic
@@ -53,9 +53,9 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
   names(AIC) <- names(BIC) <- fit.survHE$models
 
   # Store and return results
-  res <- list(models = fit.survHE,
-              AIC    = AIC,
-              BIC    = BIC)
+  res <- list(model.objects = fit.survHE,
+              AIC           = AIC,
+              BIC           = BIC)
   return(res)
 }
 
