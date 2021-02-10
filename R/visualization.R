@@ -40,7 +40,7 @@ plot_m_TR <- function(m_M) {
   plot(0:n_t, m_TR[, 1], type = "l", main = "Health state trace",
        ylim = c(0, 1), ylab = "Proportion of cohort", xlab = "Cycle")
   # add a line for each additional state
-  for (n_states in 2:length(v_names_statesames_states)) {
+  for (n_states in 2:length(v_names_states)) {
     lines(0:n_t, m_TR[, n_states], col = n_states)   # adds a line to current plot
   }
   legend("topright", v_names_states, col = 1:4,      # add a legend to current plot
