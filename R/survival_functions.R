@@ -570,7 +570,7 @@ plot_trace_microsim <- function(m_M, v_names_states) {
   colnames(m_TR) <- v_names_states                    # name the rows of the matrix
   rownames(m_TR) <- paste("Cycle", 0:n_t, sep = " ")  # name the columns of the matrix
   # Plot trace of first health state
-  matplot(m_TR, type = "l", main = "Health state trace", col= 1:n_s,
+  matplot(m_TR, type = "l", main = "Health state trace", col= 1:n_states,
           ylim = c(0, 1), ylab = "Proportion of cohort", xlab = "Cycle")
   legend("topright", v_names_states, col = 1:length(v_names_states),  # add a legend to current plot
          lty = rep(1, length(v_names_states)), bty = "n", cex = 0.65)
