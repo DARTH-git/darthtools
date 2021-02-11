@@ -279,34 +279,6 @@ expected_surv <- function(time, surv) {
   sum(diff(time[order(time)])*rollmean(surv[order(time)],2))
 }
 
-#' Plot Markov trace from a partitioned survival model.
-#'
-#' \code{plot_trace_PSM} plots Markov trace from a partitioned survival model.
-#'
-#' @param time numeric vector of time to estimate probabilities.
-#' @param partsurv.model partitioned survival model.
-#' @param PA run probabilistic analysis.
-#' @param v_names_states vector of state names
-#' Default = FALSE.
-#' @return
-#' a plot of the cohort trace.
-#' @export
-plot_trace_PSM <- function(time, partsurv.model, PA=F, v_names_states) {
-  if (PA) {
-    matplot(time, partsurv.model$Mean, type = 'l', lty = 1, ylab = "Markov trace")
-    title(main = partsurv.model$chosen_models)
-    matlines(time, partsurv.model$CI[,,1], lty = 2)
-    matlines(time, partsurv.model$CI[,,2], lty = 2)
-    legend("topright", v_names_states,
-           col = 1:length(v_names_states), lty = rep(1,length(v_names_states)), bty = "n")
-  } else {
-    matplot(time, partsurv.model$trace, type = "l", lty = 1, ylab = "Markov trace")
-    title(main = partsurv.model$chosen_models)
-    legend("topright", v_names_states,
-           col = 1:length(v_names_states), lty = rep(1,length(v_names_states)), bty = "n")
-  }
-}
-
 #' Fit partitioned survival model on all combinations of chosen PFS and OS parametric survival functions.
 #'
 #' \code{all_partsurv} fits partitioned survival model on all combinations of chosen PFS and OS parametric survival functions.
@@ -542,30 +514,6 @@ trace.DES <- function(msm_sim = des_sim, tmat, n_i, times) {
   M.tr.des <- prevalence.msm(fit.msm.sim, times = times) # Markov trace when DES model is used
 
   return(M.tr.des[[3]]/100)
-}
-
-#' Plot cohort trace from microsimulation model
-#'
-#' \code{plot_trace_microsim} computes Markov trace out of a multi-state model using DES.
-#'
-#' @param m_M cohort trace array from microsimulation model.
-#' @param v_names_states vector of state names
-#' @return
-#' Plot of the cohort trace.
-#' @export
-plot_trace_microsim <- function(m_M, v_names_states) {
-  # plot the distribution of the population across health states over time (trace)
-  # count the number of individuals in each health state at each cycle
-  m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_names_states, ordered = TRUE))))
-  m_TR <- m_TR / n_i                                  # calculate the proportion of individuals
-  colnames(m_TR) <- v_names_states                    # name the rows of the matrix
-  rownames(m_TR) <- paste("Cycle", 0:n_t, sep = " ")  # name the columns of the matrix
-  # Plot trace of first health state
-  matplot(m_TR, type = "l", main = "Health state trace", col= 1:n_states,
-          ylim = c(0, 1), ylab = "Proportion of cohort", xlab = "Cycle")
-  legend("topright", v_names_states, col = 1:length(v_names_states),  # add a legend to current plot
-         lty = rep(1, length(v_names_states)), bty = "n", cex = 0.65)
-
 }
 
 #' Converts cumulative hazards to hazard rates
