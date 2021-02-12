@@ -32,26 +32,26 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
   fit.survHE <- fit.models(formula = Surv(time, status) ~ 1, data = data, distr = mods, k = k)
 
   # Extrapolate all models beyond the KM curve and plot
-  KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
-  plot(KM.fit, ylab = "Survival", xlab = "Time", ylim = c(0,1), xlim = c(0, max(plot.times)), conf.int = F, mark.time = T)
-  lines(fit.survHE$models$Exponential,      t = plot.times, col = 2, ci = F)
-  lines(fit.survHE$models$`Weibull (AFT)`,  t = plot.times, col = 3, ci = F)
-  lines(fit.survHE$models$Gamma,            t = plot.times, col = 4, ci = F)
-  lines(fit.survHE$models$`log-Normal`,     t = plot.times, col = 5, ci = F)
-  lines(fit.survHE$models$`log-Logistic`,   t = plot.times, col = 6, ci = F)
-  lines(fit.survHE$models$Gompertz,         t = plot.times, col = 7, ci = F)
-  lines(fit.survHE$models$`Royston-Parmar`, t = plot.times, col = 8, ci = F)
-  # add a legend
-  legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survHE$models)), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
-  # print(plot(fit.survHE,
-  #      t               = plot.times,
-  #      add.km          = T,
-  #      legend.position = c(0.75, 0.6),
-  #      legend.text     = element_text(size = 9),
-  #      legend.title    = element_text(size = 11)) +
-  #      theme(plot.margin = unit(c(1,3.5,0.5,0.5), "cm")) + # top, right, bottom, left
-  #      theme(legend.position = c(1.14,0.5)) +
-  #      labs(title      = "Fitted survival curves"))
+  # KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
+  # plot(KM.fit, ylab = "Survival", xlab = "Time", ylim = c(0,1), xlim = c(0, max(plot.times)), conf.int = F, mark.time = T)
+  # lines(fit.survHE$models$Exponential,      t = plot.times, col = 2, ci = F)
+  # lines(fit.survHE$models$`Weibull (AFT)`,  t = plot.times, col = 3, ci = F)
+  # lines(fit.survHE$models$Gamma,            t = plot.times, col = 4, ci = F)
+  # lines(fit.survHE$models$`log-Normal`,     t = plot.times, col = 5, ci = F)
+  # lines(fit.survHE$models$`log-Logistic`,   t = plot.times, col = 6, ci = F)
+  # lines(fit.survHE$models$Gompertz,         t = plot.times, col = 7, ci = F)
+  # lines(fit.survHE$models$`Royston-Parmar`, t = plot.times, col = 8, ci = F)
+  # # add a legend
+  # legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survHE$models)), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
+  print(plot(fit.survHE,
+       t               = plot.times,
+       add.km          = T,
+       legend.position = c(0.75, 0.6),
+       legend.text     = element_text(size = 9),
+       legend.title    = element_text(size = 11)) +
+       theme(plot.margin = unit(c(1,3.5,0.5,0.5), "cm")) + # top, right, bottom, left
+       theme(legend.position = c(1.14,0.5)) +
+       labs(title      = "Fitted survival curves"))
 
   # Compare AIC values
   AIC <- fit.survHE$model.fitting$aic
