@@ -32,6 +32,17 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
   fit.survHE <- fit.models(formula = Surv(time, status) ~ 1, data = data, distr = mods, k = k)
 
   # Extrapolate all models beyond the KM curve and plot
+  # KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
+  # plot(KM.fit, ylab = "Survival", xlab = "Time", ylim = c(0,1), xlim = c(0, max(plot.times)), conf.int = F, mark.time = T)
+  # lines(fit.survHE$models$Exponential,      t = plot.times, col = 2, ci = F)
+  # lines(fit.survHE$models$`Weibull (AFT)`,  t = plot.times, col = 3, ci = F)
+  # lines(fit.survHE$models$Gamma,            t = plot.times, col = 4, ci = F)
+  # lines(fit.survHE$models$`log-Normal`,     t = plot.times, col = 5, ci = F)
+  # lines(fit.survHE$models$`log-Logistic`,   t = plot.times, col = 6, ci = F)
+  # lines(fit.survHE$models$Gompertz,         t = plot.times, col = 7, ci = F)
+  # lines(fit.survHE$models$`Royston-Parmar`, t = plot.times, col = 8, ci = F)
+  # # add a legend
+  # legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survHE$models)), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
   print(plot(fit.survHE,
        t               = plot.times,
        add.km          = T,
@@ -145,33 +156,24 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
   chosen_models <- paste0("PFS: ", choose_PFS, ", ", "OS: ", choose_OS) # chosen model names
 
-  mod.pfs <- names(pfs_survHE$models)
-  mod.os  <- names(os_survHE$models)
-
   # Model-setup
-  if (choose_PFS == "Royston-Parmar") { # fit spline model
-    fit.pfs  <- pfs_survHE$fit.survHE.spline
-    mod.pfs.chosen <- 1
-  } else {  # fit parametric survival models
-    fit.pfs  <- pfs_survHE$fit.survHE
-    mod.pfs.chosen <- which(mod.pfs == choose_PFS)
-  }
-
-  if (choose_OS == "Royston-Parmar") { # fit spline model
-    fit.os  <- os_survHE$fit.survHE.spline
-    mod.os.chosen <- 1
-  } else {  # fit parametric survival models
-    fit.os  <- os_survHE$fit.survHE
-    mod.os.chosen <- which(mod.os == choose_OS)
-  }
+  # model objects
+  pfs_survHE <- pfs_survHE$model.objects
+   os_survHE <-  os_survHE$model.objects
+  # model outputs
+  mod.pfs <- names(pfs_survHE$models)
+   mod.os <- names(os_survHE$models)
+  # chosen model index
+  mod.pfs.chosen <- which(mod.pfs == choose_PFS)
+   mod.os.chosen <- which(mod.pfs == choose_OS)
 
   # Calculate survival probabilities
   if (deter == 0) { # probabilistic
-    fit_PFS <- make.surv(fit.pfs,
+    fit_PFS <- make.surv(pfs_survHE,
                          mod = mod.pfs.chosen,
                          nsim = n_sim,
                          t = times)
-    fit_OS  <- make.surv(fit.os,
+    fit_OS  <- make.surv(os_survHE,
                          mod = mod.os.chosen,
                          nsim = n_sim,
                          t = times)
@@ -286,34 +288,6 @@ trans_prob <- function(surv){
 expected_surv <- function(time, surv) {
   require(zoo)
   sum(diff(time[order(time)])*rollmean(surv[order(time)],2))
-}
-
-#' Plot Markov trace from a partitioned survival model.
-#'
-#' \code{plot_trace_PSM} plots Markov trace from a partitioned survival model.
-#'
-#' @param time numeric vector of time to estimate probabilities.
-#' @param partsurv.model partitioned survival model.
-#' @param PA run probabilistic analysis.
-#' @param v_names_states vector of state names
-#' Default = FALSE.
-#' @return
-#' a plot of the cohort trace.
-#' @export
-plot_trace_PSM <- function(time, partsurv.model, PA=F, v_names_states) {
-  if (PA) {
-    matplot(time, partsurv.model$Mean, type = 'l', lty = 1, ylab = "Markov trace")
-    title(main = partsurv.model$chosen_models)
-    matlines(time, partsurv.model$CI[,,1], lty = 2)
-    matlines(time, partsurv.model$CI[,,2], lty = 2)
-    legend("topright", v_names_states,
-           col = 1:length(v_names_states), lty = rep(1,length(v_names_states)), bty = "n")
-  } else {
-    matplot(time, partsurv.model$trace, type = "l", lty = 1, ylab = "Markov trace")
-    title(main = partsurv.model$chosen_models)
-    legend("topright", v_names_states,
-           col = 1:length(v_names_states), lty = rep(1,length(v_names_states)), bty = "n")
-  }
 }
 
 #' Fit partitioned survival model on all combinations of chosen PFS and OS parametric survival functions.
@@ -551,30 +525,6 @@ trace.DES <- function(msm_sim = des_sim, tmat, n_i, times) {
   M.tr.des <- prevalence.msm(fit.msm.sim, times = times) # Markov trace when DES model is used
 
   return(M.tr.des[[3]]/100)
-}
-
-#' Plot cohort trace from microsimulation model
-#'
-#' \code{plot_trace_microsim} computes Markov trace out of a multi-state model using DES.
-#'
-#' @param m_M cohort trace array from microsimulation model.
-#' @param v_names_states vector of state names
-#' @return
-#' Plot of the cohort trace.
-#' @export
-plot_trace_microsim <- function(m_M, v_names_states) {
-  # plot the distribution of the population across health states over time (trace)
-  # count the number of individuals in each health state at each cycle
-  m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_names_states, ordered = TRUE))))
-  m_TR <- m_TR / n_i                                  # calculate the proportion of individuals
-  colnames(m_TR) <- v_names_states                    # name the rows of the matrix
-  rownames(m_TR) <- paste("Cycle", 0:n_t, sep = " ")  # name the columns of the matrix
-  # Plot trace of first health state
-  matplot(m_TR, type = "l", main = "Health state trace", col= 1:n_states,
-          ylim = c(0, 1), ylab = "Proportion of cohort", xlab = "Cycle")
-  legend("topright", v_names_states, col = 1:length(v_names_states),  # add a legend to current plot
-         lty = rep(1, length(v_names_states)), bty = "n", cex = 0.65)
-
 }
 
 #' Converts cumulative hazards to hazard rates

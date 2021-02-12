@@ -22,14 +22,14 @@ plot_te <- function(te) {
   plot(density(te), main = paste("Total QALYs per person"), xlab = "QALYs")
 }
 
-#' Plot cohort trace
+#' Plot cohort trace of a microsimulation model
 #'
-#' \code{plot_m_TR} plots cohort trace
+#' \code{plot_trace_microsim} plots cohort trace of a microsimulation model.
 #'
 #' @param m_M a cohort trace matrix
 #' @return a plot of the cohort trace
 #' @export
-plot_m_TR <- function(m_M) {
+plot_trace_microsim <- function(m_M) {
   # plot the distribution of the population across health states over time (trace)
   # count the number of individuals in each health state at each cycle
   m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_names_states, ordered = TRUE))))
@@ -48,14 +48,14 @@ plot_m_TR <- function(m_M) {
 
 }
 
-#' Plot cohort trace for the Shiny App
+#' Plot cohort trace of a microsimulation model for the Shiny App
 #'
-#' \code{plot_m_TR_shiny} plots cohort trace for the Shiny App
+#' \code{plot_trace_microsim_shiny} plots cohort trace of a microsimulatoin model for the Shiny App.
 #'
 #' @param m_M a cohort trace matrix
 #' @return a plot of the cohort trace for Shiny App
 #' @export
-plot_m_TR_shiny <- function(m_M, input_list = NULL) {
+plot_trace_microsim_shiny <- function(m_M, input_list = NULL) {
   with(input_list,{
     # plot the distribution of the population across health states over time (trace)
     # count the number of individuals in each health state at each cycle
@@ -69,4 +69,32 @@ plot_m_TR_shiny <- function(m_M, input_list = NULL) {
     legend("topright", v_names_states, col = 1:n_states,  # add a legend to current plot
            lty = rep(1, 3), bty = "n", cex = 0.65)
   })
+}
+
+#' Plot Markov trace from a partitioned survival model.
+#'
+#' \code{plot_trace_PSM} plots Markov trace from a partitioned survival model.
+#'
+#' @param time numeric vector of time to estimate probabilities.
+#' @param partsurv.model partitioned survival model.
+#' @param PA run probabilistic analysis.
+#' @param v_names_states vector of state names
+#' Default = FALSE.
+#' @return
+#' a plot of the cohort trace.
+#' @export
+plot_trace_PSM <- function(time, partsurv.model, PA=F, v_names_states) {
+  if (PA) {
+    matplot(time, partsurv.model$Mean, type = 'l', lty = 1, ylab = "Markov trace")
+    title(main = partsurv.model$chosen_models)
+    matlines(time, partsurv.model$CI[,,1], lty = 2)
+    matlines(time, partsurv.model$CI[,,2], lty = 2)
+    legend("topright", v_names_states,
+           col = 1:length(v_names_states), lty = rep(1,length(v_names_states)), bty = "n")
+  } else {
+    matplot(time, partsurv.model$trace, type = "l", lty = 1, ylab = "Markov trace")
+    title(main = partsurv.model$chosen_models)
+    legend("topright", v_names_states,
+           col = 1:length(v_names_states), lty = rep(1,length(v_names_states)), bty = "n")
+  }
 }
