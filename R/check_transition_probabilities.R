@@ -57,7 +57,8 @@ check_transition_probability <- function(a_P,
 #' transition matrices sum to one.
 #'
 #' @param a_P A transition probability array/ matrix.
-#' @param n_rows Number of rows. Typically, it is the number of states in a Markov model and the number of individuals in a microsimulation model.
+#' @param n_states Number of health states in a Markov trace, appropriate for Markov models.
+#' @param n_rows Number of rows (individuals), appropriate for microsimulation models.
 #' @param n_cycles Number of cycles.
 #' @param err_stop Logical variable to stop model run if set up as TRUE.
 #' Default = TRUE.
@@ -67,17 +68,30 @@ check_transition_probability <- function(a_P,
 #' The transition probability array and the cohort trace matrix.
 #' @export
 check_sum_of_transition_array <- function(a_P,
-                                          n_rows,
+                                          n_rows = NULL,
+                                          n_states = NULL,
                                           n_cycles,
                                           err_stop = TRUE,
                                           verbose  = TRUE) {
+
+  if (!is.null(n_rows) & !is.null(n_states)) {
+    stop("Pick either n_rows or n_states, not both.")
+  }
+
+  if (is.null(n_rows) & is.null(n_states)) {
+    stop("Need to specify either n_rows or n_states, but not both.")
+  }
+
+  if (!is.null(n_rows)) {
+    n_states <- n_rows
+  }
 
   a_P <- as.array(a_P)
   d <- length(dim(a_P))
   # For matrix
   if (d == 2) {
     valid <- sum(rowSums(a_P))
-    if (valid != n_rows) {
+    if (valid != n_states) {
       if(err_stop) {
         stop("This is not a valid transition Matrix")
       }
@@ -88,7 +102,7 @@ check_sum_of_transition_array <- function(a_P,
     }
   } else {
     # For array
-    valid <- (apply(a_P, d, function(x) sum(rowSums(x))) == n_rows)
+    valid <- (apply(a_P, d, function(x) sum(rowSums(x))) == n_states)
     if (!isTRUE(all.equal(as.numeric(sum(valid)), as.numeric(n_cycles)))) {
       if(err_stop) {
         stop("This is not a valid transition Matrix")
