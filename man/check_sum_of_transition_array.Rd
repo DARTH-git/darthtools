@@ -6,7 +6,7 @@
 \usage{
 check_sum_of_transition_array(
   a_P,
-  n_rows,
+  n_states,
   n_cycles,
   err_stop = TRUE,
   verbose = TRUE
@@ -15,7 +15,7 @@ check_sum_of_transition_array(
 \arguments{
 \item{a_P}{A transition probability array/ matrix.}
 
-\item{n_rows}{Number of rows. Typically, it is the number of states in a Markov model and the number of individuals in a microsimulation model.}
+\item{n_states}{Number of rows. Typically, it is the number of states in a Markov model and the number of individuals in a microsimulation model.}
 
 \item{n_cycles}{Number of cycles.}
 
