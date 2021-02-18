@@ -9,7 +9,6 @@
 #' Default = TRUE
 #' @return
 #' Information about the validity of the list
-#' @import
 #' @export
 check_list_elements <- function(l_list,
                              err_stop = TRUE,
