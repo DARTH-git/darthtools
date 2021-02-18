@@ -44,8 +44,9 @@ Description: More about what it does (maybe more than one line)
 License: file LICENSE
 Depends:
     R (>= 3.5.0)
-Imports:
 Suggests: 
+Imports:
+    survHE
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
