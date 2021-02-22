@@ -13,7 +13,7 @@
 #' @export
 fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2) {
   # *TASK: use ggsurv*
-  require(survHE)
+  require("survHE")
   # Extract the right data columns
   data$time   <- data[,   time]
   data$status <- data[, status]
@@ -83,7 +83,6 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
 #' a list containing all survival model objects.
 #' @export
 fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) {
-  require(survHE)
   # Extract the right data columns
   data$time   <- data[,   time]
   data$status <- data[, status]
