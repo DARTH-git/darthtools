@@ -6,7 +6,7 @@
 #' @param m number of time cycles to sample
 #' @return n_i x 1 matrix filled with sampled health state(s) per individual
 #' @export
-samplev <- function(m.Probs, m) {
+samplev <- function(m.Probs, m = 1) {
   # Arguments
   # m.Probs: matrix with probabilities (n.i * n.s)
   # m:       number of states than need to be sampled per individual

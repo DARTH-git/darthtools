@@ -83,6 +83,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
 #' a list containing all survival model objects.
 #' @export
 fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) {
+  require(flexsurvcure)
   # Extract the right data columns
   data$time   <- data[,   time]
   data$status <- data[, status]
@@ -537,3 +538,142 @@ trace.DES <- function(msm_sim = des_sim, tmat, n_i, times) {
 cumhaz_to_haz <- function(cumhaz) {
   c(cumhaz[1], diff(cumhaz))
 }
+
+#' Calculates hazards
+#' @export
+hazard.fn = function( x, t, start, ...) {
+  ret <- x$dfns$h(t, ...) * (1 - x$dfns$p(start, ...))
+  ret[t < start] <- 0
+  ret
+}
+
+#' Bootstrap hazards
+#' @export
+normboot.haz <- function (x, t, start, newdata = NULL, X = NULL, fn, B) {
+  sim <- normboot.flexsurvreg(x, B, newdata = newdata, X = X)
+  X <- attr(sim, "X")
+  if (!is.list(sim))
+    sim <- list(sim)
+  ret <- array(NA_real_, dim = c(nrow(X), B, length(t)))
+  for (k in 1:nrow(X)) {
+    for (i in seq(length = B)) {
+      fncall <- list(t, start)
+      fncall[["x"]] = x
+
+      for (j in seq(along = x$dlist$pars)) fncall[[x$dlist$pars[j]]] <- sim[[k]][i,
+                                                                                 j]
+      for (j in seq_along(x$aux)) fncall[[names(x$aux)[j]]] <- x$aux[[j]]
+      ret[k, i, ] <- do.call(fn, fncall)
+    }
+  }
+  if (nrow(X) == 1)
+    ret[1, , , drop = FALSE]
+  else ret
+}
+
+#' Bootstrap hazards
+#' @export
+boot.haz <- function (x, t, start = 0 ,X = NULL, newdata =NULL, B = 1000) {
+  dat <- x$data
+  Xraw <- model.frame(x)[, unique(attr(model.frame(x), "covnames.orig")),
+                         drop = FALSE]
+  isfac <- sapply(Xraw, function(x) {
+    is.factor(x) || is.character(x)
+  })
+
+  if (is.null(newdata)) {
+    if (is.vector(X))
+      X <- matrix(X, nrow = 1)
+    if (x$ncovs > 0 && is.null(X)) {
+      if (!all(isfac)) {
+        nd <- colMeans(model.matrix(x))
+        X <- matrix(nd, nrow = 1, dimnames = list(NULL,
+                                                  names(nd)))
+        attr(X, "newdata") <- as.data.frame(X)
+      }
+      else {
+        X <- unique(model.matrix(x))
+        nam <- as.matrix(unique(Xraw))
+        for (i in 1:ncol(nam)) nam[, i] <- paste(colnames(nam)[i],
+                                                 nam[, i], sep = "=")
+        rownames(X) <- apply(nam, 1, paste, collapse = ",")
+        attr(X, "newdata") <- unique(Xraw)
+      }
+    }
+    else if (is.null(X))
+      X <- as.matrix(0, nrow = 1, ncol = max(x$ncoveffs,
+                                             1))
+    else if (!is.matrix(X) || (is.matrix(X) && ncol(X) !=
+                               x$ncoveffs)) {
+      plural <- if (x$ncoveffs > 1)
+        "s"
+      else ""
+      stop("expected X to be a matrix with ", x$ncoveffs,
+           " column", plural, " or a vector with ", x$ncoveffs,
+           " element", plural)
+    }else {
+      attr(X, "newdata") <- X
+      colnames(attr(X, "newdata")) <- colnames(model.matrix(x))
+    }
+  }
+
+  hazard.fn <- flexsurv:::expand.summfn.args(hazard.fn)
+  fncall <- list( t, start)
+  beta <- if (x$ncovs == 0) {
+    0
+  }else x$res[x$covpars, "est"]
+  dlist <- x$dlist
+  ret <- vector(nrow(X), mode = "list")
+  if (!is.null(newdata)) {
+    nd <- attr(X, "newdata")
+    covnames <- apply(as.data.frame(nd), 1, function(x) paste0(names(nd),
+                                                               "=", x, collapse = ", "))
+  }else covnames <- rownames(X)
+  names(ret) <- covnames
+  for (i in 1:nrow(X)) {
+    basepars.mat <- flexsurv:::add.covs(x, x$res.t[dlist$pars, "est"],
+                                        beta, X[i, , drop = FALSE], transform = FALSE)
+    basepars <- as.list(as.data.frame(basepars.mat))
+    fncall[dlist$pars] <- basepars
+    for (j in seq_along(x$aux)) {
+      fncall[[names(x$aux)[j]]] <- x$aux[[j]]
+    }
+
+    fncall[["x"]] <- x
+    # browser()
+
+    y <- do.call(hazard.fn, fncall)
+    ret <- normboot.haz(x = x, t = t, start = start,
+                        X = X, fn = hazard.fn, B = B)
+
+  }
+  ret
+}
+
+#' Bootstrap hazards ratios
+#' @export
+boot_hr <- function(surv_model1, surv_model2, times, B = 100){
+  # bootstrap hazards of survival model 1
+  boot.haz1 = boot.haz(x = surv_model1, B = 100, t = times)
+  boot.haz1[boot.haz1==0] = 0.01
+  boot.haz1 <- boot.haz1[1,,]
+  # take log hazards
+  boot.log.haz1 <- log(boot.haz1)
+
+  # bootstrap hazards of survival model 2
+  boot.haz2 = boot.haz(x = surv_model2, B = 100, t = times)
+  boot.haz2[boot.haz2==0] = 0.01
+  boot.haz2 <- boot.haz2[1,,]
+  # take log hazards
+  boot.log.haz2 <- log(boot.haz2)
+
+  # calculate log hazard ratios of model 1 vs. 2
+  boot.log.hr <- boot.log.haz1 - boot.log.haz2
+  # return median hazard ratios with 95% confidence intervals
+  HR <- apply(boot.log.hr, 2, function(x)exp(quantile(x, probs = c(0.025, 0.5, 0.975))))
+  HR <- as.data.frame(t(HR))
+  HR$times <- times
+  colnames(HR) <- c("lcl", "med", "ucl", "time")
+  return(HR)
+}
+

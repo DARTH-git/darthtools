@@ -4,7 +4,7 @@
 \alias{samplev}
 \title{Vectorized categorical distribution}
 \usage{
-samplev(m.Probs, m)
+samplev(m.Probs, m = 1)
 }
 \arguments{
 \item{m.Probs}{matrix with probabilities (n_i * n_states)}
