@@ -4,7 +4,7 @@
 \alias{surv_prob}
 \title{Calculate survival probabilities.}
 \usage{
-surv_prob(model, PA = FALSE)
+surv_prob(model, times = NULL, PA = FALSE)
 }
 \arguments{
 \item{model}{survival model.}

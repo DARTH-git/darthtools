@@ -160,10 +160,10 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
   # model objects
   pfs_survHE <- pfs_survHE$model.objects
    os_survHE <-  os_survHE$model.objects
-  # model outputs
+  # model names
   mod.pfs <- names(pfs_survHE$models)
    mod.os <- names(os_survHE$models)
-  # chosen model index
+  # chosen model index based on name
   mod.pfs.chosen <- which(mod.pfs == choose_PFS)
    mod.os.chosen <- which(mod.pfs == choose_OS)
 
@@ -180,8 +180,8 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
     pfs.surv <- surv_prob(fit_PFS, PA = TRUE)
     os.surv  <- surv_prob( fit_OS, PA = TRUE)
   } else { # deterministic
-    pfs.surv <- surv_prob(pfs_survHE$models[[which(mod.pfs == choose_PFS)]])
-    os.surv  <- surv_prob( os_survHE$models[[which(mod.os  == choose_OS)]])
+    pfs.surv <- surv_prob(pfs_survHE$models[[which(mod.pfs == choose_PFS)]], time = times)
+    os.surv  <- surv_prob( os_survHE$models[[which(mod.os  ==  choose_OS)]], time = times)
   }
 
   # Calculate area under survival curve (expected survival)
@@ -204,6 +204,7 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
 
   # Calculate state occupation proportions
   Sick                 <- os.surv - pfs.surv    # estimate the probability of remaining in the progressed state
+  if (any(Sick < 0)) {print("Warning: PFS > OS")} # print warning message if PFS > OS
   Sick[Sick < 0]       <- 0                     # in cases where the probability is negative replace with zero
   Healthy              <- pfs.surv              # probability of remaining stable
   Dead                 <- 1 - os.surv           # probability of being Dead
@@ -254,7 +255,7 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
 #' @return
 #' vector of survival probabilities.
 #' @export
-surv_prob <- function(model, PA = FALSE) {
+surv_prob <- function(model, times = NULL, PA = FALSE) {
   if (PA) {
     surv <- model$mat[[1]][,-1]
   } else {
