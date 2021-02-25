@@ -12,8 +12,7 @@
 #' a list containing all survival model objects.
 #' @export
 fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2) {
-  # *TASK: use ggsurv*
-  require("survHE")
+  require(survHE)
   # Extract the right data columns
   data$time   <- data[,   time]
   data$status <- data[, status]
@@ -204,7 +203,7 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
 
   # Calculate state occupation proportions
   Sick                 <- os.surv - pfs.surv    # estimate the probability of remaining in the progressed state
-  if (any(Sick < 0)) {print("Warning: PFS > OS")} # print warning message if PFS > OS
+  if (any(Sick < 0)) {print(paste0("Warning: PFS > OS at cycle ", min(which(Sick < 0))))} # print warning message if PFS > OS
   Sick[Sick < 0]       <- 0                     # in cases where the probability is negative replace with zero
   Healthy              <- pfs.surv              # probability of remaining stable
   Dead                 <- 1 - os.surv           # probability of being Dead
