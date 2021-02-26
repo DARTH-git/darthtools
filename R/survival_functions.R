@@ -203,7 +203,7 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
 
   # Calculate state occupation proportions
   Sick                 <- os.surv - pfs.surv    # estimate the probability of remaining in the progressed state
-  if (any(Sick < 0)) {print(paste0("Warning: PFS > OS at cycle ", min(which(Sick < 0))))} # print warning message if PFS > OS
+  check_PFS_OS(Sick)                            # print warning message if PFS > OS
   Sick[Sick < 0]       <- 0                     # in cases where the probability is negative replace with zero
   Healthy              <- pfs.surv              # probability of remaining stable
   Dead                 <- 1 - os.surv           # probability of being Dead
@@ -675,5 +675,22 @@ boot_hr <- function(surv_model1, surv_model2, times, B = 100){
   HR$times <- times
   colnames(HR) <- c("lcl", "med", "ucl", "time")
   return(HR)
+}
+
+#' Print a warning message if PFS > OS
+#'
+#' \code{check_PFS_OS} prints a warning message if PFS > OS.
+#'
+#' @param Sick vector (or matrix) of PFS - OS probabilities
+#' @return
+#' a warning message if PFS > OS
+#' @export
+check_PFS_OS <- function(Sick){
+  Sick1 <- as.matrix(Sick)
+  for (j in 1:ncol(Sick1)) {
+    if (length(which(Sick1[,j] < 0) > 0)) {
+      print(paste0("PFS > OS starting cycle ", min(which(Sick1[,j] < 0)), " at simulation ", j))
+    }
+  }
 }
 

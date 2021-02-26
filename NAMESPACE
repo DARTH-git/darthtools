@@ -3,6 +3,7 @@
 export(all_partsurv)
 export(boot.haz)
 export(boot_hr)
+export(check_PFS_OS)
 export(check_list_elements)
 export(check_sum_of_transition_array)
 export(check_transition_probability)

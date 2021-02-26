@@ -98,3 +98,4 @@ plot_trace_PSM <- function(time, partsurv.model, PA=F, v_names_states) {
            col = 1:length(v_names_states), lty = rep(1,length(v_names_states)), bty = "n")
   }
 }
+
