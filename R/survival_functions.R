@@ -689,7 +689,7 @@ check_PFS_OS <- function(Sick){
   Sick1 <- as.matrix(Sick)
   for (j in 1:ncol(Sick1)) {
     if (length(which(Sick1[,j] < 0) > 0)) {
-      print(paste0("PFS > OS starting cycle ", min(which(Sick1[,j] < 0)), " at simulation ", j))
+      print(paste0("Warning: PFS > OS starting cycle ", min(which(Sick1[,j] < 0)), " at simulation ", j))
     }
   }
 }
