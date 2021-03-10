@@ -43,8 +43,8 @@ plot_trace_microsim <- function(m_M) {
   for (n_states in 2:length(v_names_states)) {
     lines(0:n_t, m_TR[, n_states], col = n_states)   # adds a line to current plot
   }
-  legend("topright", v_names_states, col = 1:4,      # add a legend to current plot
-         lty = rep(1, 3), bty = "n", cex = 0.65)
+  legend("topright", v_names_states, col = 1:length(v_names_states), # add a legend to current plot
+         lty = rep(1, length(v_names_states)), bty = "n", cex = 0.65)
 
 }
 
@@ -64,10 +64,10 @@ plot_trace_microsim_shiny <- function(m_M, input_list = NULL) {
     colnames(m_TR) <- v_names_states                   # name the rows of the matrix
     rownames(m_TR) <- paste("Cycle", 0:n_t, sep = " ") # name the columns of the matrix
     # Plot trace of first health state
-    matplot(m_TR, type = "l", main = "Health state trace", col= 1:n_states,
+    matplot(m_TR, type = "l", main = "Health state trace", col= 1:length(v_names_states),
             ylim = c(0, 1), ylab = "Proportion of cohort", xlab = "Cycle")
-    legend("topright", v_names_states, col = 1:n_states,  # add a legend to current plot
-           lty = rep(1, 3), bty = "n", cex = 0.65)
+    legend("topright", v_names_states, col = 1:length(v_names_states),  # add a legend to current plot
+           lty = rep(1, length(v_names_states)), bty = "n", cex = 0.65)
   })
 }
 
