@@ -70,7 +70,6 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
   #      theme(legend.position = c(1.14,0.5)) +
   #      labs(title      = "Fitted survival curves"))
 
-  xlow = min(plot.times); xhigh = max(plot.times) # set x-axis limits
   KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
   S_superimpose <- ggsurvplot(
     KM.fit,
@@ -191,7 +190,6 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
   # # add a legend
   # legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survcure)), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
 
-  xlow = min(plot.times); xhigh = max(plot.times) # set x-axis limits
   KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
   S_superimpose <- ggsurvplot(
     KM.fit,
