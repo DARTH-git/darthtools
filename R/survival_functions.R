@@ -110,7 +110,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
     scale_x_continuous(limits = c(0, 8)) +
     coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
     guides(color=guide_legend(override.aes = list(size=1.2)))
-  S_superimpose
+  print(S_superimpose)
 
   # Compare AIC values
   AIC <- fit.survHE$model.fitting$aic
@@ -231,7 +231,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
     scale_x_continuous(limits = c(0, 8)) +
     coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
     guides(color=guide_legend(override.aes = list(size=1.2)))
-  S_superimpose
+  print(S_superimpose)
 
   # Compare AIC values
   AIC <- unlist(lapply(fit.survcure, function(x) AIC(x)))  # cure models
