@@ -232,14 +232,14 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
   print(S_superimpose)
 
   # Compare AIC values
-  AIC <- unlist(lapply(fit.survcure, function(x) AIC(x)))  # cure models
+  AIC <- unlist(lapply(fit.survcure$models, function(x) AIC(x)))  # cure models
   AIC <- round(AIC,3)
 
   # Compare BIC values
-  BIC <- unlist(lapply(fit.survcure, function(x) BIC(x)))  # cure models
+  BIC <- unlist(lapply(fit.survcure$models, function(x) BIC(x)))  # cure models
   BIC <- round(BIC,3)
 
-  names(AIC) <- names(BIC) <- names(fit.survcure)
+  names(AIC) <- names(BIC) <- names(fit.survcure$models)
 
   # Store and return results
   res <- list(models = fit.survcure,
