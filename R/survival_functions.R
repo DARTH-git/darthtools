@@ -1,4 +1,4 @@
-#' Fit multiple survival models survival data
+#' Fit multiple survival models on survival data
 #'
 #' \code{fit.fun} fits multiple survival models to survival data using survHE.
 #'
@@ -8,10 +8,25 @@
 #' @param extrapolate extrapolate beyond model time horizon.
 #' Default = FALSE.
 #' @param times time horizon the extrapolation is done over.
+#' @param k number of knots in Royston-Parmar spline model.
+#' Default = 2.
+#' @param legend_position position of the legend.
+#' Default = "top".
+#' @param xlow time horizon the extrapolation is done over.
+#' Default = min(time).
+#' @param xhigh time horizon the extrapolation is done over.
+#' Default = max(time).
+#' @param ylow time horizon the extrapolation is done over.
+#' Default = 0.
+#' @param yhigh time horizon the extrapolation is done over.
+#' Default = 1.
+#' @param risktable time horizon the extrapolation is done over.
+#' Default = F.
 #' @return
 #' a list containing all survival model objects.
 #' @export
-fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2) {
+fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2,
+                    legend_position = "top", xlow = min(time), xhigh = max(time), ylow = 0, yhigh = 1, risktable = F) {
   require(survHE)
   # Extract the right data columns
   data$time   <- data[,   time]
@@ -30,6 +45,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
   # Run the models using MLE via flexsurv
   fit.survHE <- fit.models(formula = Surv(time, status) ~ 1, data = data, distr = mods, k = k)
 
+  ## Traditional way
   # Extrapolate all models beyond the KM curve and plot
   # KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
   # plot(KM.fit, ylab = "Survival", xlab = "Time", ylim = c(0,1), xlim = c(0, max(plot.times)), conf.int = F, mark.time = T)
@@ -42,15 +58,59 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
   # lines(fit.survHE$models$`Royston-Parmar`, t = plot.times, col = 8, ci = F)
   # # add a legend
   # legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survHE$models)), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
-  print(plot(fit.survHE,
-       t               = plot.times,
-       add.km          = T,
-       legend.position = c(0.75, 0.6),
-       legend.text     = element_text(size = 9),
-       legend.title    = element_text(size = 11)) +
-       theme(plot.margin = unit(c(1,3.5,0.5,0.5), "cm")) + # top, right, bottom, left
-       theme(legend.position = c(1.14,0.5)) +
-       labs(title      = "Fitted survival curves"))
+
+  ## survHE
+  # print(plot(fit.survHE,
+  #      t               = plot.times,
+  #      add.km          = T,
+  #      legend.position = c(0.75, 0.6),
+  #      legend.text     = element_text(size = 9),
+  #      legend.title    = element_text(size = 11)) +
+  #      theme(plot.margin = unit(c(1,3.5,0.5,0.5), "cm")) + # top, right, bottom, left
+  #      theme(legend.position = c(1.14,0.5)) +
+  #      labs(title      = "Fitted survival curves"))
+
+  xlow = min(plot.times); xhigh = max(plot.times) # set x-axis limits
+  KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
+  S_superimpose <- ggsurvplot(
+    KM.fit,
+    data       = data,           # specify dataset
+    size       = 1,              # change line size
+    palette    = c("#988791"),   # custom color palettes
+    conf.int   = TRUE,           # add confidence interval
+    pval       = F,              # add p-value
+    risk.table = risktable,      # add risk table
+    risk.table.height = 0.25,    # useful to change when you have multiple groups
+    ggtheme    = theme_bw(),     # change ggplot2 theme
+    xlab       = 'Time',         # change x-axis label
+    ylab       = 'Survival',     # change y-axis label
+    xlim       = c(xlow, xhigh),
+    ylim       = c(ylow, yhigh),
+    title      = "Fitted survival curves", # add title
+    legend     = legend_position # change legend position
+  )
+  surv_probs <- list()
+  fit.fun.colors <- c("#DB8681", "#B69B34", "#68A232", "#35A58C", "#30A8C3", "#9F95D4", "#E271C9")
+  fit.fun.labels <- c("b", "c", "d", "e", "f", "g", "h")
+  for (i in 1:length(fit.survHE$models)) {
+    model_output <- fit.survHE$models[[i]]
+    # extract the estimated survival probabilities and the confidence intervals
+    surv_probs[[i]] <- as.data.frame(summary(model_output, t = times))
+    surv_probs[[i]]$Model <- paste0(fit.fun.labels[i], names(fit.survHE$models)[i])
+    # superimpose the survival probabilities
+  }
+  surv_probs <- rbindlist(surv_probs)
+  surv_probs$Model <- as.factor(surv_probs$Model)
+  S_superimpose$plot  <- S_superimpose$plot +
+    geom_line(aes(x=time, y=est, color = Model),
+              size = 0.75, alpha = 1, key_glyph = "path",
+              data=surv_probs) +
+    scale_color_manual(name = "Models", values = c("#988791", fit.fun.colors),
+                       labels = c("Kaplan-Meier", names(fit.survHE$models))) +
+    scale_x_continuous(limits = c(0, 8)) +
+    coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
+    guides(color=guide_legend(override.aes = list(size=1.2)))
+  S_superimpose
 
   # Compare AIC values
   AIC <- fit.survHE$model.fitting$aic
@@ -69,19 +129,33 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
   return(res)
 }
 
-#' Fit multiple mixture cure models survival data
+#' Fit multiple mixture cure models on survival data
 #'
-#' \code{fit.fun.cure} fits multiple mixure cure models to survival data using flexsurv.
+#' \code{fit.fun.cure} fits multiple mixture cure models to survival data using flexsurv.
 #'
 #' @param time numeric vector of time to estimate probabilities.
 #' @param status numeric vector of event status.
 #' @param data dataframe containing the time and status variables.
 #' @param extrapolate extrapolate beyond model time horizon.
+#' Default = FALSE.
 #' @param times time horizon the extrapolation is done over.
+#' @param legend_position position of the legend.
+#' Default = "top".
+#' @param xlow time horizon the extrapolation is done over.
+#' Default = min(time).
+#' @param xhigh time horizon the extrapolation is done over.
+#' Default = max(time).
+#' @param ylow time horizon the extrapolation is done over.
+#' Default = 0.
+#' @param yhigh time horizon the extrapolation is done over.
+#' Default = 1.
+#' @param risktable time horizon the extrapolation is done over.
+#' Default = F.
 #' @return
 #' a list containing all survival model objects.
 #' @export
-fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) {
+fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
+                         legend_position = "top", xlow = min(time), xhigh = max(time), ylow = 0, yhigh = 1, risktable = F) {
   require(flexsurvcure)
   # Extract the right data columns
   data$time   <- data[,   time]
@@ -99,20 +173,65 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times) 
   mods <- c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz")
 
   # Run mixture cure models via flexsurvcure
-  fit.survcure <- lapply(mods, function(x) flexsurvcure(formula = Surv(time, status) ~ 1, data = data, dist = x, mixture = T))
-  names(fit.survcure) <- paste(c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal", "log-Logistic", "Gompertz"), "Cure", sep = " ")
+  fit.survcure <- list()
+  fit.survcure$models <- lapply(mods, function(x) flexsurvcure(formula = Surv(time, status) ~ 1, data = data, dist = x, mixture = T))
+  names(fit.survcure$models) <- paste(c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal", "log-Logistic", "Gompertz"), "Cure",
+                                      sep = " ")
 
+  ## Traditional way
   # Extrapolate all models beyond the KM curve and plot - cure models
+  # KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
+  # plot(KM.fit, ylab = "Survival", xlab = "Time", ylim = c(0,1), xlim = c(0, max(plot.times)), conf.int = F, mark.time = T)
+  # lines(fit.survcure$`Exponential Cure`,   t = plot.times, col = 2, ci = F)
+  # lines(fit.survcure$`Weibull (AFT) Cure`, t = plot.times, col = 3, ci = F)
+  # lines(fit.survcure$`Gamma Cure`,         t = plot.times, col = 4, ci = F)
+  # lines(fit.survcure$`log-Normal Cure`,    t = plot.times, col = 5, ci = F)
+  # lines(fit.survcure$`log-Logistic Cure`,  t = plot.times, col = 6, ci = F)
+  # lines(fit.survcure$`Gompertz Cure`,      t = plot.times, col = 7, ci = F)
+  # # add a legend
+  # legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survcure)), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
+
+  xlow = min(plot.times); xhigh = max(plot.times) # set x-axis limits
   KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
-  plot(KM.fit, ylab = "Survival", xlab = "Time", ylim = c(0,1), xlim = c(0, max(plot.times)), conf.int = F, mark.time = T)
-  lines(fit.survcure$`Exponential Cure`,   t = plot.times, col = 2, ci = F)
-  lines(fit.survcure$`Weibull (AFT) Cure`, t = plot.times, col = 3, ci = F)
-  lines(fit.survcure$`Gamma Cure`,         t = plot.times, col = 4, ci = F)
-  lines(fit.survcure$`log-Normal Cure`,    t = plot.times, col = 5, ci = F)
-  lines(fit.survcure$`log-Logistic Cure`,  t = plot.times, col = 6, ci = F)
-  lines(fit.survcure$`Gompertz Cure`,      t = plot.times, col = 7, ci = F)
-  # add a legend
-  legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survcure)), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
+  S_superimpose <- ggsurvplot(
+    KM.fit,
+    data       = data,           # specify dataset
+    size       = 1,              # change line size
+    palette    = c("#988791"),   # custom color palettes
+    conf.int   = TRUE,           # add confidence interval
+    pval       = F,              # add p-value
+    risk.table = risktable,      # add risk table
+    risk.table.height = 0.25,    # useful to change when you have multiple groups
+    ggtheme    = theme_bw(),     # change ggplot2 theme
+    xlab       = 'Time',         # change x-axis label
+    ylab       = 'Survival',     # change y-axis label
+    xlim       = c(xlow, xhigh),
+    ylim       = c(ylow, yhigh),
+    title      = "Fitted survival curves", # add title
+    legend     = legend_position # change legend position
+  )
+  surv_probs <- list()
+  fit.fun.colors <- c("#DB8681", "#B69B34", "#68A232", "#35A58C", "#30A8C3", "#9F95D4")
+  fit.fun.labels <- c("b", "c", "d", "e", "f", "g", "h")
+  for (i in 1:length(fit.survcure$models)) {
+    model_output <- fit.survcure$models[[i]]
+    # extract the estimated survival probabilities and the confidence intervals
+    surv_probs[[i]] <- as.data.frame(summary(model_output, t = times))
+    surv_probs[[i]]$Model <- paste0(fit.fun.labels[i], names(fit.survcure$models)[i])
+    # superimpose the survival probabilities
+  }
+  surv_probs <- rbindlist(surv_probs)
+  surv_probs$Model <- as.factor(surv_probs$Model)
+  S_superimpose$plot  <- S_superimpose$plot +
+    geom_line(aes(x=time, y=est, color = Model),
+              size = 0.75, alpha = 1, key_glyph = "path",
+              data=surv_probs) +
+    scale_color_manual(name = "Models", values = c("#988791", fit.fun.colors),
+                       labels = c("Kaplan-Meier", names(fit.survcure$models))) +
+    scale_x_continuous(limits = c(0, 8)) +
+    coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
+    guides(color=guide_legend(override.aes = list(size=1.2)))
+  S_superimpose
 
   # Compare AIC values
   AIC <- unlist(lapply(fit.survcure, function(x) AIC(x)))  # cure models
@@ -694,3 +813,58 @@ check_PFS_OS <- function(Sick){
   }
 }
 
+
+
+#' Determine which rows the upper and lower values of each interval are (in the survival data set).
+#'
+#' \code{find_interval_limits} determines which rows the upper and lower values of each interval are (in the survival data set).
+#'
+#' @param start_time start time.
+#' @param start_time survival times.
+#' @return
+#' matrix of limits.
+#' @export
+find_interval_limits <- function(start_time,
+                                 surv_time){
+
+  if (max(surv_time) > max(start_time))
+    stop("Intervals must span all survival times. Later interval missing.")
+
+  interval <- 1
+  end_time <- start_time[2]
+  upper <- NULL
+
+  for (i in seq_along(surv_time)){
+    if (surv_time[i] >= end_time) {
+      upper[interval] <- i - 1
+      interval <- interval + 1
+      end_time <- start_time[interval + 1]
+    }
+  }
+
+  cbind(lower = c(1, upper + 1),
+        upper = c(upper, length(surv_time)))
+}
+
+#' Function to create at-risk table.
+#'
+#' \code{create_at_risk_table} creates at-risk table.
+#'
+#' @param survival_time vector of survival times.
+#' @param Years vector of time intervals.
+#' @param AtRisk vector of number of patients at risk.
+#' @return
+#' at-risk table (dataframe).
+#' @export
+create_at_risk_table <- function(survival_time, Years, AtRisk) {
+  require(dplyr)
+  time_interval <- c(Years, max(Years)+diff(Years)[1])
+  df_nrisk <- as.data.frame(find_interval_limits(start_time = time_interval,
+                                                 surv_time = survival_time))
+  colnames(df_nrisk) <- c("Lower", "Upper")
+  df_nrisk$Interval <- 1:nrow(df_nrisk)
+  df_nrisk$Years <- Years[1:nrow(df_nrisk)]
+  df_nrisk$AtRisk <- AtRisk[1:nrow(df_nrisk)]
+  df_nrisk <- df_nrisk %>% dplyr::select(Interval, Years, Lower, Upper, AtRisk)
+  return(df_nrisk)
+}

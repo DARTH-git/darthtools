@@ -2,9 +2,21 @@
 % Please edit documentation in R/survival_functions.R
 \name{fit.fun.cure}
 \alias{fit.fun.cure}
-\title{Fit multiple mixture cure models survival data}
+\title{Fit multiple mixture cure models on survival data}
 \usage{
-fit.fun.cure(time, status, data = data, extrapolate = FALSE, times)
+fit.fun.cure(
+  time,
+  status,
+  data = data,
+  extrapolate = FALSE,
+  times,
+  legend_position = "top",
+  xlow = min(time),
+  xhigh = max(time),
+  ylow = 0,
+  yhigh = 1,
+  risktable = F
+)
 }
 \arguments{
 \item{time}{numeric vector of time to estimate probabilities.}
@@ -13,13 +25,32 @@ fit.fun.cure(time, status, data = data, extrapolate = FALSE, times)
 
 \item{data}{dataframe containing the time and status variables.}
 
-\item{extrapolate}{extrapolate beyond model time horizon.}
+\item{extrapolate}{extrapolate beyond model time horizon.
+Default = FALSE.}
 
 \item{times}{time horizon the extrapolation is done over.}
+
+\item{legend_position}{position of the legend.
+Default = "top".}
+
+\item{xlow}{time horizon the extrapolation is done over.
+Default = min(time).}
+
+\item{xhigh}{time horizon the extrapolation is done over.
+Default = max(time).}
+
+\item{ylow}{time horizon the extrapolation is done over.
+Default = 0.}
+
+\item{yhigh}{time horizon the extrapolation is done over.
+Default = 1.}
+
+\item{risktable}{time horizon the extrapolation is done over.
+Default = F.}
 }
 \value{
 a list containing all survival model objects.
 }
 \description{
-\code{fit.fun.cure} fits multiple mixure cure models to survival data using flexsurv.
+\code{fit.fun.cure} fits multiple mixture cure models to survival data using flexsurv.
 }

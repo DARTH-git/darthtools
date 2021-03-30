@@ -2,9 +2,22 @@
 % Please edit documentation in R/survival_functions.R
 \name{fit.fun}
 \alias{fit.fun}
-\title{Fit multiple survival models survival data}
+\title{Fit multiple survival models on survival data}
 \usage{
-fit.fun(time, status, data = data, extrapolate = FALSE, times, k = 2)
+fit.fun(
+  time,
+  status,
+  data = data,
+  extrapolate = FALSE,
+  times,
+  k = 2,
+  legend_position = "top",
+  xlow = min(time),
+  xhigh = max(time),
+  ylow = 0,
+  yhigh = 1,
+  risktable = F
+)
 }
 \arguments{
 \item{time}{numeric vector of time to estimate probabilities.}
@@ -17,6 +30,27 @@ fit.fun(time, status, data = data, extrapolate = FALSE, times, k = 2)
 Default = FALSE.}
 
 \item{times}{time horizon the extrapolation is done over.}
+
+\item{k}{number of knots in Royston-Parmar spline model.
+Default = 2.}
+
+\item{legend_position}{position of the legend.
+Default = "top".}
+
+\item{xlow}{time horizon the extrapolation is done over.
+Default = min(time).}
+
+\item{xhigh}{time horizon the extrapolation is done over.
+Default = max(time).}
+
+\item{ylow}{time horizon the extrapolation is done over.
+Default = 0.}
+
+\item{yhigh}{time horizon the extrapolation is done over.
+Default = 1.}
+
+\item{risktable}{time horizon the extrapolation is done over.
+Default = F.}
 }
 \value{
 a list containing all survival model objects.
