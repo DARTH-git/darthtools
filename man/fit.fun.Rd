@@ -12,8 +12,8 @@ fit.fun(
   times,
   k = 2,
   legend_position = "top",
-  xlow = min(time),
-  xhigh = max(time),
+  xlow = min(times),
+  xhigh = max(times),
   ylow = 0,
   yhigh = 1,
   risktable = F

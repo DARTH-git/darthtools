@@ -26,7 +26,7 @@
 #' a list containing all survival model objects.
 #' @export
 fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2,
-                    legend_position = "top", xlow = min(time), xhigh = max(time), ylow = 0, yhigh = 1, risktable = F) {
+                    legend_position = "top", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F) {
   require(survHE)
   # Extract the right data columns
   data$time   <- data[,   time]
@@ -94,7 +94,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
   for (i in 1:length(fit.survHE$models)) {
     model_output <- fit.survHE$models[[i]]
     # extract the estimated survival probabilities and the confidence intervals
-    surv_probs[[i]] <- as.data.frame(summary(model_output, t = times))
+    surv_probs[[i]] <- as.data.frame(summary(model_output, t = plot.times))
     surv_probs[[i]]$Model <- paste0(fit.fun.labels[i], names(fit.survHE$models)[i])
     # superimpose the survival probabilities
   }
@@ -106,7 +106,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
               data=surv_probs) +
     scale_color_manual(name = "Models", values = c("#988791", fit.fun.colors),
                        labels = c("Kaplan-Meier", names(fit.survHE$models))) +
-    scale_x_continuous(limits = c(0, 8)) +
+    scale_x_continuous(limits = c(0, plot.times)) +
     coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
     guides(color=guide_legend(override.aes = list(size=1.2)))
   print(S_superimpose)
@@ -214,7 +214,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
   for (i in 1:length(fit.survcure$models)) {
     model_output <- fit.survcure$models[[i]]
     # extract the estimated survival probabilities and the confidence intervals
-    surv_probs[[i]] <- as.data.frame(summary(model_output, t = times))
+    surv_probs[[i]] <- as.data.frame(summary(model_output, t = plot.times))
     surv_probs[[i]]$Model <- paste0(fit.fun.labels[i], names(fit.survcure$models)[i])
     # superimpose the survival probabilities
   }
@@ -226,7 +226,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
               data=surv_probs) +
     scale_color_manual(name = "Models", values = c("#988791", fit.fun.colors),
                        labels = c("Kaplan-Meier", names(fit.survcure$models))) +
-    scale_x_continuous(limits = c(0, 8)) +
+    scale_x_continuous(limits = c(0, plot.times)) +
     coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
     guides(color=guide_legend(override.aes = list(size=1.2)))
   print(S_superimpose)
