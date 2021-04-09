@@ -106,7 +106,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
               data=surv_probs) +
     scale_color_manual(name = "Models", values = c("#988791", fit.fun.colors),
                        labels = c("Kaplan-Meier", names(fit.survHE$models))) +
-    scale_x_continuous(limits = c(0, plot.times)) +
+    scale_x_continuous(limits = c(0, max(plot.times))) +
     coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
     guides(color=guide_legend(override.aes = list(size=1.2)))
   print(S_superimpose)
@@ -226,7 +226,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
               data=surv_probs) +
     scale_color_manual(name = "Models", values = c("#988791", fit.fun.colors),
                        labels = c("Kaplan-Meier", names(fit.survcure$models))) +
-    scale_x_continuous(limits = c(0, plot.times)) +
+    scale_x_continuous(limits = c(0, max(plot.times))) +
     coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
     guides(color=guide_legend(override.aes = list(size=1.2)))
   print(S_superimpose)
