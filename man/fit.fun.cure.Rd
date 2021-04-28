@@ -15,7 +15,8 @@ fit.fun.cure(
   xhigh = max(time),
   ylow = 0,
   yhigh = 1,
-  risktable = F
+  risktable = F,
+  mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps")
 )
 }
 \arguments{
@@ -47,6 +48,9 @@ Default = 1.}
 
 \item{risktable}{time horizon the extrapolation is done over.
 Default = F.}
+
+\item{mods}{a vector of models to fit.
+Default = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps").}
 }
 \value{
 a list containing all survival model objects.

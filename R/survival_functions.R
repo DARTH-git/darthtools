@@ -22,11 +22,14 @@
 #' Default = 1.
 #' @param risktable time horizon the extrapolation is done over.
 #' Default = F.
+#' @param mods a vector of models to fit.
+#' Default = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps").
 #' @return
 #' a list containing all survival model objects.
 #' @export
 fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2,
-                    legend_position = "top", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F) {
+                    legend_position = "top", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
+                    mods =  c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps")) {
   require(survHE)
   # Extract the right data columns
   data$time   <- data[,   time]
@@ -41,7 +44,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
 
   # Fit parametric survival models
   # Define the vector of models to be used
-  mods <- c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps")
+  mods <- mods
   # Run the models using MLE via flexsurv
   fit.survHE <- fit.models(formula = Surv(time, status) ~ 1, data = data, distr = mods, k = k)
 
@@ -150,11 +153,14 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
 #' Default = 1.
 #' @param risktable time horizon the extrapolation is done over.
 #' Default = F.
+#' @param mods a vector of models to fit.
+#' Default = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps").
 #' @return
 #' a list containing all survival model objects.
 #' @export
 fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
-                         legend_position = "top", xlow = min(time), xhigh = max(time), ylow = 0, yhigh = 1, risktable = F) {
+                         legend_position = "top", xlow = min(time), xhigh = max(time), ylow = 0, yhigh = 1, risktable = F,
+                         mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps")) {
   require(flexsurvcure)
   # Extract the right data columns
   data$time   <- data[,   time]
