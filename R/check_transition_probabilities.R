@@ -93,24 +93,28 @@ check_sum_of_transition_array <- function(a_P,
     valid <- sum(rowSums(a_P))
     if (valid != n_states) {
       if(err_stop) {
-        stop("This is not a valid transition Matrix")
+        stop("This is not a valid transition matrix")
       }
 
       if(verbose){
-        warning("This is not a valid transition Matrix")
+        warning("This is not a valid transition matrix")
       }
     }
+
+    warning("This is a valid transition matrix")
+
   } else {
     # For array
     valid <- (apply(a_P, d, function(x) sum(rowSums(x))) == n_states)
     if (!isTRUE(all.equal(as.numeric(sum(valid)), as.numeric(n_cycles)))) {
       if(err_stop) {
-        stop("This is not a valid transition Matrix")
+        stop("This is not a valid transition array")
       }
 
       if(verbose){
-        warning("This is not a valid transition Matrix")
+        warning("This is not a valid transition array")
       }
     }
+    warning("This is a valid transition array")
   }
 }
