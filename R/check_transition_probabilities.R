@@ -100,9 +100,6 @@ check_sum_of_transition_array <- function(a_P,
         warning("This is not a valid transition matrix")
       }
     }
-
-    print("This is a valid transition matrix")
-
   } else {
     # For array
     valid <- (apply(a_P, d, function(x) sum(rowSums(x))) == n_states)
@@ -115,6 +112,5 @@ check_sum_of_transition_array <- function(a_P,
         warning("This is not a valid transition array")
       }
     }
-    print("This is a valid transition array")
   }
 }

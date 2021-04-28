@@ -317,8 +317,8 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
 
   # Calculate transition probabilities
   if (deter == 0) { # probabilistic
-    pfs.trans.prob <- rowMeans(apply(pfs.surv, 2, trans_prob))
-    os.trans.prob  <- rowMeans(apply( os.surv, 2, trans_prob))
+    pfs.trans.prob <- apply(pfs.surv, 2, trans_prob)
+    os.trans.prob  <- apply( os.surv, 2, trans_prob)
   } else { # deterministic
     pfs.trans.prob <- trans_prob(pfs.surv)
     os.trans.prob  <- trans_prob(os.surv)
