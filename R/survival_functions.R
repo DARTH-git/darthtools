@@ -372,6 +372,7 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
 #' \code{surv_prob} calculates survival probabilities from survival models.
 #'
 #' @param model survival model.
+#' @param times time horizon to calculate survival probabilities.
 #' @param PA run probabilistic analysis.
 #' Default = FALSE.
 #' @return

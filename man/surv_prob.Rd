@@ -9,6 +9,8 @@ surv_prob(model, times = NULL, PA = FALSE)
 \arguments{
 \item{model}{survival model.}
 
+\item{times}{time horizon to calculate survival probabilities.}
+
 \item{PA}{run probabilistic analysis.
 Default = FALSE.}
 }
