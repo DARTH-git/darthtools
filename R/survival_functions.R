@@ -31,6 +31,7 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
                     legend_position = "top", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
                     mods =  c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps")) {
   require(survHE)
+  require(survminer)
   # Extract the right data columns
   data$time   <- data[,   time]
   data$status <- data[, status]
@@ -162,6 +163,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
                          legend_position = "top", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
                          mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps")) {
   require(flexsurvcure)
+  require(survminer)
   # Extract the right data columns
   data$time   <- data[,   time]
   data$status <- data[, status]
