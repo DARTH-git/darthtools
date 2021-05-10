@@ -93,8 +93,14 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
     legend     = legend_position # change legend position
   )
   surv_probs <- list()
-  fit.fun.colors <- c("#DB8681", "#B69B34", "#68A232", "#35A58C", "#30A8C3", "#9F95D4", "#E271C9")
-  fit.fun.labels <- c("b", "c", "d", "e", "f", "g", "h")
+
+  mod.aesthetics <- data.frame(mod = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma"),
+                               color = c("#DB8681", "#B69B34", "#68A232", "#35A58C", "#30A8C3", "#249de5", "#9F95D4", "#E271C9"),
+                               label = c("b", "c", "d", "e", "f", "g", "h", "i"))
+
+  fit.fun.colors <- mod.aesthetics %>% filter(mod %in% mods) %>% select(color) %>% pull()
+  fit.fun.labels <- mod.aesthetics %>% filter(mod %in% mods) %>% select(label) %>% pull()
+
   for (i in 1:length(fit.survHE$models)) {
     model_output <- fit.survHE$models[[i]]
     # extract the estimated survival probabilities and the confidence intervals
@@ -217,8 +223,14 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
     legend     = legend_position # change legend position
   )
   surv_probs <- list()
-  fit.fun.colors <- c("#DB8681", "#B69B34", "#68A232", "#35A58C", "#30A8C3", "#9F95D4")
-  fit.fun.labels <- c("b", "c", "d", "e", "f", "g", "h")
+
+  mod.aesthetics <- data.frame(mod = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma"),
+                               color = c("#DB8681", "#B69B34", "#68A232", "#35A58C", "#30A8C3", "#249de5", "#9F95D4", "#E271C9"),
+                               label = c("b", "c", "d", "e", "f", "g", "h", "i"))
+
+  fit.fun.colors <- mod.aesthetics %>% filter(mod %in% mods) %>% select(color) %>% pull()
+  fit.fun.labels <- mod.aesthetics %>% filter(mod %in% mods) %>% select(label) %>% pull()
+
   for (i in 1:length(fit.survcure$models)) {
     model_output <- fit.survcure$models[[i]]
     # extract the estimated survival probabilities and the confidence intervals
