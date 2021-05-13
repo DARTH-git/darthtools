@@ -264,7 +264,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
   names(AIC) <- names(BIC) <- names(fit.survcure$models)
 
   # Store and return results
-  res <- list(models = fit.survcure,
+  res <- list(model.objects = fit.survcure,
               AIC    = AIC,
               BIC    = BIC)
   return(res)
