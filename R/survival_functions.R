@@ -23,13 +23,13 @@
 #' @param risktable time horizon the extrapolation is done over.
 #' Default = F.
 #' @param mods a vector of models to fit.
-#' Default = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps").
+#' Default = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma").
 #' @return
 #' a list containing all survival model objects.
 #' @export
 fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2,
                     legend_position = "top", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
-                    mods =  c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps")) {
+                    mods =  c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma")) {
   require(survHE)
   require(survminer)
   # Extract the right data columns
@@ -161,13 +161,13 @@ fit.fun <- function(time, status, data = data, extrapolate = FALSE, times, k = 2
 #' @param risktable time horizon the extrapolation is done over.
 #' Default = F.
 #' @param mods a vector of models to fit.
-#' Default = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps").
+#' Default = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "gengamma").
 #' @return
 #' a list containing all survival model objects.
 #' @export
 fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
                          legend_position = "top", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
-                         mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps")) {
+                         mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "gengamma")) {
   require(flexsurvcure)
   require(survminer)
   # Extract the right data columns
@@ -182,14 +182,20 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
   }
 
   # Fit parametric survival models
-  # Define the vector of models to be used
-  mods <- c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz")
+  # set up model for names, format and aesthetics
+  mod.aesthetics <- data.frame(mod = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "gengamma"),
+                               name = c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
+                                        "log-Logistic", "Gompertz", "Generalized Gamma"),
+                               color = c("#DB8681", "#B69B34", "#68A232", "#35A58C", "#30A8C3", "#249de5", "#E271C9"),
+                               label = c("b", "c", "d", "e", "f", "g", "h"))
 
   # Run mixture cure models via flexsurvcure
   fit.survcure <- list()
   fit.survcure$models <- lapply(mods, function(x) flexsurvcure(formula = Surv(time, status) ~ 1, data = data, dist = x, mixture = T))
-  names(fit.survcure$models) <- paste(c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal", "log-Logistic", "Gompertz"), "Cure",
-                                      sep = " ")
+
+  # Assign model names
+  modelnames <- mod.aesthetics %>% filter(mod %in% mods) %>% select(name) %>% pull()
+  names(fit.survcure$models) <- paste(modelnames, "Cure", sep = " ")
 
   ## Traditional way
   # Extrapolate all models beyond the KM curve and plot - cure models
@@ -223,10 +229,6 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
     legend     = legend_position # change legend position
   )
   surv_probs <- list()
-
-  mod.aesthetics <- data.frame(mod = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma"),
-                               color = c("#DB8681", "#B69B34", "#68A232", "#35A58C", "#30A8C3", "#249de5", "#9F95D4", "#E271C9"),
-                               label = c("b", "c", "d", "e", "f", "g", "h", "i"))
 
   fit.fun.colors <- mod.aesthetics %>% filter(mod %in% mods) %>% select(color) %>% pull()
   fit.fun.labels <- mod.aesthetics %>% filter(mod %in% mods) %>% select(label) %>% pull()
