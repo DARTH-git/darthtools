@@ -5,6 +5,7 @@
 #' @param time numeric vector of time to estimate probabilities.
 #' @param status numeric vector of event status.
 #' @param covariate logical value indicating whether treatment is being used as a covariate in parameteric survival models.
+#' Default = FALSE.
 #' @param rx numerical value indicating the treatment variable used as as covariate in parameteric survival models.
 #' @param data dataframe containing the time and status variables.
 #' @param extrapolate extrapolate beyond model time horizon.
@@ -13,7 +14,7 @@
 #' @param k number of knots in Royston-Parmar spline model.
 #' Default = 2.
 #' @param legend_position position of the legend.
-#' Default = "top".
+#' Default = "bottom".
 #' @param xlow time horizon the extrapolation is done over.
 #' Default = min(time).
 #' @param xhigh time horizon the extrapolation is done over.
@@ -29,7 +30,7 @@
 #' @return
 #' a list containing all survival model objects.
 #' @export
-fit.fun <- function(time, status, rx = NULL, covariate = F, data, extrapolate = FALSE, times, k = 2,
+fit.fun <- function(time, status, covariate = F,  rx = NULL, data, extrapolate = FALSE, times, k = 2,
                     legend_position = "bottom", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
                     mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma")) {
   require(survHE)
@@ -57,11 +58,12 @@ fit.fun <- function(time, status, rx = NULL, covariate = F, data, extrapolate = 
   }
 
   # Plots
-  if (covariate) {
-    KM.fit <- survfit(Surv(time, status) ~ rx, data = data) # fit Kaplan-Meier curve
+  if (covariate) { # fit Kaplan-Meier curve
+    KM.fit <- survfit(Surv(time, status) ~ rx, data = data)
   } else {
-    KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
+    KM.fit <- survfit(Surv(time, status) ~ 1, data = data)
   }
+
   S_superimpose <- ggsurvplot(
     KM.fit,
     data       = data,           # specify dataset
@@ -77,7 +79,7 @@ fit.fun <- function(time, status, rx = NULL, covariate = F, data, extrapolate = 
     xlim       = c(xlow, xhigh),
     ylim       = c(ylow, yhigh),
     title      = "Fitted survival curves", # add title
-    legend     = "bottom", # change legend position
+    legend     = legend_position, # change legend position
     legend.title = "KM",
   )
   surv_probs <- list()
@@ -99,7 +101,7 @@ fit.fun <- function(time, status, rx = NULL, covariate = F, data, extrapolate = 
   surv_probs       <- rbindlist(surv_probs)
   surv_probs$Model <- as.factor(surv_probs$Model)
 
-  if (covariate) { # if we are using treatment as a covariate
+  if (covariate) { # if using treatment as a covariate
     surv_probs1 <- as.data.frame(surv_probs)
     colnames(surv_probs1)[1] <- "time"
     surv_probs1 <- surv_probs1[, colnames(surv_probs1) %in%
@@ -126,6 +128,7 @@ fit.fun <- function(time, status, rx = NULL, covariate = F, data, extrapolate = 
       coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
       guides(color=guide_legend(override.aes = list(size=1.2)))
     print(S_superimpose)
+
   } else { # if not using treatment as a covariate
     S_superimpose$plot  <- S_superimpose$plot +
       geom_line(aes(x=time, y=est, color = Model),
@@ -163,6 +166,9 @@ fit.fun <- function(time, status, rx = NULL, covariate = F, data, extrapolate = 
 #' @param time numeric vector of time to estimate probabilities.
 #' @param status numeric vector of event status.
 #' @param data dataframe containing the time and status variables.
+#' @param covariate logical value indicating whether treatment is being used as a covariate in parameteric survival models.
+#' Default = FALSE.
+#' @param rx numerical value indicating the treatment variable used as as covariate in parameteric survival models.
 #' @param extrapolate extrapolate beyond model time horizon.
 #' Default = FALSE.
 #' @param times time horizon the extrapolation is done over.
@@ -183,11 +189,13 @@ fit.fun <- function(time, status, rx = NULL, covariate = F, data, extrapolate = 
 #' @return
 #' a list containing all survival model objects.
 #' @export
-fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
-                         legend_position = "top", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
+fit.fun.cure <- function(time, status, covariate = T, rx = "rx", data = data, extrapolate = FALSE, times,
+                         legend_position = "bottom", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
                          mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "gengamma")) {
   require(flexsurvcure)
   require(survminer)
+  require(tm)
+
   # Extract the right data columns
   data$time   <- data[,   time]
   data$status <- data[, status]
@@ -196,7 +204,7 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
   if (extrapolate == TRUE)  {
     plot.times <- times
   } else if  (extrapolate == FALSE) {
-    plot.times <- seq(min(times),max(data$time), by = diff(times)[1])
+      plot.times <- seq(min(times),max(data$time), by = diff(times)[1])
   }
 
   # Fit parametric survival models
@@ -209,31 +217,31 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
 
   # Run mixture cure models via flexsurvcure
   fit.survcure <- list()
-  fit.survcure$models <- lapply(mods, function(x) flexsurvcure(formula = Surv(time, status) ~ 1, data = data, dist = x, mixture = T))
+  if (covariate) {
+    fit.survcure$models <- lapply(mods, function(x) flexsurvcure(formula = Surv(time, status) ~ rx,
+                                                                 data = data, dist = x, mixture = T))
+  } else {
+    fit.survcure$models <- lapply(mods, function(x) flexsurvcure(formula = Surv(time, status) ~ 1,
+                                                                 data = data, dist = x, mixture = T))
+  }
 
   # Assign model names
   modelnames <- mod.aesthetics %>% filter(mod %in% mods) %>% select(name) %>% pull()
   names(fit.survcure$models) <- paste(modelnames, "Cure", sep = " ")
 
-  ## Traditional way
-  # Extrapolate all models beyond the KM curve and plot - cure models
-  # KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
-  # plot(KM.fit, ylab = "Survival", xlab = "Time", ylim = c(0,1), xlim = c(0, max(plot.times)), conf.int = F, mark.time = T)
-  # lines(fit.survcure$`Exponential Cure`,   t = plot.times, col = 2, ci = F)
-  # lines(fit.survcure$`Weibull (AFT) Cure`, t = plot.times, col = 3, ci = F)
-  # lines(fit.survcure$`Gamma Cure`,         t = plot.times, col = 4, ci = F)
-  # lines(fit.survcure$`log-Normal Cure`,    t = plot.times, col = 5, ci = F)
-  # lines(fit.survcure$`log-Logistic Cure`,  t = plot.times, col = 6, ci = F)
-  # lines(fit.survcure$`Gompertz Cure`,      t = plot.times, col = 7, ci = F)
-  # # add a legend
-  # legend("topright", cex = 0.7, c("Kaplan-Meier", names(fit.survcure)), col = 1:(length(mods)+1), lty = rep(1, (length(mods)+1)), bty="n")
+  # plots
 
-  KM.fit <- survfit(Surv(time, status) ~ 1, data = data) # fit Kaplan-Meier curve
+  if (covariate) { # fit Kaplan-Meier curve
+    KM.fit <- survfit(Surv(time, status) ~ rx, data = data)
+  } else {
+    KM.fit <- survfit(Surv(time, status) ~ 1, data = data)
+  }
+
   S_superimpose <- ggsurvplot(
     KM.fit,
     data       = data,           # specify dataset
     size       = 1,              # change line size
-    palette    = c("#988791"),   # custom color palettes
+    palette    = "Dark2",        # custom color palettes
     conf.int   = TRUE,           # add confidence interval
     pval       = F,              # add p-value
     risk.table = risktable,      # add risk table
@@ -244,7 +252,8 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
     xlim       = c(xlow, xhigh),
     ylim       = c(ylow, yhigh),
     title      = "Fitted survival curves", # add title
-    legend     = legend_position # change legend position
+    legend     = legend_position,
+    legend.title = "KM" # change legend position
   )
   surv_probs <- list()
 
@@ -260,16 +269,47 @@ fit.fun.cure <- function(time, status, data = data, extrapolate = FALSE, times,
   }
   surv_probs <- rbindlist(surv_probs)
   surv_probs$Model <- as.factor(surv_probs$Model)
-  S_superimpose$plot  <- S_superimpose$plot +
-    geom_line(aes(x=time, y=est, color = Model),
-              size = 0.75, alpha = 1, key_glyph = "path",
-              data=surv_probs) +
-    scale_color_manual(name = "Models", values = c("#988791", fit.fun.colors),
-                       labels = c("Kaplan-Meier", names(fit.survcure$models))) +
-    scale_x_continuous(limits = c(0, max(plot.times))) +
-    coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
-    guides(color=guide_legend(override.aes = list(size=1.2)))
-  print(S_superimpose)
+
+  if (covariate) { # if using treatment as a covariate
+    surv_probs1 <- as.data.frame(surv_probs)
+    colnames(surv_probs1)[1] <- "time"
+    surv_probs1 <- surv_probs1[, colnames(surv_probs1) %in%
+                                 c("time",
+                                   colnames(surv_probs1)[grep("est", colnames(surv_probs1))],
+                                   "Model")]
+    surv_probs1 <- surv_probs1 %>% pivot_longer(cols = !c(Model, time), names_to = "rx",
+                                                values_to = "est") %>% as.data.frame()
+    surv_probs1$rx <- removeWords(surv_probs1$rx, c("rx.", ".est"))
+    surv_probs1$rx <- as.factor(surv_probs1$rx)
+    surv_probs <- surv_probs1
+
+    filler_colour <- rep("white", length(unique(surv_probs1$rx)))
+    filler_label  <- rep("", length(unique(surv_probs1$rx)))
+
+    S_superimpose$plot  <- S_superimpose$plot +
+      geom_line(aes(x=time, y=est, color = Model,  linetype = rx),
+                size = 0.75, alpha = 1, key_glyph = "path",
+                data=surv_probs) +
+      scale_color_manual(name = "", values = c(filler_colour, fit.fun.colors),
+                         labels = c(filler_label, names(fit.survcure$models))) +
+      scale_linetype_manual(name = "Strategy", values = 1:length(unique(surv_probs1$rx))) +
+      scale_x_continuous(limits = c(0, max(plot.times))) +
+      coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
+      guides(color=guide_legend(override.aes = list(size=1.2)))
+    print(S_superimpose)
+
+  } else { # if not using treatment as a covariate
+    S_superimpose$plot  <- S_superimpose$plot +
+      geom_line(aes(x=time, y=est, color = Model),
+                size = 0.75, alpha = 1, key_glyph = "path",
+                data=surv_probs) +
+      scale_color_manual(name = "Models", values = c("#988791", fit.fun.colors),
+                         labels = c("Kaplan-Meier", names(fit.survcure$models))) +
+      scale_x_continuous(limits = c(0, max(plot.times))) +
+      coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
+      guides(color=guide_legend(override.aes = list(size=1.2)))
+    print(S_superimpose)
+  }
 
   # Compare AIC values
   AIC <- unlist(lapply(fit.survcure$models, function(x) AIC(x)))  # cure models

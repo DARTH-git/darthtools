@@ -7,8 +7,8 @@
 fit.fun(
   time,
   status,
-  rx = NULL,
   covariate = F,
+  rx = NULL,
   data,
   extrapolate = FALSE,
   times,
@@ -27,9 +27,10 @@ fit.fun(
 
 \item{status}{numeric vector of event status.}
 
-\item{rx}{numerical value indicating the treatment variable used as as covariate in parameteric survival models.}
+\item{covariate}{logical value indicating whether treatment is being used as a covariate in parameteric survival models.
+Default = FALSE.}
 
-\item{covariate}{logical value indicating whether treatment is being used as a covariate in parameteric survival models.}
+\item{rx}{numerical value indicating the treatment variable used as as covariate in parameteric survival models.}
 
 \item{data}{dataframe containing the time and status variables.}
 
@@ -42,7 +43,7 @@ Default = FALSE.}
 Default = 2.}
 
 \item{legend_position}{position of the legend.
-Default = "top".}
+Default = "bottom".}
 
 \item{xlow}{time horizon the extrapolation is done over.
 Default = min(time).}

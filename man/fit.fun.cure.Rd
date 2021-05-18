@@ -7,10 +7,12 @@
 fit.fun.cure(
   time,
   status,
+  covariate = T,
+  rx = "rx",
   data = data,
   extrapolate = FALSE,
   times,
-  legend_position = "top",
+  legend_position = "bottom",
   xlow = min(times),
   xhigh = max(times),
   ylow = 0,
@@ -23,6 +25,11 @@ fit.fun.cure(
 \item{time}{numeric vector of time to estimate probabilities.}
 
 \item{status}{numeric vector of event status.}
+
+\item{covariate}{logical value indicating whether treatment is being used as a covariate in parameteric survival models.
+Default = FALSE.}
+
+\item{rx}{numerical value indicating the treatment variable used as as covariate in parameteric survival models.}
 
 \item{data}{dataframe containing the time and status variables.}
 
