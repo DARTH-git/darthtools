@@ -36,6 +36,8 @@ fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = 
   require(survHE)
   require(survminer)
   require(tm)
+
+  ## Set up
   # Extract the right data columns
   data$time   <- data[,   time]
   data$status <- data[, status]
@@ -47,7 +49,7 @@ fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = 
     plot.times <- seq(min(times),max(data$time), by = diff(times)[1])
   }
 
-  # Fit parametric survival models
+  ## Fit parametric survival models
   # Define the vector of models to be used
   mods <- mods
   # Run the models using MLE via flexsurv
@@ -57,7 +59,7 @@ fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = 
     fit.survHE <- fit.models(formula = Surv(time, status) ~ 1, data = data, distr = mods, k = k)
   }
 
-  # Plots
+  ## Plots
   if (covariate) { # fit Kaplan-Meier curve
     KM.fit <- survfit(Surv(time, status) ~ rx, data = data)
   } else {
@@ -193,9 +195,11 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
                          legend_position = "bottom", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
                          mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "gengamma")) {
   require(flexsurvcure)
+  require(survHE)
   require(survminer)
   require(tm)
 
+  ## Set up
   # Extract the right data columns
   data$time   <- data[,   time]
   data$status <- data[, status]
@@ -204,33 +208,20 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
   if (extrapolate == TRUE)  {
     plot.times <- times
   } else if  (extrapolate == FALSE) {
-      plot.times <- seq(min(times),max(data$time), by = diff(times)[1])
+    plot.times <- seq(min(times),max(data$time), by = diff(times)[1])
   }
 
-  # Fit parametric survival models
-  # set up model for names, format and aesthetics
-  mod.aesthetics <- data.frame(mod = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "gengamma"),
-                               name = c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
-                                        "log-Logistic", "Gompertz", "Generalized Gamma"),
-                               color = c("#DB8681", "#B69B34", "#68A232", "#35A58C", "#30A8C3", "#249de5", "#E271C9"),
-                               label = c("b", "c", "d", "e", "f", "g", "h"))
-
-  # Run mixture cure models via flexsurvcure
-  fit.survcure <- list()
+  ## Fit parametric survival models
+  # Define the vector of models to be used
+  mods <- mods
+  # Run the models using MLE via flexsurvcure
   if (covariate) {
-    fit.survcure$models <- lapply(mods, function(x) flexsurvcure(formula = Surv(time, status) ~ rx,
-                                                                 data = data, dist = x, mixture = T))
+    fit.survHE <- fit.models.cure(formula = Surv(time, status) ~ rx, data = data, distr = mods)
   } else {
-    fit.survcure$models <- lapply(mods, function(x) flexsurvcure(formula = Surv(time, status) ~ 1,
-                                                                 data = data, dist = x, mixture = T))
+    fit.survHE <- fit.models.cure(formula = Surv(time, status) ~ 1, data = data, distr = mods)
   }
 
-  # Assign model names
-  modelnames <- mod.aesthetics %>% filter(mod %in% mods) %>% select(name) %>% pull()
-  names(fit.survcure$models) <- paste(modelnames, "Cure", sep = " ")
-
-  # plots
-
+  ## Plots
   if (covariate) { # fit Kaplan-Meier curve
     KM.fit <- survfit(Surv(time, status) ~ rx, data = data)
   } else {
@@ -241,7 +232,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
     KM.fit,
     data       = data,           # specify dataset
     size       = 1,              # change line size
-    palette    = "Dark2",        # custom color palettes
+    palette = "Dark2",
     conf.int   = TRUE,           # add confidence interval
     pval       = F,              # add p-value
     risk.table = risktable,      # add risk table
@@ -252,22 +243,26 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
     xlim       = c(xlow, xhigh),
     ylim       = c(ylow, yhigh),
     title      = "Fitted survival curves", # add title
-    legend     = legend_position,
-    legend.title = "KM" # change legend position
+    legend     = legend_position, # change legend position
+    legend.title = "KM",
   )
   surv_probs <- list()
+
+  mod.aesthetics <- data.frame(mod = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma"),
+                               color = c("#DB8681", "#B69B34", "#68A232", "#35A58C", "#30A8C3", "#249de5", "#9F95D4", "#E271C9"),
+                               label = c("b", "c", "d", "e", "f", "g", "h", "i"))
 
   fit.fun.colors <- mod.aesthetics %>% filter(mod %in% mods) %>% select(color) %>% pull()
   fit.fun.labels <- mod.aesthetics %>% filter(mod %in% mods) %>% select(label) %>% pull()
 
-  for (i in 1:length(fit.survcure$models)) {
-    model_output <- fit.survcure$models[[i]]
+  for (i in 1:length(fit.survHE$models)) {
+    model_output <- fit.survHE$models[[i]]
     # extract the estimated survival probabilities and the confidence intervals
     surv_probs[[i]] <- as.data.frame(summary(model_output, t = plot.times))
-    surv_probs[[i]]$Model <- paste0(fit.fun.labels[i], names(fit.survcure$models)[i])
+    surv_probs[[i]]$Model <- paste0(fit.fun.labels[i], names(fit.survHE$models)[i])
     # superimpose the survival probabilities
   }
-  surv_probs <- rbindlist(surv_probs)
+  surv_probs       <- rbindlist(surv_probs)
   surv_probs$Model <- as.factor(surv_probs$Model)
 
   if (covariate) { # if using treatment as a covariate
@@ -291,7 +286,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
                 size = 0.75, alpha = 1, key_glyph = "path",
                 data=surv_probs) +
       scale_color_manual(name = "", values = c(filler_colour, fit.fun.colors),
-                         labels = c(filler_label, names(fit.survcure$models))) +
+                         labels = c(filler_label, names(fit.survHE$models))) +
       scale_linetype_manual(name = "Strategy", values = 1:length(unique(surv_probs1$rx))) +
       scale_x_continuous(limits = c(0, max(plot.times))) +
       coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
@@ -304,7 +299,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
                 size = 0.75, alpha = 1, key_glyph = "path",
                 data=surv_probs) +
       scale_color_manual(name = "Models", values = c("#988791", fit.fun.colors),
-                         labels = c("Kaplan-Meier", names(fit.survcure$models))) +
+                         labels = c("Kaplan-Meier", names(fit.survHE$models))) +
       scale_x_continuous(limits = c(0, max(plot.times))) +
       coord_cartesian(xlim = c(xlow, xhigh), ylim=c(ylow, yhigh)) +
       guides(color=guide_legend(override.aes = list(size=1.2)))
@@ -312,19 +307,19 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
   }
 
   # Compare AIC values
-  AIC <- unlist(lapply(fit.survcure$models, function(x) AIC(x)))  # cure models
+  AIC <- fit.survHE$model.fitting$aic
   AIC <- round(AIC,3)
 
   # Compare BIC values
-  BIC <- unlist(lapply(fit.survcure$models, function(x) BIC(x)))  # cure models
+  BIC <- fit.survHE$model.fitting$bic
   BIC <- round(BIC,3)
 
-  names(AIC) <- names(BIC) <- names(fit.survcure$models)
+  names(AIC) <- names(BIC) <- names(fit.survHE$models)
 
   # Store and return results
-  res <- list(model.objects = fit.survcure,
-              AIC    = AIC,
-              BIC    = BIC)
+  res <- list(model.objects = fit.survHE,
+              AIC           = AIC,
+              BIC           = BIC)
   return(res)
 }
 
