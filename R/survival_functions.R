@@ -953,3 +953,108 @@ create_at_risk_table <- function(survival_time, Years, AtRisk) {
   df_nrisk <- df_nrisk %>% dplyr::select(Interval, Years, Lower, Upper, AtRisk)
   return(df_nrisk)
 }
+
+#' Fit parametric mixture cure survival models for health economic evaluations.
+#'
+#' \code{create_at_risk_table} creates at-risk table.
+#'
+#' @param formula a formula specifying the model to be used, in the form Surv(time,event)~treatment[+covariates] for flexsurv.
+#' @param data A data frame containing the data to be used for the analysis. This must contain data for the 'event' variable. In case there is no censoring, then event is a column of 1s.
+#' @param distr a (vector of) string(s) containing the name(s) of the model(s) to be fitted. Available options are: flexsurv: "exponential","gamma","genf","gengamma","gompertz","weibull", "weibullPH","loglogistic","lognormal" INLA: "exponential","weibull","lognormal","loglogistic" hmc: "exponential","gamma","genf","gengamma","gompertz","weibull","weibullPH", "loglogistic","lognormal".
+#' @return
+#' A model object.
+#' @export
+fit.models.cure <- function (formula = NULL, data, distr = NULL, method = "mle",
+                             ...)
+{
+  exArgs <- list(...)
+  exArgs$formula <- formula
+  exArgs$data = data
+  if (is.null(formula)) {
+    stop("You need to specify a model 'formula', e.g. 'formula=Surv(time,event)~treat'")
+  }
+  method <- tolower(method)
+  if (!method %in% c("mle")) {
+    stop("Methods available for use are 'mle'")
+  }
+  survHE:::check_distributions(method, distr)
+  if (method == "mle") {
+    res <- survHE:::format_output_fit.models(lapply(distr, function(x) runMLE.cure(x,
+                                                                                   exArgs)), method, distr, formula, data)
+  }
+  return(res)
+}
+
+#' run MLE on cure models
+#' @export
+runMLE.cure <- function (x, exArgs)
+{
+  formula <- exArgs$formula
+  data = exArgs$data
+  availables <- survHE:::load_availables()
+  d3 <- survHE:::manipulate_distributions(x)$distr3
+  x <- survHE:::manipulate_distributions(x)$distr
+  tic <- proc.time()
+  if (x == "survspline") {
+    if (exists("bhazard", where = exArgs)) {
+      bhazard <- exArgs$bhazard
+    }
+    else {
+      bhazard <- NULL
+    }
+    if (exists("weights", where = exArgs)) {
+      weights <- exArgs$weights
+    }
+    else {
+      weights <- NULL
+    }
+    if (exists("subset", where = exArgs)) {
+      subset <- exArgs$subset
+    }
+    else {
+      subset <- NULL
+    }
+    if (exists("knots", where = exArgs)) {
+      knots <- exArgs$knots
+    }
+    else {
+      knots <- NULL
+    }
+    if (exists("k", where = exArgs)) {
+      k <- exArgs$k
+    }
+    else {
+      k <- 0
+    }
+    if (exists("bknots", where = exArgs)) {
+      bknots <- exArgs$bknots
+    }
+    else {
+      bknots <- NULL
+    }
+    if (exists("scale", where = exArgs)) {
+      scale <- exArgs$scale
+    }
+    else {
+      scale <- "hazard"
+    }
+    if (exists("timescale", where = exArgs)) {
+      timescale <- exArgs$scale
+    }
+    else {
+      timescale <- "log"
+    }
+    model <- flexsurv::flexsurvspline(formula = formula,
+                                      data = data, k = k, knots = knots, bknots = bknots,
+                                      scale = scale, timescale = timescale)
+  }
+  else {
+    model <- flexsurvcure(formula = formula, data = data, dist = x, mixture = T)
+  }
+  toc <- proc.time() - tic
+  model_name <- d3
+  list(model = model, aic = model$AIC, bic = -2 * model$loglik +
+         model$npars * log(model$N), dic = NULL, time2run = toc[3],
+       model_name = model_name)
+}
+
