@@ -221,6 +221,8 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
     fit.survHE <- fit.models.cure(formula = Surv(time, status) ~ 1, data = data, distr = mods)
   }
 
+  names(fit.survHE$models) <- paste0(names(fit.survHE$models), " Cure")
+
   ## Plots
   if (covariate) { # fit Kaplan-Meier curve
     KM.fit <- survfit(Surv(time, status) ~ rx, data = data)
