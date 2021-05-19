@@ -358,7 +358,7 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
    mod.os <- names(os_survHE$models)
   # chosen model index based on name
   mod.pfs.chosen <- which(mod.pfs == choose_PFS)
-   mod.os.chosen <- which(mod.pfs == choose_OS)
+   mod.os.chosen <- which(mod.os == choose_OS)
 
   # Calculate survival probabilities
   if (deter == 0) { # probabilistic
