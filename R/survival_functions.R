@@ -30,7 +30,7 @@
 #' @return
 #' a list containing all survival model objects.
 #' @export
-fit.fun <- function(time, status, covariate = F,  rx = NULL, data, extrapolate = FALSE, times, k = 2,
+fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = FALSE, times, k = 2,
                     legend_position = "bottom", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
                     mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma")) {
   require(survHE)
@@ -189,7 +189,7 @@ fit.fun <- function(time, status, covariate = F,  rx = NULL, data, extrapolate =
 #' @return
 #' a list containing all survival model objects.
 #' @export
-fit.fun.cure <- function(time, status, covariate = T, rx = "rx", data = data, extrapolate = FALSE, times,
+fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, extrapolate = FALSE, times,
                          legend_position = "bottom", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
                          mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "gengamma")) {
   require(flexsurvcure)
