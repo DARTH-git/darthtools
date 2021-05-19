@@ -848,7 +848,15 @@ boot.haz <- function (x, t, start = 0 ,X = NULL, newdata =NULL, B = 1000) {
   ret
 }
 
-#' Bootstrap hazards ratios
+#' Bootstrap hazards ratios of two survival models
+#' \code{boot_hr} computes bootstrap hazard ratios (HR) of two survival models (HR of model 1 vs. model 2)
+#'
+#' @param surv_model1 first survival model.
+#' @param surv_model2 second survival model.
+#' @param B number of bootstrap samples.
+#' @param times time horizon the extrapolation of the survival model is done over.
+#' @return
+#' dataframe of hazard ratio statistics (2.5% percnetile, median, 97.5% percentile, time points)
 #' @export
 boot_hr <- function(surv_model1, surv_model2, times, B = 100){
   # bootstrap hazards of survival model 1
@@ -891,8 +899,6 @@ check_PFS_OS <- function(Sick){
     }
   }
 }
-
-
 
 #' Determine which rows the upper and lower values of each interval are (in the survival data set).
 #'

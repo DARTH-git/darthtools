@@ -2,10 +2,24 @@
 % Please edit documentation in R/survival_functions.R
 \name{boot_hr}
 \alias{boot_hr}
-\title{Bootstrap hazards ratios}
+\title{Bootstrap hazards ratios of two survival models
+\code{boot_hr} computes bootstrap hazard ratios (HR) of two survival models (HR of model 1 vs. model 2)}
 \usage{
 boot_hr(surv_model1, surv_model2, times, B = 100)
 }
+\arguments{
+\item{surv_model1}{first survival model.}
+
+\item{surv_model2}{second survival model.}
+
+\item{times}{time horizon the extrapolation of the survival model is done over.}
+
+\item{B}{number of bootstrap samples.}
+}
+\value{
+dataframe of hazard ratio statistics (2.5\% percnetile, median, 97.5\% percentile, time points)
+}
 \description{
-Bootstrap hazards ratios
+Bootstrap hazards ratios of two survival models
+\code{boot_hr} computes bootstrap hazard ratios (HR) of two survival models (HR of model 1 vs. model 2)
 }

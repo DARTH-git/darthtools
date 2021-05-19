@@ -7,7 +7,7 @@
 fit.fun.cure(
   time,
   status,
-  covariate = T,
+  covariate = F,
   rx = "rx",
   data = data,
   extrapolate = FALSE,
