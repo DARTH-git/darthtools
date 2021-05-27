@@ -445,15 +445,16 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
 #' @param model survival model.
 #' @param times time horizon to calculate survival probabilities.
 #' @param PA run probabilistic analysis.
+#' @param rx determines which treatment arm (same order as factor levels of treatment variable).
 #' Default = FALSE.
 #' @return
 #' vector of survival probabilities.
 #' @export
-surv_prob <- function(model, times = NULL, PA = FALSE) {
+surv_prob <- function(model, times = NULL, PA = FALSE, rx = 1) {
   if (PA) {
-    surv <- model$mat[[1]][,-1]
+    surv <- model$mat[[rx]][,-1]
   } else {
-    surv <- summary(model, t = times, ci = F)[[1]]$est
+    surv <- summary(model, t = times, ci = F)[[rx]]$est
   }
   return(surv)
 }

@@ -4,14 +4,16 @@
 \alias{surv_prob}
 \title{Calculate survival probabilities.}
 \usage{
-surv_prob(model, times = NULL, PA = FALSE)
+surv_prob(model, times = NULL, PA = FALSE, rx = 1)
 }
 \arguments{
 \item{model}{survival model.}
 
 \item{times}{time horizon to calculate survival probabilities.}
 
-\item{PA}{run probabilistic analysis.
+\item{PA}{run probabilistic analysis.}
+
+\item{rx}{determines which treatment arm (same order as factor levels of treatment variable).
 Default = FALSE.}
 }
 \value{
