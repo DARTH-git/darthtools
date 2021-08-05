@@ -112,7 +112,7 @@ fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = 
                                    "Model")]
     surv_probs1 <- surv_probs1 %>% pivot_longer(cols = !c(Model, time), names_to = "rx",
                                                 values_to = "est") %>% as.data.frame()
-    surv_probs1$rx <- removeWords(surv_probs1$rx, c("rx.", ".est"))
+    # surv_probs1$rx <- removeWords(surv_probs1$rx, c("rx.", ".est"))
     surv_probs1$rx <- as.factor(surv_probs1$rx)
     surv_probs <- surv_probs1
 
@@ -197,7 +197,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
   require(flexsurvcure)
   require(survHE)
   require(survminer)
-  require(tm)
+  # require(tm)
 
   ## Set up
   # Extract the right data columns
@@ -276,7 +276,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
                                    "Model")]
     surv_probs1 <- surv_probs1 %>% pivot_longer(cols = !c(Model, time), names_to = "rx",
                                                 values_to = "est") %>% as.data.frame()
-    surv_probs1$rx <- removeWords(surv_probs1$rx, c("rx.", ".est"))
+    # surv_probs1$rx <- removeWords(surv_probs1$rx, c("rx.", ".est"))
     surv_probs1$rx <- as.factor(surv_probs1$rx)
     surv_probs <- surv_probs1
 
