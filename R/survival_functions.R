@@ -859,14 +859,14 @@ boot.haz <- function (x, t, start = 0 ,X = NULL, newdata =NULL, B = 1000) {
 boot_hr <- function(surv_model1, surv_model2, times, B = 100){
   # bootstrap hazards of survival model 1
   boot.haz1 = boot.haz(x = surv_model1, B = 100, t = times)
-  boot.haz1[boot.haz1==0] = 0.05
+  boot.haz1[boot.haz1==0] = 0.01
   boot.haz1 <- boot.haz1[1,,]
   # take log hazards
   boot.log.haz1 <- log(boot.haz1)
 
   # bootstrap hazards of survival model 2
   boot.haz2 = boot.haz(x = surv_model2, B = 100, t = times)
-  boot.haz2[boot.haz2==0] = 0.05
+  boot.haz2[boot.haz2==0] = 0.01
   boot.haz2 <- boot.haz2[1,,]
   # take log hazards
   boot.log.haz2 <- log(boot.haz2)
