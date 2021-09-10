@@ -331,6 +331,10 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #'
 #' @param pfs_survHE survHE obj fitting PFS.
 #' @param os_survHE survHE obj fitting OS.
+#' @param l_d.data list of mean parameter estimates (for PFS and OS)
+#' @param l_vc.data list of variance-covariance matrices of parameter estimates (for PFS and OS)
+#' @param par use parameter mean estimates and variance-covariance matrix instead of IPD
+#' Default = FALSE
 #' @param choose_PFS preferred PFS distribution.
 #' @param choose_OS preferred OS distribution.
 #' @param time numeric vector of time to estimate probabilities.
@@ -344,7 +348,8 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' @return
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
 #' @export
-partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421){
+partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE,
+                     choose_PFS, choose_OS, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421){
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
   chosen_models <- paste0("PFS: ", choose_PFS, ", ", "OS: ", choose_OS) # chosen model names
@@ -352,29 +357,62 @@ partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times,
   # Model-setup
   # model objects
   pfs_survHE <- pfs_survHE$model.objects
-   os_survHE <-  os_survHE$model.objects
+  os_survHE <-  os_survHE$model.objects
   # model names
   mod.pfs <- names(pfs_survHE$models)
-   mod.os <- names(os_survHE$models)
+  mod.os <- names(os_survHE$models)
   # chosen model index based on name
   mod.pfs.chosen <- which(mod.pfs == choose_PFS)
-   mod.os.chosen <- which(mod.os == choose_OS)
+  mod.os.chosen <- which(mod.os == choose_OS)
 
   # Calculate survival probabilities
   if (deter == 0) { # probabilistic
-    fit_PFS <- make.surv(pfs_survHE,
-                         mod = mod.pfs.chosen,
-                         nsim = n_sim,
-                         t = times)
-    fit_OS  <- make.surv(os_survHE,
-                         mod = mod.os.chosen,
-                         nsim = n_sim,
-                         t = times)
-    pfs.surv <- surv_prob(fit_PFS, PA = TRUE)
-    os.surv  <- surv_prob( fit_OS, PA = TRUE)
+    if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
+      # randomly draw parameter values from multivariate normal distribution
+      param_draws_PFS <- model.rmvnorm(dist.v  = choose_PFS,
+                                       d.data  = l_d.data$PFS,
+                                       vc.data = l_vc.data$PFS,
+                                       n_sim   = n_sim)
+      param_draws_OS  <- model.rmvnorm(dist.v  = choose_OS,
+                                       d.data  = l_d.data$OS,
+                                       vc.data = l_vc.data$OS,
+                                       n_sim   = n_sim)
+      # obtain survival probabilities
+      pfs.surv <- os.surv <- matrix(NA, nrow = length(time), ncol = n_sim)
+      for (j in 1:n_sim) {
+        pfs.surv[, j] <- model.dist(dist.v = choose_PFS, d.data = param_draws_PFS[j, ], t = time)
+        os.surv [, j] <- model.dist(dist.v = choose_OS,  d.data = param_draws_OS[j, ],  t = time)
+      }
+    } else {
+      fit_PFS <- make.surv(pfs_survHE,
+                           mod = mod.pfs.chosen,
+                           nsim = n_sim,
+                           t = times)
+      fit_OS  <- make.surv(os_survHE,
+                           mod = mod.os.chosen,
+                           nsim = n_sim,
+                           t = times)
+      pfs.surv <- surv_prob(fit_PFS, PA = TRUE)
+      os.surv  <- surv_prob( fit_OS, PA = TRUE)
+    }
   } else { # deterministic
-    pfs.surv <- surv_prob(pfs_survHE$models[[which(mod.pfs == choose_PFS)]], time = times)
-    os.surv  <- surv_prob( os_survHE$models[[which(mod.os  ==  choose_OS)]], time = times)
+    if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
+      # randomly draw parameter values from multivariate normal distribution
+      param_draws_PFS <- model.rmvnorm(dist.v  = choose_PFS,
+                                       d.data  = l_d.data[[1]],
+                                       vc.data = l_vc.data[[1]],
+                                       n_sim   = 1)
+      param_draws_OS  <- model.rmvnorm(dist.v  = choose_OS,
+                                       d.data  = l_d.data[[2]],
+                                       vc.data = l_vc.data[[2]],
+                                       n_sim   = 1)
+      # obtain survival probabilities
+      pfs.surv <- model.dist(dist.v = choose_PFS, d.data = param_draws_PFS[1, ], t = time)
+      os.surv  <- model.dist(dist.v = choose_OS,  d.data =  param_draws_OS[1, ], t = time)
+    } else {
+      pfs.surv <- surv_prob(pfs_survHE$models[[which(mod.pfs == choose_PFS)]], time = times)
+      os.surv  <- surv_prob( os_survHE$models[[which(mod.os  ==  choose_OS)]], time = times)
+    }
   }
 
   # Calculate area under survival curve (expected survival)
@@ -507,7 +545,6 @@ expected_surv <- function(time, surv) {
 all_partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = times, PA = FALSE, n_sim = 100, seed = 421) {
   all_m_M_PSM <- list() # empty list to store Markov traces
   model_names <- c(choose_PFS, choose_OS) # all parametric model names
-
   for (i in 1:length(model_names)) { # loop through model for PFS
     for (j in 1:length(model_names)) { # loop through model for OS
       # Construct a partitioned survival model out of the fitted models
@@ -954,7 +991,7 @@ create_at_risk_table <- function(survival_time, Years, AtRisk) {
 
 #' Fit parametric mixture cure survival models for health economic evaluations.
 #'
-#' \code{create_at_risk_table} creates at-risk table.
+#' \code{fit.models.cure} fits parametric mixture cure survival models for health economic evaluations.
 #'
 #' @param formula a formula specifying the model to be used, in the form Surv(time,event)~treatment[+covariates] for flexsurv.
 #' @param data A data frame containing the data to be used for the analysis. This must contain data for the 'event' variable. In case there is no censoring, then event is a column of 1s.
@@ -1056,3 +1093,587 @@ runMLE.cure <- function (x, exArgs)
        model_name = model_name)
 }
 
+#' Randomly draw parameter values of survival models from multivariate normal distribution.
+#'
+#' \code{create_at_risk_table} creates at-risk table.
+#'
+#' @param dist.v a character string specifying the name of the survival model.
+#' @param d.data a vector of mean parameter estimates of the survival model.
+#' @param vc.data variance-covariance matrix (a matrix) of parameter estimates of the survival model.
+#' @param n_sim number of random samples to draw.
+#' Default = 100.
+#' @param seed seed for random number generation.
+#' Default = 421.
+#' @return
+#' A matrix of drawn parameter values.
+#' @export
+model.rmvnorm <- function(dist.v, d.data, vc.data, n_sim, seed = 421) {
+
+  set.seed(seed)
+
+  if (!dist.v %in% names(model$AIC)) {
+    return(paste0("Incorrect distribution name, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
+                log-Logistic, Gompertz, Expoenntial Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
+                log-Logistic Cure, Gompertz Cure."))
+  }
+
+  # function returns transition probability
+  ### GAMMA, WEIBULL, LOGLOGISTIC ###
+  if(dist.v == "Gamma" | dist.v == "Weibull (AFT)" | dist.v == "log-Logistic"){
+
+    # 1) Transform MSM model est
+    logPar1 <- log(d.data[1]) # log estimate paramter 1
+    logPar2 <- log(d.data[2]) # log estimate paramter 2
+    if(length(d.data)>2){     # covariate coefficients
+      B       <- d.data[3:length(d.data)]
+      op.par  <- c(logPar1, logPar2, B)
+    }else {
+      op.par  <- c(logPar1, logPar2)
+    }
+    # 2) Run MSM output in rmvnorm - multivariate normal distribution with mean = op.par and sigma = vc.data (variance cvariance matrix)
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F) # Multivariate normal distribution sample # o simulations
+
+    #3) Transform rmvnorm MSM model est
+    t.par1  <- exp(mvnorm.res[,1])  # transform multivariate normal estimates
+    t.par2  <- exp(mvnorm.res[,2])
+    if(length(d.data)>2){
+      Beta    <- mvnorm.res[,3:ncol(mvnorm.res)]
+      results <- cbind(t.par1, t.par2, Beta)
+    }else {
+      results <- cbind(t.par1, t.par2)
+    }
+
+    ### CURE GAMMA, WEIBULL, LOGLOGISTIC ###
+  } else if(dist.v == "Gamma Cure" | dist.v == "Weibull (AFT) Cure" | dist.v == "log-Logistic Cure"){
+    Par1    <- log(d.data[1]/(1 - d.data[1]))       # theta estimate
+    logPar2 <- log(d.data[2])                       # log estimate paramter 2
+    logPar3 <- log(d.data[3])                       # log estimate paramter 3
+    if(length(d.data)>3){
+      B       <- d.data[4:length(d.data)]
+      op.par  <- c(Par1, logPar2, logPar3, B)
+    }else {
+      op.par  <- c(Par1, logPar2, logPar3)
+    }
+
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F) # Multivariate normal distribution
+
+    t.par1  <- exp(mvnorm.res[,1])/(1 + exp(mvnorm.res[,1]))
+    t.par2  <- exp(mvnorm.res[,2])
+    t.par3  <- exp(mvnorm.res[,3])
+    if(length(d.data)>3){
+      Beta    <- mvnorm.res[,4:ncol(mvnorm.res)]
+      results <- cbind(t.par1, t.par2, t.par3, Beta)
+    }else {
+      results <- cbind(t.par1, t.par2, t.par3)
+    }
+
+    ### EXPONENTIAL ###
+  } else if (dist.v == "Exponential"){
+
+    logPar1 <- log(d.data[1])  # log rate estimate
+    if(length(d.data)>1){
+      B       <- d.data[2:length(d.data)]
+      op.par  <- c(logPar1,  B)
+    }else {
+      op.par  <- c(logPar1)
+    }
+
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F)
+
+    t.par1  <- exp(mvnorm.res[,1])
+    if(length(d.data)>1){
+      Beta    <- mvnorm.res[,2:ncol(mvnorm.res)]
+      results <- cbind(t.par1,  Beta)
+    }else {
+      results <- cbind(t.par1)
+    }
+
+    ### CURE EXPONENTIAL ###
+  } else if (dist.v == "Exponential Cure"){
+    Par1    <- log(d.data[1]/(1 - d.data[1])) # theta estimate
+    logPar2 <- log(d.data[2])                 # log rate estimate
+    if(length(d.data)>2){
+      B       <- d.data[3:length(d.data)]
+      op.par  <- c(Par1, logPar2, B)
+    }else {
+      op.par  <- c(Par1, logPar2)
+    }
+
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F)
+    t.par1  <- exp(mvnorm.res[,1])/(1 + exp(mvnorm.res[,1]))
+    t.par2  <- exp(mvnorm.res[,2])
+    if(length(d.data)>2){
+      Beta    <- mvnorm.res[,3:ncol(mvnorm.res)]
+      results <- cbind(t.par1, t.par2, Beta)
+    }else {
+      results <- cbind(t.par1, t.par2)
+    }
+
+    ### LOGNORMAL, GOMPERTZ ###
+  } else if (dist.v == "log-Normal"| dist.v == "Gompertz"){
+    Par1    <- d.data[1]      # meanlog(log-Normal). shape(Gompertz)
+    logPar2 <- log(d.data[2]) # transform sdlog(log-Normal) or rate(Gompertz) estimate
+    if(length(d.data)>2){
+      B       <- d.data[3:length(d.data)]
+      op.par  <- c(Par1, logPar2, B)
+    }else {
+      op.par  <- c(Par1, logPar2)
+    }
+
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F)
+
+    t.par1  <- mvnorm.res[,1]
+    t.par2  <- exp(mvnorm.res[,2])
+    if(length(d.data)>2){
+      Beta    <- mvnorm.res[,3:ncol(mvnorm.res)]
+      results <- cbind(t.par1, t.par2, Beta)
+    }else {
+      results <- cbind(t.par1, t.par2)
+    }
+
+    ### CURE LOGNORMAL, GOMPERTZ ###
+  } else if (dist.v == "log-Normal Cure"| dist.v == "Gompertz Cure"){
+    Par1    <- log(d.data[1]/(1 - d.data[1]))      # theta
+    Par2    <- d.data[2]      # meanlog(log-Normal). shape(Gompertz)
+    logPar3 <- log(d.data[3]) # transform sdlog(log-Normal) or rate(Gompertz) estimate
+    if(length(d.data)>3){
+      B       <- d.data[4:length(d.data)]
+      op.par  <- c(Par1, Par2, logPar3, B)
+    }else {
+      op.par  <- c(Par1, Par2, logPar3)
+    }
+
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F)
+
+    t.par1  <- exp(mvnorm.res[,1])/(1 + exp(mvnorm.res[,1]))
+    t.par2  <- mvnorm.res[,2]
+    t.par3  <- exp(mvnorm.res[,3])
+    if(length(d.data)>3){
+      Beta    <- mvnorm.res[,4:ncol(mvnorm.res)]
+      results <- cbind(t.par1, t.par2, t.par3, Beta)
+    }else {
+      results <- cbind(t.par1, t.par2, t.par3)
+    }
+  } else {
+    print("no distribution found")
+    results <- NA
+  }
+  return(results)
+}
+
+#' Randomly draw parameter values of survival distributions from multivariate normal distribution.
+#'
+#' \code{model.rmvnorm} randomly draws parameter values of survival models from multivariate normal distribution.
+#'
+#' @param dist.v a character string specifying the name of the survival distribution.
+#' @param d.data a vector of mean parameter estimates of the survival distribution.
+#' @param vc.data variance-covariance matrix (a matrix) of parameter estimates of the survival distribution.
+#' @param n_sim number of random samples to draw.
+#' Default = 100.
+#' @param seed seed for random number generation.
+#' Default = 421.
+#' @return
+#' A matrix of drawn parameter values.
+#' @export
+model.rmvnorm <- function(dist.v, d.data, vc.data, n_sim, seed = 421) {
+
+  set.seed(seed)
+
+  if (!dist.v %in% names(model$AIC)) {
+    return(paste0("Incorrect distribution name, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
+                log-Logistic, Gompertz, Expoenntial Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
+                log-Logistic Cure, Gompertz Cure."))
+  }
+
+  # function returns transition probability
+  ### GAMMA, WEIBULL, LOGLOGISTIC ###
+  if(dist.v == "Gamma" | dist.v == "Weibull (AFT)" | dist.v == "log-Logistic"){
+
+    # 1) Transform MSM model est
+    logPar1 <- log(d.data[1]) # log estimate paramter 1
+    logPar2 <- log(d.data[2]) # log estimate paramter 2
+    if(length(d.data)>2){     # covariate coefficients
+      B       <- d.data[3:length(d.data)]
+      op.par  <- c(logPar1, logPar2, B)
+    }else {
+      op.par  <- c(logPar1, logPar2)
+    }
+    # 2) Run MSM output in rmvnorm - multivariate normal distribution with mean = op.par and sigma = vc.data (variance cvariance matrix)
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F) # Multivariate normal distribution sample # o simulations
+
+    #3) Transform rmvnorm MSM model est
+    t.par1  <- exp(mvnorm.res[,1])  # transform multivariate normal estimates
+    t.par2  <- exp(mvnorm.res[,2])
+    if(length(d.data)>2){
+      Beta    <- mvnorm.res[,3:ncol(mvnorm.res)]
+      results <- cbind(t.par1, t.par2, Beta)
+    }else {
+      results <- cbind(t.par1, t.par2)
+    }
+
+    ### CURE GAMMA, WEIBULL, LOGLOGISTIC ###
+  } else if(dist.v == "Gamma Cure" | dist.v == "Weibull (AFT) Cure" | dist.v == "log-Logistic Cure"){
+    Par1    <- log(d.data[1]/(1 - d.data[1]))       # theta estimate
+    logPar2 <- log(d.data[2])                       # log estimate paramter 2
+    logPar3 <- log(d.data[3])                       # log estimate paramter 3
+    if(length(d.data)>3){
+      B       <- d.data[4:length(d.data)]
+      op.par  <- c(Par1, logPar2, logPar3, B)
+    }else {
+      op.par  <- c(Par1, logPar2, logPar3)
+    }
+
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F) # Multivariate normal distribution
+
+    t.par1  <- exp(mvnorm.res[,1])/(1 + exp(mvnorm.res[,1]))
+    t.par2  <- exp(mvnorm.res[,2])
+    t.par3  <- exp(mvnorm.res[,3])
+    if(length(d.data)>3){
+      Beta    <- mvnorm.res[,4:ncol(mvnorm.res)]
+      results <- cbind(t.par1, t.par2, t.par3, Beta)
+    }else {
+      results <- cbind(t.par1, t.par2, t.par3)
+    }
+
+    ### EXPONENTIAL ###
+  } else if (dist.v == "Exponential"){
+
+    logPar1 <- log(d.data[1])  # log rate estimate
+    if(length(d.data)>1){
+      B       <- d.data[2:length(d.data)]
+      op.par  <- c(logPar1,  B)
+    }else {
+      op.par  <- c(logPar1)
+    }
+
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F)
+
+    t.par1  <- exp(mvnorm.res[,1])
+    if(length(d.data)>1){
+      Beta    <- mvnorm.res[,2:ncol(mvnorm.res)]
+      results <- cbind(t.par1,  Beta)
+    }else {
+      results <- cbind(t.par1)
+    }
+
+    ### CURE EXPONENTIAL ###
+  } else if (dist.v == "Exponential Cure"){
+    Par1    <- log(d.data[1]/(1 - d.data[1])) # theta estimate
+    logPar2 <- log(d.data[2])                 # log rate estimate
+    if(length(d.data)>2){
+      B       <- d.data[3:length(d.data)]
+      op.par  <- c(Par1, logPar2, B)
+    }else {
+      op.par  <- c(Par1, logPar2)
+    }
+
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F)
+    t.par1  <- exp(mvnorm.res[,1])/(1 + exp(mvnorm.res[,1]))
+    t.par2  <- exp(mvnorm.res[,2])
+    if(length(d.data)>2){
+      Beta    <- mvnorm.res[,3:ncol(mvnorm.res)]
+      results <- cbind(t.par1, t.par2, Beta)
+    }else {
+      results <- cbind(t.par1, t.par2)
+    }
+
+    ### LOGNORMAL, GOMPERTZ ###
+  } else if (dist.v == "log-Normal"| dist.v == "Gompertz"){
+    Par1    <- d.data[1]      # meanlog(log-Normal). shape(Gompertz)
+    logPar2 <- log(d.data[2]) # transform sdlog(log-Normal) or rate(Gompertz) estimate
+    if(length(d.data)>2){
+      B       <- d.data[3:length(d.data)]
+      op.par  <- c(Par1, logPar2, B)
+    }else {
+      op.par  <- c(Par1, logPar2)
+    }
+
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F)
+
+    t.par1  <- mvnorm.res[,1]
+    t.par2  <- exp(mvnorm.res[,2])
+    if(length(d.data)>2){
+      Beta    <- mvnorm.res[,3:ncol(mvnorm.res)]
+      results <- cbind(t.par1, t.par2, Beta)
+    }else {
+      results <- cbind(t.par1, t.par2)
+    }
+
+    ### CURE LOGNORMAL, GOMPERTZ ###
+  } else if (dist.v == "log-Normal Cure"| dist.v == "Gompertz Cure"){
+    Par1    <- log(d.data[1]/(1 - d.data[1]))      # theta
+    Par2    <- d.data[2]      # meanlog(log-Normal). shape(Gompertz)
+    logPar3 <- log(d.data[3]) # transform sdlog(log-Normal) or rate(Gompertz) estimate
+    if(length(d.data)>3){
+      B       <- d.data[4:length(d.data)]
+      op.par  <- c(Par1, Par2, logPar3, B)
+    }else {
+      op.par  <- c(Par1, Par2, logPar3)
+    }
+
+    mvnorm.res <- mvtnorm::rmvnorm(n_sim, op.par, vc.data, checkSymmetry = F)
+
+    t.par1  <- exp(mvnorm.res[,1])/(1 + exp(mvnorm.res[,1]))
+    t.par2  <- mvnorm.res[,2]
+    t.par3  <- exp(mvnorm.res[,3])
+    if(length(d.data)>3){
+      Beta    <- mvnorm.res[,4:ncol(mvnorm.res)]
+      results <- cbind(t.par1, t.par2, t.par3, Beta)
+    }else {
+      results <- cbind(t.par1, t.par2, t.par3)
+    }
+  } else {
+    print("no distribution found")
+    results <- NA
+  }
+  return(results)
+}
+
+#' Calculate survival probabilities given a survival distribution and its parameter values.
+#'
+#' \code{model.dist} calculates survival probabilities given a survival distribution and its parameter values.
+#'
+#' @param dist.v a character string specifying the name of the survival distribution.
+#' @param d.data a vector of parameter values of the survival distribution.
+#' @param t a vector of time points to calculate the survival probabilities at.
+#' @return
+#' A vector of survival probabilities.
+#' @export
+model.dist <- function(dist.v, d.data, t){
+
+  # save parameters as pars and coefficients as beta
+
+  v_par1 <- c("Exponential")
+  v_par2 <- c("Gamma", "Weibull", "log-Normal", "log-Logistic", "Gompertz", "Exponential Cure")
+  v_par3 <- c("Gamma Cure", "Weibull Cure", "log-Normal Cure", "log-Logistic Cure", "Gompertz Cure")
+
+  if (dist.v %in% v_par1){
+    pars <- d.data[1]
+    beta <- if(length(d.data) > 1){d.data[2:length(d.data)]} else{NA}
+    beta <- beta[!is.na(beta)]
+  } else if(dist.v %in% v_par2){
+    pars <- d.data[1:2]
+    beta <- if(length(d.data) > 2){d.data[3:length(d.data)]} else{NA}
+    beta <- beta[!is.na(beta)]
+  } else if(dist.v %in% v_par3){
+    pars <- d.data[1:3]
+    beta <- if(length(d.data) > 3){d.data[4:length(d.data)]} else{NA}
+    beta <- beta[!is.na(beta)]
+  }
+
+  # Get cumulative survival probability for each individual
+  ############################ Gamma ############################
+  if(dist.v == "Gamma"){
+    for (i in 1:length(pars)) {
+      if(i == 2){
+        # print("rate") # beta affects the rate
+
+        if(length(beta) == 0){beta.raw = 0 # if no covariates
+        }else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+        pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
+        pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
+      }
+      # else{print("Gamma")}
+    }
+    p.res   <- pgamma(t,        shape = pars[1], rate = pred, lower.tail = F)
+    # p.res.1 <- pgamma(t - step, shape = pars[1], rate = pred, lower.tail = F)
+
+    ############################ Gamma Cure ############################
+  } else if (dist.v == "Gamma Cure"){
+    for (i in 1:length(pars)){
+      if (i == 3){
+        print("rate") # beta affects the rate
+
+        if(length(beta) == 0){beta.raw = 0}
+        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+        pred.raw <- log(pars[i]) + beta.raw # fit$dlist$transforms + beta.raw
+        pred     <- exp(pred.raw)           # fit$dlist$inv.transforms
+      }
+      # else{print("Gamma Cure")}
+    }
+    p.res   <- pmixsurv(pgamma, t,        theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
+    # p.res.1 <- pmixsurv(pgamma, t - step, theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
+
+    ############################ Exponential ############################
+  } else if (dist.v == "Exponential") {
+    for (i in 1:length(pars)) {
+      # print("rate") # beta affects the rate
+
+      if(length(beta) ==0){beta.raw = 0}
+      else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+      pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
+      pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
+    }
+
+    p.res   <- pexp(t,        rate = pred, lower.tail = F)
+    # p.res.1 <- pexp(t - step, rate = pred, lower.tail = F)
+
+    ############################ Exponential Cure ############################
+  } else if (dist.v == "Exponential Cure") {
+    for (i in 1:length(pars)) {
+      if (i == 2){
+        # print("rate") # Beta affects the rate
+
+        if(length(beta) ==0){beta.raw = 0}
+        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+        pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
+        pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
+      }
+      # else{print("Exponential Cure")}
+    }
+    p.res   <- pmixsurv(pexp, t,        theta = pars[1], rate = pred, lower.tail = F)
+    # p.res.1 <- pmixsurv(pexp, t - step, theta = pars[1], rate = pred, lower.tail = F)
+
+    ############################ Weibull ############################
+  } else if (dist.v == "Weibull") {
+    for (i in 1:length(pars)) {
+      if(i == 2) {
+        # print("scale") # Beta affects the scale
+
+        if(length(beta) ==0){beta.raw = 0}
+        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+        pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
+        pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
+
+      }
+      # else{print("Weibull (AFT)")}
+    }
+    p.res   <- pWeibull (AFT)(t,        shape = pars[1], scale = pred, lower.tail = F)
+    # p.res.1 <- pWeibull (AFT)(t - step, shape = pars[1], scale = pred, lower.tail = F)
+
+    ############################ Weibull Cure ############################
+  } else if (dist.v == "Weibull (AFT) Cure") {
+    for (i in 1:length(pars)) {
+      if(i == 3) {
+        # print("scale") # Beta affects the scale
+
+        if(length(beta) ==0){beta.raw = 0}
+        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+        pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
+        pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
+
+      }
+      # else{print("Weibull (AFT) Cure")}
+    }
+    p.res   <- pmixsurv(pWeibull (AFT), t,        theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
+    # p.res.1 <- pmixsurv(pWeibull (AFT), t - step, theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
+
+    ############################ log-Normal ############################
+  } else if (dist.v == "log-Normal") {
+    for (i in 1:length(pars)) {
+      if(i == 1) {
+        # print("meanlog")
+
+        if(length(beta) ==0){beta.raw = 0}
+        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+        pred.raw <- pars[i] + beta.raw    # fit$dlist$transforms + beta.raw
+        pred     <- pred.raw              # fit$dlist$inv.transforms
+      }
+      # else{print("log-Normal")}
+    }
+    p.res   <- plnorm(t,        meanlog = pred, sdlog = pars[2], lower.tail = F)
+    # p.res.1 <- plnorm(t - step, meanlog = pred, sdlog = pars[2], lower.tail = F)
+
+    ############################ log-Normal Cure ############################
+  } else if (dist.v == "log-Normal Cure") {
+    for (i in 1:length(pars)) {
+      if(i == 2) {
+        # print("meanlog")
+
+        if(length(beta) ==0){beta.raw = 0}
+        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+        pred.raw <- pars[i] + beta.raw    # fit$dlist$transforms + beta.raw
+        pred     <- pred.raw              # fit$dlist$inv.transforms
+      }
+      # else{print("log-Normal Cure")}
+    }
+
+    p.res   <- pmixsurv(plnorm, t       , theta = pars[1], meanlog = pred, sdlog = pars[3], lower.tail = F)
+    # p.res.1 <- pmixsurv(plnorm, t - step, theta = pars[1], meanlog = pred, sdlog = pars[3], lower.tail = F)
+    ############################ Gompertz ############################
+  } else if (dist.v == "Gompertz") {
+    for (i in 1:length(pars)) {
+      if(i == 2) {
+        # print("rate")
+
+        if(length(beta) ==0){beta.raw = 0}
+        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+        pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
+        pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
+
+      }
+      # else{print("Gompertz")}
+    }
+    p.res   <- pgompertz(t,        shape = pars[1], rate = pred, lower.tail = F)
+    # p.res.1 <- pgompertz(t - step, shape = pars[1], rate = pred, lower.tail = F)
+
+    ############################ Gompertz Cure ############################
+  } else if (dist.v == "Gompertz Cure") {
+    for (i in 1:length(pars)) {
+      if(i == 3) {
+        # print("rate")
+
+        if(length(beta) ==0){beta.raw = 0}
+        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+        pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
+        pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
+      }
+      # else{print("Gompertz Cure")}
+    }
+    p.res   <- pmixsurv(pgompertz, t,        theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
+    # p.res.1 <- pmixsurv(pgompertz, t - step, theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
+
+    ############################ log-Logistic ############################
+  } else if (dist.v == "log-Logistic") {
+    for (i in 1:length(pars)) {
+      if(i == 2) {
+        # print("scale")
+
+        if(length(beta) ==0){beta.raw = 0}
+        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+        pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
+        pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
+      }
+      # else{print("log-Logistic")}
+    }
+    p.res   <- pllogis(t,        shape = pars[1], scale = pred, lower.tail = F)
+    # p.res.1 <- pllogis(t - step, shape = pars[1], scale = pred, lower.tail = F)
+
+    ############################ log-Logistic Cure ############################
+  } else if (dist.v == "log-Logistic Cure") {
+    for (i in 1:length(pars)) {
+      if(i == 3) {
+        # print("scale")
+
+        if(length(beta) ==0){beta.raw = 0}
+        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+
+        pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
+        pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
+      }
+      # else{print("log-Logistic Cure")}
+    }
+
+    p.res   <- pmixsurv(pllogis, t,        theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
+    # p.res.1 <- pmixsurv(pllogis, t - step, theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
+
+    ############################ No Distribution ############################
+  } else {
+    print("no distribution found")
+    p.res <- NA
+    # p.res.1 <- NA
+  }
+
+  return(p.res)   # return survival probabilities
+}
