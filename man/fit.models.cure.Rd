@@ -17,5 +17,5 @@ fit.models.cure(formula = NULL, data, distr = NULL, method = "mle", ...)
 A model object.
 }
 \description{
-\code{create_at_risk_table} creates at-risk table.
+\code{fit.models.cure} fits parametric mixture cure survival models for health economic evaluations.
 }

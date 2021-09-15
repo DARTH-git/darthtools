@@ -5,8 +5,11 @@
 \title{Fit partitioned survival model to survival data}
 \usage{
 partsurv(
-  pfs_survHE,
-  os_survHE,
+  pfs_survHE = NULL,
+  os_survHE = NULL,
+  l_d.data = NULL,
+  l_vc.data = NULL,
+  par = FALSE,
   choose_PFS,
   choose_OS,
   time = times,
@@ -20,6 +23,13 @@ partsurv(
 \item{pfs_survHE}{survHE obj fitting PFS.}
 
 \item{os_survHE}{survHE obj fitting OS.}
+
+\item{l_d.data}{list of mean parameter estimates (for PFS and OS)}
+
+\item{l_vc.data}{list of variance-covariance matrices of parameter estimates (for PFS and OS)}
+
+\item{par}{use parameter mean estimates and variance-covariance matrix instead of IPD
+Default = FALSE}
 
 \item{choose_PFS}{preferred PFS distribution.}
 
