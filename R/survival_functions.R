@@ -1280,7 +1280,9 @@ model.rmvnorm <- function(dist.v, d.data, vc.data, n_sim, seed = 421) {
 
   set.seed(seed)
 
-  if (!dist.v %in% names(model$AIC)) {
+  if (!dist.v %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
+                     "log-Logistic", "Gompertz", "Expoenntial Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
+                     "log-Logistic Cure", "Gompertz Cure")) {
     return(paste0("Incorrect distribution name, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
                 log-Logistic, Gompertz, Expoenntial Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
                 log-Logistic Cure, Gompertz Cure."))
