@@ -354,17 +354,6 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
   chosen_models <- paste0("PFS: ", choose_PFS, ", ", "OS: ", choose_OS) # chosen model names
 
-  # Model-setup
-  # model objects
-  pfs_survHE <- pfs_survHE$model.objects
-  os_survHE <-  os_survHE$model.objects
-  # model names
-  mod.pfs <- names(pfs_survHE$models)
-  mod.os <- names(os_survHE$models)
-  # chosen model index based on name
-  mod.pfs.chosen <- which(mod.pfs == choose_PFS)
-  mod.os.chosen <- which(mod.os == choose_OS)
-
   # Calculate survival probabilities
   if (deter == 0) { # probabilistic
     if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
@@ -384,6 +373,16 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
         os.surv [, j] <- model.dist(dist.v = choose_OS,  d.data = param_draws_OS[j, ],  t = time)
       }
     } else {
+      # Model-setup
+      # model objects
+      pfs_survHE <- pfs_survHE$model.objects
+      os_survHE <-  os_survHE$model.objects
+      # model names
+      mod.pfs <- names(pfs_survHE$models)
+      mod.os <- names(os_survHE$models)
+      # chosen model index based on name
+      mod.pfs.chosen <- which(mod.pfs == choose_PFS)
+      mod.os.chosen <- which(mod.os == choose_OS)
       fit_PFS <- make.surv(pfs_survHE,
                            mod = mod.pfs.chosen,
                            nsim = n_sim,
