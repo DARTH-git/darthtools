@@ -10,8 +10,10 @@ partsurv(
   l_d.data = NULL,
   l_vc.data = NULL,
   par = FALSE,
-  choose_PFS,
-  choose_OS,
+  dist_name_PFS = NULL,
+  dist_name_OS = NULL,
+  choose_PFS = NULL,
+  choose_OS = NULL,
   time = times,
   v_names_states,
   PA = FALSE,
@@ -30,6 +32,12 @@ partsurv(
 
 \item{par}{use parameter mean estimates and variance-covariance matrix instead of IPD
 Default = FALSE}
+
+\item{dist_name_PFS}{specify PFS distribution when par = T.
+Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.}
+
+\item{dist_name_OS}{specify OS distribution when par = T.
+Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.}
 
 \item{choose_PFS}{preferred PFS distribution.}
 

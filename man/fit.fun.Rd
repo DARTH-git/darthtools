@@ -61,7 +61,7 @@ Default = 1.}
 Default = F.}
 
 \item{mods}{a vector of models to fit.
-Default = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma").}
+Choose from = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma").}
 }
 \value{
 a list containing all survival model objects.

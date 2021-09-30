@@ -26,7 +26,7 @@
 #' @param risktable time horizon the extrapolation is done over.
 #' Default = F.
 #' @param mods a vector of models to fit.
-#' Default = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma").
+#' Choose from = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma").
 #' @return
 #' a list containing all survival model objects.
 #' @export
@@ -337,6 +337,10 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' Default = FALSE
 #' @param choose_PFS preferred PFS distribution.
 #' @param choose_OS preferred OS distribution.
+#' @param dist_name_PFS specify PFS distribution when par = T.
+#' Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.
+#' @param dist_name_OS specify OS distribution when par = T.
+#' Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.
 #' @param time numeric vector of time to estimate probabilities.
 #' @param v_names_states vector of state names.
 #' @param PA run probabilistic analysis.
@@ -349,9 +353,16 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
 #' @export
 partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE,
-                     choose_PFS, choose_OS, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421){
+                     dist_name_PFS = NULL, dist_name_OS = NULL, choose_PFS = NULL, choose_OS = NULL,
+                     time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421){
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
+
+  if (par == TRUE) {
+    choose_PFS <<- dist_name_PFS
+    choose_OS  <<- dist_name_OS
+  }
+
   chosen_models <- paste0("PFS: ", choose_PFS, ", ", "OS: ", choose_OS) # chosen model names
 
   # Calculate survival probabilities
@@ -1094,7 +1105,7 @@ runMLE.cure <- function (x, exArgs)
 
 #' Randomly draw parameter values of survival models from multivariate normal distribution.
 #'
-#' \code{create_at_risk_table} creates at-risk table.
+#' \code{model.rmvnorm} randomly draws parameter values of survival models from multivariate normal distributio.
 #'
 #' @param dist.v a character string specifying the name of the survival model.
 #' @param d.data a vector of mean parameter estimates of the survival model.
@@ -1111,10 +1122,10 @@ model.rmvnorm <- function(dist.v, d.data, vc.data, n_sim, seed = 421) {
   set.seed(seed) #
 
   if (!dist.v %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
-                     "log-Logistic", "Gompertz", "Expoenntial Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
+                     "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
                      "log-Logistic Cure", "Gompertz Cure")) {
     return(paste0("Incorrect distribution name, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
-                log-Logistic, Gompertz, Expoenntial Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
+                log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
                 log-Logistic Cure, Gompertz Cure."))
   }
 
