@@ -359,29 +359,32 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
 
   if (par == TRUE) {
-    choose_PFS <<- dist_name_PFS
-    choose_OS  <<- dist_name_OS
+    dist_PFS <- dist_name_PFS
+    dist_OS  <- dist_name_OS
+  } else {
+    dist_PFS <- choose_PFS
+    dist_OS  <- choose_OS
   }
 
-  chosen_models <- paste0("PFS: ", choose_PFS, ", ", "OS: ", choose_OS) # chosen model names
+  chosen_models <- paste0("PFS: ", dist_PFS, ", ", "OS: ", dist_OS) # chosen model names
 
   # Calculate survival probabilities
   if (deter == 0) { # probabilistic
     if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
       # randomly draw parameter values from multivariate normal distribution
-      param_draws_PFS <- model.rmvnorm(dist.v  = choose_PFS,
+      param_draws_PFS <- model.rmvnorm(dist.v  = dist_PFS,
                                        d.data  = l_d.data$PFS,
                                        vc.data = l_vc.data$PFS,
                                        n_sim   = n_sim)
-      param_draws_OS  <- model.rmvnorm(dist.v  = choose_OS,
+      param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
                                        d.data  = l_d.data$OS,
                                        vc.data = l_vc.data$OS,
                                        n_sim   = n_sim)
       # obtain survival probabilities
       pfs.surv <- os.surv <- matrix(NA, nrow = length(time), ncol = n_sim)
       for (j in 1:n_sim) {
-        pfs.surv[, j] <- model.dist(dist.v = choose_PFS, d.data = param_draws_PFS[j, ], t = time)
-        os.surv [, j] <- model.dist(dist.v = choose_OS,  d.data = param_draws_OS[j, ],  t = time)
+        pfs.surv[, j] <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[j, ], t = time)
+        os.surv [, j] <- model.dist(dist.v = dist_OS,  d.data = param_draws_OS[j, ],  t = time)
       }
     } else {
       # Model-setup
@@ -392,8 +395,8 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
       mod.pfs <- names(pfs_survHE$models)
       mod.os <- names(os_survHE$models)
       # chosen model index based on name
-      mod.pfs.chosen <- which(mod.pfs == choose_PFS)
-      mod.os.chosen <- which(mod.os == choose_OS)
+      mod.pfs.chosen <- which(mod.pfs == dist_PFS)
+      mod.os.chosen <- which(mod.os == dist_OS)
       fit_PFS <- make.surv(pfs_survHE,
                            mod = mod.pfs.chosen,
                            nsim = n_sim,
@@ -408,20 +411,20 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
   } else { # deterministic
     if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
       # randomly draw parameter values from multivariate normal distribution
-      param_draws_PFS <- model.rmvnorm(dist.v  = choose_PFS,
+      param_draws_PFS <- model.rmvnorm(dist.v  = dist_PFS,
                                        d.data  = l_d.data[[1]],
                                        vc.data = l_vc.data[[1]],
                                        n_sim   = 1)
-      param_draws_OS  <- model.rmvnorm(dist.v  = choose_OS,
+      param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
                                        d.data  = l_d.data[[2]],
                                        vc.data = l_vc.data[[2]],
                                        n_sim   = 1)
       # obtain survival probabilities
-      pfs.surv <- model.dist(dist.v = choose_PFS, d.data = param_draws_PFS[1, ], t = time)
-      os.surv  <- model.dist(dist.v = choose_OS,  d.data =  param_draws_OS[1, ], t = time)
+      pfs.surv <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[1, ], t = time)
+      os.surv  <- model.dist(dist.v = dist_OS,  d.data =  param_draws_OS[1, ], t = time)
     } else {
-      pfs.surv <- surv_prob(pfs_survHE$models[[which(mod.pfs == choose_PFS)]], time = times)
-      os.surv  <- surv_prob( os_survHE$models[[which(mod.os  ==  choose_OS)]], time = times)
+      pfs.surv <- surv_prob(pfs_survHE$models[[which(mod.pfs == dist_PFS)]], time = times)
+      os.surv  <- surv_prob( os_survHE$models[[which(mod.os  ==  dist_OS)]], time = times)
     }
   }
 
@@ -1125,8 +1128,8 @@ model.rmvnorm <- function(dist.v, d.data, vc.data, n_sim, seed = 421) {
                      "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
                      "log-Logistic Cure", "Gompertz Cure")) {
     return(paste0("Incorrect distribution name, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
-                log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
-                log-Logistic Cure, Gompertz Cure."))
+                 log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
+                 log-Logistic Cure, Gompertz Cure."))
   }
 
   # function returns transition probability
