@@ -10,6 +10,7 @@ partsurv(
   l_d.data = NULL,
   l_vc.data = NULL,
   par = FALSE,
+  chol = FALSE,
   dist_name_PFS = NULL,
   dist_name_OS = NULL,
   choose_PFS = NULL,
@@ -28,10 +29,12 @@ partsurv(
 
 \item{l_d.data}{list of mean parameter estimates (for PFS and OS)}
 
-\item{l_vc.data}{list of variance-covariance matrices of parameter estimates (for PFS and OS)}
+\item{l_vc.data}{list of variance-covariance matrices (or their Cholesky decomposition) of parameter estimates (for PFS and OS)}
 
 \item{par}{use parameter mean estimates and variance-covariance matrix instead of IPD
 Default = FALSE}
+
+\item{chol}{if the Cholesky decomposition of the variance-covariance matrix is used instead of the variance-covariance matrix}
 
 \item{dist_name_PFS}{specify PFS distribution when par = T.
 Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.}

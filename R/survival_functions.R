@@ -332,9 +332,10 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' @param pfs_survHE survHE obj fitting PFS.
 #' @param os_survHE survHE obj fitting OS.
 #' @param l_d.data list of mean parameter estimates (for PFS and OS)
-#' @param l_vc.data list of variance-covariance matrices of parameter estimates (for PFS and OS)
+#' @param l_vc.data list of variance-covariance matrices (or their Cholesky decomposition) of parameter estimates (for PFS and OS)
 #' @param par use parameter mean estimates and variance-covariance matrix instead of IPD
 #' Default = FALSE
+#' @param chol if the Cholesky decomposition of the variance-covariance matrix is used instead of the variance-covariance matrix
 #' @param choose_PFS preferred PFS distribution.
 #' @param choose_OS preferred OS distribution.
 #' @param dist_name_PFS specify PFS distribution when par = T.
@@ -352,7 +353,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' @return
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
 #' @export
-partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE,
+partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE, chol = FALSE,
                      dist_name_PFS = NULL, dist_name_OS = NULL, choose_PFS = NULL, choose_OS = NULL,
                      time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421){
   set.seed(seed)
@@ -361,6 +362,13 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
   if (par == TRUE) {
     dist_PFS <- dist_name_PFS
     dist_OS  <- dist_name_OS
+    # deal with Cholesky decomposition
+
+    if (chol == TRUE) {
+      for (i in 1:length(l_vc.data)) {
+        l_vc.data[[i]] <- crossprod(l_vc.data[[i]])
+      }
+    }
   } else {
     dist_PFS <- choose_PFS
     dist_OS  <- choose_OS
