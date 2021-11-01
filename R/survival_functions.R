@@ -458,6 +458,7 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
   Sick                 <- os.surv - pfs.surv    # estimate the probability of remaining in the progressed state
   check_PFS_OS(Sick)                            # print warning message if PFS > OS
   Sick[Sick < 0]       <- 0                     # in cases where the probability is negative replace with zero
+  if (pfs.surv > os.surv) {pfs.surv = os.surv}  # if PFS > OS, make PFS = OS
   Healthy              <- pfs.surv              # probability of remaining stable
   Dead                 <- 1 - os.surv           # probability of being Dead
   trace <- abind(Healthy,
