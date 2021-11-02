@@ -404,7 +404,7 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
       mod.os <- names(os_survHE$models)
       # chosen model index based on name
       mod.pfs.chosen <- which(mod.pfs == dist_PFS)
-      mod.os.chosen <- which(mod.os == dist_OS)
+      mod.os.chosen  <- which(mod.os == dist_OS)
       fit_PFS <- make.surv(pfs_survHE,
                            mod = mod.pfs.chosen,
                            nsim = n_sim,
@@ -461,11 +461,13 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
     os.trans.prob  <- trans_prob(os.surv)
   }
 
+  # if PFS > OS, make PFS = OS
+  pfs.surv[pfs.surv > os.surv] <- os.surv[pfs.surv > os.surv]
+
   # Calculate state occupation proportions
   Sick                 <- os.surv - pfs.surv    # estimate the probability of remaining in the progressed state
   check_PFS_OS(Sick)                            # print warning message if PFS > OS
   Sick[Sick < 0]       <- 0                     # in cases where the probability is negative replace with zero
-  if (pfs.surv > os.surv) {pfs.surv = os.surv}  # if PFS > OS, make PFS = OS
   Healthy              <- pfs.surv              # probability of remaining stable
   Dead                 <- 1 - os.surv           # probability of being Dead
   trace <- abind(Healthy,
