@@ -394,7 +394,7 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
         pfs.surv[, j] <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[j, ], t = time)
         os.surv [, j] <- model.dist(dist.v = dist_OS,  d.data = param_draws_OS[j, ],  t = time)
       }
-    } else {
+    } else { # use survival models
       # Model-setup
       # model objects
       pfs_survHE <- pfs_survHE$model.objects
@@ -430,7 +430,14 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
       # obtain survival probabilities
       pfs.surv <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[1, ], t = time)
       os.surv  <- model.dist(dist.v = dist_OS,  d.data =  param_draws_OS[1, ], t = time)
-    } else {
+    } else { # use survival models
+      # Model-setup
+      # model objects
+      pfs_survHE <- pfs_survHE$model.objects
+      os_survHE <-  os_survHE$model.objects
+      # model names
+      mod.pfs <- names(pfs_survHE$models)
+      mod.os <- names(os_survHE$models)
       pfs.surv <- surv_prob(pfs_survHE$models[[which(mod.pfs == dist_PFS)]], time = times)
       os.surv  <- surv_prob( os_survHE$models[[which(mod.os  ==  dist_OS)]], time = times)
     }
