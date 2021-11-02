@@ -462,7 +462,13 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
   }
 
   # if PFS > OS, make PFS = OS
-  pfs.surv[pfs.surv > os.surv] <- os.surv[pfs.surv > os.surv]
+  if (deter == 0) { # probabilistic
+    for (i in 1:ncol(pfs.surv)) {
+      pfs.surv[,i][pfs.surv[,i] > os.surv[,i]] <- os.surv[,i][pfs.surv[,i] > os.surv[,i]]
+    }
+  } else { # deterministic
+      pfs.surv[pfs.surv > os.surv] <- os.surv[pfs.surv > os.surv]
+  }
 
   # Calculate state occupation proportions
   Sick                 <- os.surv - pfs.surv    # estimate the probability of remaining in the progressed state
