@@ -11,8 +11,6 @@ partsurv(
   l_vc.data = NULL,
   par = FALSE,
   chol = FALSE,
-  dist_name_PFS = NULL,
-  dist_name_OS = NULL,
   choose_PFS = NULL,
   choose_OS = NULL,
   time = times,
@@ -27,24 +25,19 @@ partsurv(
 
 \item{os_survHE}{survHE obj fitting OS.}
 
-\item{l_d.data}{list of mean parameter estimates (for PFS and OS)}
+\item{l_d.data}{list of mean parameter estimates (list containing 2 numerical estimates, 1 for PFS and 1 for OS).}
 
-\item{l_vc.data}{list of variance-covariance matrices (or their Cholesky decomposition) of parameter estimates (for PFS and OS)}
+\item{l_vc.data}{list of variance-covariance matrices (or their Cholesky decomposition) of parameter estimates (list containing 2 matrices, 1 for PFS and 1 for OS).}
 
-\item{par}{use parameter mean estimates and variance-covariance matrix instead of IPD
+\item{par}{set to TRUE if parameter mean estimates and their variance-covariance matrices are used instead of survHE objects.
 Default = FALSE}
 
-\item{chol}{if the Cholesky decomposition of the variance-covariance matrix is used instead of the variance-covariance matrix}
+\item{chol}{set to TRUE if l_vc.data contains Cholesky decomposition of the variance-covariance matrices instead of the actual variance-covariance matrices.
+Default = FALSE}
 
-\item{dist_name_PFS}{specify PFS distribution when par = T.
-Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.}
+\item{choose_PFS}{chosen PFS distribution. Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.}
 
-\item{dist_name_OS}{specify OS distribution when par = T.
-Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.}
-
-\item{choose_PFS}{preferred PFS distribution.}
-
-\item{choose_OS}{preferred OS distribution.}
+\item{choose_OS}{chosen OS distribution. Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.}
 
 \item{time}{numeric vector of time to estimate probabilities.}
 

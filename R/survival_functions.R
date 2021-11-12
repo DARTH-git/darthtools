@@ -331,17 +331,14 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #'
 #' @param pfs_survHE survHE obj fitting PFS.
 #' @param os_survHE survHE obj fitting OS.
-#' @param l_d.data list of mean parameter estimates (for PFS and OS)
-#' @param l_vc.data list of variance-covariance matrices (or their Cholesky decomposition) of parameter estimates (for PFS and OS)
-#' @param par use parameter mean estimates and variance-covariance matrix instead of IPD
+#' @param l_d.data list of mean parameter estimates (list containing 2 numerical estimates, 1 for PFS and 1 for OS).
+#' @param l_vc.data list of variance-covariance matrices (or their Cholesky decomposition) of parameter estimates (list containing 2 matrices, 1 for PFS and 1 for OS).
+#' @param par set to TRUE if parameter mean estimates and their variance-covariance matrices are used instead of survHE objects.
 #' Default = FALSE
-#' @param chol if the Cholesky decomposition of the variance-covariance matrix is used instead of the variance-covariance matrix
-#' @param choose_PFS preferred PFS distribution.
-#' @param choose_OS preferred OS distribution.
-#' @param dist_name_PFS specify PFS distribution when par = T.
-#' Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.
-#' @param dist_name_OS specify OS distribution when par = T.
-#' Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.
+#' @param chol set to TRUE if l_vc.data contains Cholesky decomposition of the variance-covariance matrices instead of the actual variance-covariance matrices.
+#' Default = FALSE
+#' @param choose_PFS chosen PFS distribution. Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.
+#' @param choose_OS chosen OS distribution. Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.
 #' @param time numeric vector of time to estimate probabilities.
 #' @param v_names_states vector of state names.
 #' @param PA run probabilistic analysis.
@@ -354,19 +351,18 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
 #' @export
 partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE, chol = FALSE,
-                     dist_name_PFS = NULL, dist_name_OS = NULL, choose_PFS = NULL, choose_OS = NULL,
-                     time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421){
+                     choose_PFS = NULL, choose_OS = NULL, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421){
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
 
   if (par == TRUE) {
-    dist_PFS <- dist_name_PFS
-    dist_OS  <- dist_name_OS
+    dist_PFS <- choose_PFS
+    dist_OS  <- choose_OS
     # deal with Cholesky decomposition
-
     if (chol == TRUE) {
       for (i in 1:length(l_vc.data)) {
-        l_vc.data[[i]] <- crossprod(l_vc.data[[i]])
+        l_vc.data[[i]][lower.tri(l_vc.data[[i]])] <- 0  # make sure the lower triangle of the Cholesky decomposition is 0
+        l_vc.data[[i]] <- crossprod(l_vc.data[[i]])     # transform Cholesky decomposition into the original variance-covariance matrix
       }
     }
   } else {
@@ -443,6 +439,25 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
     }
   }
 
+  # if PFS > OS, make PFS = OS
+  check_PFS_OS(os.surv - pfs.surv)                            # print warning message if PFS > OS
+  if (deter == 0) { # probabilistic
+    pfs.surv <- as.matrix(pfs.surv)
+    os.surv  <- as.matrix(os.surv)
+    for (i in 1:ncol(pfs.surv)) {
+      pfs.surv[,i][pfs.surv[,i] > os.surv[,i]] <- os.surv[,i][pfs.surv[,i] > os.surv[,i]]
+    }
+  } else { # deterministic
+    pfs.surv[pfs.surv > os.surv] <- os.surv[pfs.surv > os.surv]
+  }
+
+  # Calculate state occupation proportions
+  Sick                 <- os.surv - pfs.surv    # estimate the probability of remaining in the progressed state
+  Healthy              <- pfs.surv              # probability of remaining stable
+  Dead                 <- 1 - os.surv           # probability of being Dead
+  trace <- abind(Healthy,
+                 Sick,
+                 Dead, rev.along = 0)
   # Calculate area under survival curve (expected survival)
   if (deter == 0) { # probabilistic
     pfs.expected.surv <- mean(apply(pfs.surv, 2, function(x){expected_surv(time = times, surv = x)}))
@@ -460,27 +475,6 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
     pfs.trans.prob <- trans_prob(pfs.surv)
     os.trans.prob  <- trans_prob(os.surv)
   }
-
-  # if PFS > OS, make PFS = OS
-  if (deter == 0) { # probabilistic
-    pfs.surv <- as.matrix(pfs.surv)
-    os.surv  <- as.matrix(os.surv)
-    for (i in 1:ncol(pfs.surv)) {
-      pfs.surv[,i][pfs.surv[,i] > os.surv[,i]] <- os.surv[,i][pfs.surv[,i] > os.surv[,i]]
-    }
-  } else { # deterministic
-    pfs.surv[pfs.surv > os.surv] <- os.surv[pfs.surv > os.surv]
-  }
-
-  # Calculate state occupation proportions
-  Sick                 <- os.surv - pfs.surv    # estimate the probability of remaining in the progressed state
-  check_PFS_OS(Sick)                            # print warning message if PFS > OS
-  Sick[Sick < 0]       <- 0                     # in cases where the probability is negative replace with zero
-  Healthy              <- pfs.surv              # probability of remaining stable
-  Dead                 <- 1 - os.surv           # probability of being Dead
-  trace <- abind(Healthy,
-                 Sick,
-                 Dead, rev.along = 0)
 
   # Calculate Markov trace
   if (deter == 0){ # probabilistic
