@@ -917,38 +917,71 @@ boot.haz <- function (x, t, start = 0 ,X = NULL, newdata =NULL, B = 1000) {
 }
 
 #' Bootstrap hazards ratios of two survival models
-#' \code{boot_hr} computes bootstrap hazard ratios (HR) of two survival models (HR of model 1 vs. model 2)
+#' \code{boot_hr} computes bootstrap hazard ratios (HR) of two survival models (model 1 vs. 2) or one survival model with multiple treatments (rx 1 vs. 2)
 #'
 #' @param surv_model1 first survival model.
 #' @param surv_model2 second survival model.
+#' @param rx whether to model treatment arms within one model.
+#' Default = FALSE.
+#' @param rx1 first treatment arm (if rx = T).
+#' @param rx2 second treatment arm (if rx = T).
+#' @param surv_model_rx survival model (if rx = T), can only choose weibull or gamma models.
 #' @param B number of bootstrap samples.
 #' @param times time horizon the extrapolation of the survival model is done over.
 #' @return
 #' dataframe of hazard ratio statistics (2.5% percnetile, median, 97.5% percentile, time points)
 #' @export
-boot_hr <- function(surv_model1, surv_model2, times, B = 100){
-  # bootstrap hazards of survival model 1
-  boot.haz1 = boot.haz(x = surv_model1, B = 100, t = times)
-  boot.haz1[boot.haz1==0] = 0.01
-  boot.haz1 <- boot.haz1[1,,]
-  # take log hazards
-  boot.log.haz1 <- log(boot.haz1)
+boot_hr <- function(surv_model1 = NULL, surv_model2 = NULL, rx1 = NULL, rx2 = NULL, rx = F, surv_model_rx = NULL, times, B = 100){
+  if (rx == F) { # use separate models
+    # bootstrap hazards of survival model 1
+    boot.haz1 = boot.haz(x = surv_model1, B = B, t = times)
+    boot.haz1[boot.haz1==0] = 0.01
+    boot.haz1 <- boot.haz1[1,,]
+    # take log hazards
+    boot.log.haz1 <- log(boot.haz1)
 
-  # bootstrap hazards of survival model 2
-  boot.haz2 = boot.haz(x = surv_model2, B = 100, t = times)
-  boot.haz2[boot.haz2==0] = 0.01
-  boot.haz2 <- boot.haz2[1,,]
-  # take log hazards
-  boot.log.haz2 <- log(boot.haz2)
+    # bootstrap hazards of survival model 2
+    boot.haz2 = boot.haz(x = surv_model2, B = B, t = times)
+    boot.haz2[boot.haz2==0] = 0.01
+    boot.haz2 <- boot.haz2[1,,]
+    # take log hazards
+    boot.log.haz2 <- log(boot.haz2)
 
-  # calculate log hazard ratios of model 1 vs. 2
-  boot.log.hr <- boot.log.haz1 - boot.log.haz2
-  # return median hazard ratios with 95% confidence intervals
-  HR <- apply(boot.log.hr, 2, function(x)exp(quantile(x, probs = c(0.025, 0.5, 0.975))))
-  HR <- as.data.frame(t(HR))
-  HR$times <- times
-  colnames(HR) <- c("lcl", "med", "ucl", "time")
-  return(HR)
+    # calculate log hazard ratios of model 1 vs. 2
+    boot.log.hr <- boot.log.haz1 - boot.log.haz2
+    # return median hazard ratios with 95% confidence intervals
+    HR <- apply(boot.log.hr, 2, function(x)exp(quantile(x, probs = c(0.025, 0.5, 0.975))))
+    HR <- as.data.frame(t(HR))
+    HR$times <- times
+    colnames(HR) <- c("lcl", "med", "ucl", "time")
+    return(HR)
+  } else { # use combined treatment model
+      distt <- surv_model_rx$call$dist
+      t <- times
+      hr.est <- summary(surv_model_rx, t=t, type="hazard", newdata=data.frame(rx=rx1),ci=FALSE)[[1]][,"est"] /
+                summary(surv_model_rx, t=t, type="hazard", newdata=data.frame(rx=rx2),ci=FALSE)[[1]][,"est"]
+      pars <- normboot.flexsurvreg(surv_model_rx, B=B, newdata=data.frame(rx=c(rx2,rx1)))
+      hr <- matrix(nrow=B, ncol=length(t))
+
+      for (i in seq_along(t)){
+        if (distt == "weibull") {
+          haz.rx1.rep <- do.call(hweibull, c(list(t[i]), as.data.frame(pars[[2]])))
+          haz.rx2.rep <- do.call(hweibull, c(list(t[i]), as.data.frame(pars[[1]])))
+        } else if (distt == "gamma") {
+          haz.rx1.rep <- do.call(hgamma, c(list(t[i]), as.data.frame(pars[[2]])))
+          haz.rx2.rep <- do.call(hgamma, c(list(t[i]), as.data.frame(pars[[1]])))
+        }
+        hr[,i] <- haz.rx1.rep / haz.rx2.rep
+      }
+      hr <- apply(hr, 2, quantile, c(0.025, 0.975))
+
+      HR <- data.frame(lcl = hr[1,],
+                       med = hr.est,
+                       ucl = hr[2,],
+                       time = times)
+      return(HR)
+  }
+
 }
 
 #' Print a warning message if PFS > OS

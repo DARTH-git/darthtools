@@ -3,14 +3,32 @@
 \name{boot_hr}
 \alias{boot_hr}
 \title{Bootstrap hazards ratios of two survival models
-\code{boot_hr} computes bootstrap hazard ratios (HR) of two survival models (HR of model 1 vs. model 2)}
+\code{boot_hr} computes bootstrap hazard ratios (HR) of two survival models (model 1 vs. 2) or one survival model with multiple treatments (rx 1 vs. 2)}
 \usage{
-boot_hr(surv_model1, surv_model2, times, B = 100)
+boot_hr(
+  surv_model1 = NULL,
+  surv_model2 = NULL,
+  rx1 = NULL,
+  rx2 = NULL,
+  rx = F,
+  surv_model_rx = NULL,
+  times,
+  B = 100
+)
 }
 \arguments{
 \item{surv_model1}{first survival model.}
 
 \item{surv_model2}{second survival model.}
+
+\item{rx1}{first treatment arm (if rx = T).}
+
+\item{rx2}{second treatment arm (if rx = T).}
+
+\item{rx}{whether to model treatment arms within one model.
+Default = FALSE.}
+
+\item{surv_model_rx}{survival model (if rx = T), can only choose weibull or gamma models.}
 
 \item{times}{time horizon the extrapolation of the survival model is done over.}
 
@@ -21,5 +39,5 @@ dataframe of hazard ratio statistics (2.5\% percnetile, median, 97.5\% percentil
 }
 \description{
 Bootstrap hazards ratios of two survival models
-\code{boot_hr} computes bootstrap hazard ratios (HR) of two survival models (HR of model 1 vs. model 2)
+\code{boot_hr} computes bootstrap hazard ratios (HR) of two survival models (model 1 vs. 2) or one survival model with multiple treatments (rx 1 vs. 2)
 }
