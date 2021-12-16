@@ -931,7 +931,6 @@ boot.haz <- function (x, t, start = 0 ,X = NULL, newdata =NULL, B = 1000) {
 #' @return
 #' dataframe of hazard ratio statistics (2.5% percnetile, median, 97.5% percentile, time points)
 #' @export
-# Add plotting into function, paste ylab
 boot_hr <- function(surv_model1 = NULL, surv_model2 = NULL, rx1 = NULL, rx2 = NULL, rx = F, surv_model_rx = NULL, times, B = 100){
   if (rx == F) { # use separate models
     # bootstrap hazards of survival model 1
@@ -972,11 +971,42 @@ boot_hr <- function(surv_model1 = NULL, surv_model2 = NULL, rx1 = NULL, rx2 = NU
     }
     hr <- apply(hr, 2, quantile, c(0.025, 0.975))
     HR <- data.frame(lcl = hr[1,], med = hr.est, ucl = hr[2,], time = times)
+    plot(t, hr.est, type="l", ylim=c(0, 2), col="red", xlab="time", ylab=paste0("Hazard ratio", rx1, "/ ", rx2), lwd=2)
+    lines(t, hr[1,], col="red", lwd=1, lty=2)
+    lines(t, hr[2,], col="red", lwd=1, lty=2)
     return(HR)
   }
 
 }
 
+#' Non-parametric hazard bootstrap
+#' \code{boot_hr} computes non-parametric bootstrap hazards from time-to-event data.
+#'
+#' @param surv_data survival (time-to-event) data.
+#' @param time name of time variable in survival data (character variable).
+#' @param status name of status variable survival data (character variable).
+#' @param B number of bootstrap samples.
+#' @return
+#' list of objects (time points, hazard, hazard CI, bootstrapped time points).
+#' @export
+# non-parametric hazard boostrap
+boot_muhaz <- function(surv_data, time, status, B){
+  fit <- muhaz(surv_data[, time],surv_data[, status] )
+  masurv_data_time <- masurv_data(fit$est.grid)
+  s_time <- s_haz <-matrisurv_data(NA, nrow = length(fit$est.grid), ncol = B)
+  for (i in 1:B){
+    s_id <- sample(1:nrow(surv_data), replace = T)
+    s_surv_data <- surv_data[s_id,]
+    s_fit       <- muhaz(times = s_surv_data[,time],delta = s_surv_data[,status], masurv_data.time = masurv_data_time )
+    s_haz[,i]   <- s_fit$haz.est
+    s_time[,i]  <- s_fit$est.grid
+  }
+  m_s_haz  <- rowMeans(s_haz)
+  ci_s_haz <- t(apply(s_haz,1,quantile, c(0.025,0.975)))
+  ci_s_haz <- as.data.frame(ci_s_haz)
+  colnames(ci_s_haz) <- c("Low-95%CI", "High-95%CI")
+  list(time = fit$est.grid , hazard = m_s_haz, ci.hazard = ci_s_haz, boot.time = s_time )
+}
 
 #' Print a warning message if PFS > OS
 #'
