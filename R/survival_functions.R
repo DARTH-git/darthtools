@@ -931,6 +931,7 @@ boot.haz <- function (x, t, start = 0 ,X = NULL, newdata =NULL, B = 1000) {
 #' @return
 #' dataframe of hazard ratio statistics (2.5% percnetile, median, 97.5% percentile, time points)
 #' @export
+# Add plotting into function, paste ylab
 boot_hr <- function(surv_model1 = NULL, surv_model2 = NULL, rx1 = NULL, rx2 = NULL, rx = F, surv_model_rx = NULL, times, B = 100){
   if (rx == F) { # use separate models
     # bootstrap hazards of survival model 1
@@ -956,33 +957,26 @@ boot_hr <- function(surv_model1 = NULL, surv_model2 = NULL, rx1 = NULL, rx2 = NU
     colnames(HR) <- c("lcl", "med", "ucl", "time")
     return(HR)
   } else { # use combined treatment model
-      distt <- surv_model_rx$call$dist
-      t <- times
-      hr.est <- summary(surv_model_rx, t=t, type="hazard", newdata=data.frame(rx=rx1),ci=FALSE)[[1]][,"est"] /
-                summary(surv_model_rx, t=t, type="hazard", newdata=data.frame(rx=rx2),ci=FALSE)[[1]][,"est"]
-      pars <- normboot.flexsurvreg(surv_model_rx, B=B, newdata=data.frame(rx=c(rx2,rx1)))
-      hr <- matrix(nrow=B, ncol=length(t))
+    mod.rx <- surv_model_rx
+    distt <- mod.rx$call$dist
+    t <- times
+    hr.est <- summary(mod.rx, t=t, type="hazard", newdata=data.frame(rx=rx1),ci=FALSE)[[1]][,"est"] /
+      summary(mod.rx, t=t, type="hazard", newdata=data.frame(rx=rx2),ci=FALSE)[[1]][,"est"]
+    pars <- normboot.flexsurvreg(mod.rx, B=B, newdata=data.frame(rx=c(rx2,rx1)))
+    hr <- matrix(nrow=B, ncol=length(t))
 
-      for (i in seq_along(t)){
-        if (distt == "weibull") {
-          haz.rx1.rep <- do.call(hweibull, c(list(t[i]), as.data.frame(pars[[2]])))
-          haz.rx2.rep <- do.call(hweibull, c(list(t[i]), as.data.frame(pars[[1]])))
-        } else if (distt == "gamma") {
-          haz.rx1.rep <- do.call(hgamma, c(list(t[i]), as.data.frame(pars[[2]])))
-          haz.rx2.rep <- do.call(hgamma, c(list(t[i]), as.data.frame(pars[[1]])))
-        }
-        hr[,i] <- haz.rx1.rep / haz.rx2.rep
-      }
-      hr <- apply(hr, 2, quantile, c(0.025, 0.975))
-
-      HR <- data.frame(lcl = hr[1,],
-                       med = hr.est,
-                       ucl = hr[2,],
-                       time = times)
-      return(HR)
+    for (i in seq_along(t)){
+      haz.rx1.rep <- do.call(mod.rx$dfns$h, c(list(t[i]), as.data.frame(pars[[2]])))
+      haz.rx2.rep <- do.call(mod.rx$dfns$h, c(list(t[i]), as.data.frame(pars[[1]])))
+      hr[,i] <- haz.rx1.rep / haz.rx2.rep
+    }
+    hr <- apply(hr, 2, quantile, c(0.025, 0.975))
+    HR <- data.frame(lcl = hr[1,], med = hr.est, ucl = hr[2,], time = times)
+    return(HR)
   }
 
 }
+
 
 #' Print a warning message if PFS > OS
 #'
