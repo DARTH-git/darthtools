@@ -980,7 +980,7 @@ boot_hr <- function(surv_model1 = NULL, surv_model2 = NULL, rx1 = NULL, rx2 = NU
 }
 
 #' Non-parametric hazard bootstrap
-#' \code{boot_hr} computes non-parametric bootstrap hazards from time-to-event data.
+#' \code{boot_haz_np} computes non-parametric bootstrap hazards from time-to-event data.
 #'
 #' @param surv_data survival (time-to-event) data.
 #' @param time name of time variable in survival data (character variable).
@@ -989,23 +989,23 @@ boot_hr <- function(surv_model1 = NULL, surv_model2 = NULL, rx1 = NULL, rx2 = NU
 #' @return
 #' list of objects (time points, hazard, hazard CI, bootstrapped time points).
 #' @export
-# non-parametric hazard boostrap
-boot_muhaz <- function(surv_data, time, status, B){
-  fit <- muhaz(surv_data[, time],surv_data[, status] )
-  masurv_data_time <- masurv_data(fit$est.grid)
-  s_time <- s_haz <-matrisurv_data(NA, nrow = length(fit$est.grid), ncol = B)
+boot_haz_np <- function(surv_data, time, status, B){
+  require(muhaz)
+  fit      <- muhaz(surv_data[,time], surv_data[,status])
+  max_time <- max(fit$est.grid)
+  s_time <- s_haz <-matrix(NA, nrow = length(fit$est.grid), ncol = B)
   for (i in 1:B){
-    s_id <- sample(1:nrow(surv_data), replace = T)
-    s_surv_data <- surv_data[s_id,]
-    s_fit       <- muhaz(times = s_surv_data[,time],delta = s_surv_data[,status], masurv_data.time = masurv_data_time )
-    s_haz[,i]   <- s_fit$haz.est
-    s_time[,i]  <- s_fit$est.grid
+    s_id       <- sample(1:nrow(surv_data), replace = T)
+    s_x        <- surv_data[s_id,]
+    s_fit      <- muhaz(times = s_x[,time],delta = s_x[,status], max.time = max_time)
+    s_haz[,i]  <- s_fit$haz.est
+    s_time[,i] <- s_fit$est.grid
   }
   m_s_haz  <- rowMeans(s_haz)
   ci_s_haz <- t(apply(s_haz,1,quantile, c(0.025,0.975)))
   ci_s_haz <- as.data.frame(ci_s_haz)
   colnames(ci_s_haz) <- c("Low-95%CI", "High-95%CI")
-  list(time = fit$est.grid , hazard = m_s_haz, ci.hazard = ci_s_haz, boot.time = s_time )
+  return(list(time = fit$est.grid , hazard = m_s_haz, ci.hazard = ci_s_haz, boot.time = s_time))
 }
 
 #' Print a warning message if PFS > OS
