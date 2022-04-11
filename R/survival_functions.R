@@ -6,7 +6,7 @@
 #' @param status numeric vector of event status.
 #' @param covariate logical value indicating whether treatment is being used as a covariate in parameteric survival models.
 #' Default = FALSE.
-#' @param rx numerical value indicating the treatment variable used as as covariate in parameteric survival models.
+#' @param rx character value indicating the treatment variable used as as covariate in parameteric survival models.
 #' @param data dataframe containing the time and status variables.
 #' @param extrapolate extrapolate beyond model time horizon.
 #' Default = FALSE.
@@ -986,11 +986,13 @@ boot_hr <- function(surv_model1 = NULL, surv_model2 = NULL, rx1 = NULL, rx2 = NU
 #' @param time name of time variable in survival data (character variable).
 #' @param status name of status variable survival data (character variable).
 #' @param B number of bootstrap samples.
+#' @param Rx treatment arm.
 #' @return
 #' list of objects (time points, hazard, hazard CI, bootstrapped time points).
 #' @export
-boot_haz_np <- function(surv_data, time, status, B){
+boot_haz_np <- function(surv_data, time, status, Rx, B){
   require(muhaz)
+  surv_data <- surv_data %>% filter(rx == Rx)
   fit      <- muhaz(surv_data[,time], surv_data[,status])
   max_time <- max(fit$est.grid)
   s_time <- s_haz <-matrix(NA, nrow = length(fit$est.grid), ncol = B)
@@ -1004,8 +1006,13 @@ boot_haz_np <- function(surv_data, time, status, B){
   m_s_haz  <- rowMeans(s_haz)
   ci_s_haz <- t(apply(s_haz,1,quantile, c(0.025,0.975)))
   ci_s_haz <- as.data.frame(ci_s_haz)
-  colnames(ci_s_haz) <- c("Low-95%CI", "High-95%CI")
-  return(list(time = fit$est.grid , hazard = m_s_haz, ci.hazard = ci_s_haz, boot.time = s_time))
+  result_haz <- data.frame(time = fit$est.grid, hazard = m_s_haz, ci.hazard = ci_s_haz)
+  colnames(result_haz) <- c("Time", "Hazard", "Low-95%CI", "High-95%CI")
+  plot(result_haz$time, result_haz$haz, type="l", col="red", xlab="time", ylab=paste0("hazard"), lwd=2,
+       ylim=c(min(result_haz[,3]), max(result_haz[,4])))
+  lines(result_haz$time, result_haz[,3], col="red", lwd=1, lty=2)
+  lines(result_haz$time, result_haz[,4], col="red", lwd=1, lty=2)
+  return(result_haz)
 }
 
 #' Print a warning message if PFS > OS
