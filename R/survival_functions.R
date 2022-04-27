@@ -209,7 +209,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
   if (extrapolate == TRUE)  {
     plot.times <- times
   } else if  (extrapolate == FALSE) {
-    plot.times <- seq(min(times),max(data$time), by = diff(times)[1])
+    plot.times <- data$time
   }
 
   ## Fit parametric survival models
@@ -231,6 +231,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
     KM.fit <- survfit(Surv(time, status) ~ 1, data = data)
   }
 
+  xlow = min(plot.times); xhigh = max(plot.times) # set plot x-axis limits
   S_superimpose <- ggsurvplot(
     KM.fit,
     data       = data,           # specify dataset
