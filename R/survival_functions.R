@@ -46,7 +46,7 @@ fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = 
   if (extrapolate == TRUE)  {
     plot.times <- times
   } else if  (extrapolate == FALSE) {
-    plot.times <- seq(min(times),max(data$time), by = diff(times)[1])
+    plot.times <- data$time
   }
 
   ## Fit parametric survival models
@@ -66,6 +66,7 @@ fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = 
     KM.fit <- survfit(Surv(time, status) ~ 1, data = data)
   }
 
+  xlow = min(plot.times); xhigh = max(plot.times) # set plot x-axis limits
   S_superimpose <- ggsurvplot(
     KM.fit,
     data       = data,           # specify dataset
@@ -539,7 +540,13 @@ surv_prob <- function(model, times = NULL, PA = FALSE, rx = 1) {
 #' matrix of transition probabilities
 #' @export
 trans_prob <- function(surv){
-  t.p <- 1- surv[-1]/(surv[-length(surv)])
+  d_surv <- surv[-1]/(surv[-length(surv)])
+  t.p <- 1 - d_surv
+  if (sum(t.p < 0) > 0) {
+    message("Negative transition probabilities were set to 0.")
+  }
+  d_surv[d_surv > 1] <- 1
+  t.p <- 1 - d_surv
   return(t.p = t.p)
 }
 
