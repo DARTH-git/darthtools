@@ -11,7 +11,7 @@ samplev <- function(m_Probs, m = 1) {
   # m_Probs: matrix with probabilities (n.i * n.s)
   # m:       number of states than need to be sampled per individual
   # Return
-  # ran:    n.i x m matrix filled with sampled health state(s) per individual
+  # v_cat:   n.i x m matrix filled with sampled health state(s) per individual
   require(matrixStats)
   lev <- dimnames(m_Probs)[[2]]  # extract the names of the health states considered for sampling
   n_samp <- nrow(m_Probs)
