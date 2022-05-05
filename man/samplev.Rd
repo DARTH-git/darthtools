@@ -4,10 +4,12 @@
 \alias{samplev}
 \title{Vectorized categorical distribution}
 \usage{
-samplev(m_Probs)
+samplev(m_Probs, m = 1)
 }
 \arguments{
 \item{m_Probs}{matrix with probabilities (n_i * n_states)}
+
+\item{m}{number of cycles to sample}
 }
 \value{
 n_i x 1 matrix filled with sampled health state(s) per individual
