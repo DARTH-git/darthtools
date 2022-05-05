@@ -5,7 +5,7 @@
 \title{Non-parametric hazard bootstrap
 \code{boot_haz_np} computes non-parametric bootstrap hazards from time-to-event data.}
 \usage{
-boot_haz_np(surv_data, time, status, B)
+boot_haz_np(surv_data, time, status, Rx, B)
 }
 \arguments{
 \item{surv_data}{survival (time-to-event) data.}
@@ -13,6 +13,8 @@ boot_haz_np(surv_data, time, status, B)
 \item{time}{name of time variable in survival data (character variable).}
 
 \item{status}{name of status variable survival data (character variable).}
+
+\item{Rx}{treatment arm.}
 
 \item{B}{number of bootstrap samples.}
 }

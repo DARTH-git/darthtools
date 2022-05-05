@@ -30,7 +30,7 @@ fit.fun(
 \item{covariate}{logical value indicating whether treatment is being used as a covariate in parameteric survival models.
 Default = FALSE.}
 
-\item{rx}{numerical value indicating the treatment variable used as as covariate in parameteric survival models.}
+\item{rx}{character value indicating the treatment variable used as as covariate in parameteric survival models.}
 
 \item{data}{dataframe containing the time and status variables.}
 
