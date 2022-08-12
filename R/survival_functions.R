@@ -357,6 +357,24 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
 
+  # make sure distribution names for PFS and OS are correct
+  if (!choose_PFS %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
+                         "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
+                         "log-Logistic Cure", "Gompertz Cure")) {
+    stop(paste0("Incorrect distribution name for PFS, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
+                 log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
+                 log-Logistic Cure, Gompertz Cure."))
+  }
+
+  if (!choose_OS %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
+                         "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
+                         "log-Logistic Cure", "Gompertz Cure")) {
+    stop(paste0("Incorrect distribution name for OS, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
+                 log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
+                 log-Logistic Cure, Gompertz Cure."))
+  }
+
+
   if (par == TRUE) {
     dist_PFS <- choose_PFS
     dist_OS  <- choose_OS
@@ -1219,7 +1237,7 @@ model.rmvnorm <- function(dist.v, d.data, vc.data, n_sim, seed = 421) {
   if (!dist.v %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
                      "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
                      "log-Logistic Cure", "Gompertz Cure")) {
-    return(paste0("Incorrect distribution name, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
+    stop(paste0("Incorrect distribution name, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
                  log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
                  log-Logistic Cure, Gompertz Cure."))
   }
@@ -1389,7 +1407,7 @@ model.rmvnorm <- function(dist.v, d.data, vc.data, n_sim, seed = 421) {
   if (!dist.v %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
                      "log-Logistic", "Gompertz", "Expoenntial Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
                      "log-Logistic Cure", "Gompertz Cure")) {
-    return(paste0("Incorrect distribution name, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
+    stop(paste0("Incorrect distribution name, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
                 log-Logistic, Gompertz, Expoenntial Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
                 log-Logistic Cure, Gompertz Cure."))
   }
