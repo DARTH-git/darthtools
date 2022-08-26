@@ -99,3 +99,30 @@ plot_trace_PSM <- function(time, partsurv.model, PA=F, v_names_states) {
   }
 }
 
+#----------------------------------------------------------------------------#
+####                    Function to plot cohort trace                     ####
+#----------------------------------------------------------------------------#
+#' Plot cohort trace
+#'
+#' \code{plot_trace} plots the cohort trace.
+#'
+#' @param m_M a cohort trace matrix
+#' @return a ggplot object - plot of the cohort trace
+#'
+plot_trace <- function(m_M) {
+  df_M      <- data.frame(Cycle = 0:n_cycles, m_M, check.names = F)
+  df_M_long <- tidyr::gather(df_M, key = `Health State`, value, 2:ncol(df_M))
+  df_M_long$`Health State` <- factor(df_M_long$`Health State`, levels = v_names_states)
+  gg_trace <- ggplot(df_M_long, aes(x = Cycle, y = value,
+                                    color = `Health State`, linetype = `Health State`)) +
+    geom_line(size = 1) +
+    xlab("Cycle") +
+    ylab("Proportion of the cohort") +
+    scale_x_continuous(breaks = number_ticks(8)) +
+    theme_bw(base_size = 14) +
+    theme(legend.position  = "bottom",
+          legend.background = element_rect(fill = NA))
+
+  return(gg_trace)
+}
+
