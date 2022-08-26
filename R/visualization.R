@@ -99,9 +99,6 @@ plot_trace_PSM <- function(time, partsurv.model, PA=F, v_names_states) {
   }
 }
 
-#----------------------------------------------------------------------------#
-####                    Function to plot cohort trace                     ####
-#----------------------------------------------------------------------------#
 #' Plot cohort trace
 #'
 #' \code{plot_trace} plots the cohort trace.
