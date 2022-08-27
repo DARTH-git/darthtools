@@ -375,7 +375,7 @@ update_param_list <- function(l_params_all, params_updated){
 
 #' Plot of ICERs
 #'
-#' Plots the cost-effectiveness plane for a ICER object, calculated with \code{\link{calculate_icers}}
+#' \code{plot.icers} plots the cost-effectiveness plane for a ICER object, calculated with \code{\link{calculate_icers}}
 #' @param x Object of class \code{icers}.
 #' @inheritParams add_common_aes
 #' @param currency string. with currency used in the cost-effectiveness analysis (CEA).
@@ -390,9 +390,9 @@ update_param_list <- function(l_params_all, params_updated){
 #'
 #' @return a ggplot2 object which can be modified by adding additional geoms
 #'
+#' @export
 #' @importFrom stringr str_sub
 #' @importFrom ggrepel geom_label_repel
-#' @export
 plot.icers <- function(x,
                        txtsize = 12,
                        currency = "$",

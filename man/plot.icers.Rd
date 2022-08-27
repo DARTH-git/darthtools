@@ -64,5 +64,5 @@ Defaults to 10000.}
 a ggplot2 object which can be modified by adding additional geoms
 }
 \description{
-Plots the cost-effectiveness plane for a ICER object, calculated with \code{\link{calculate_icers}}
+\code{plot.icers} plots the cost-effectiveness plane for a ICER object, calculated with \code{\link{calculate_icers}}
 }
