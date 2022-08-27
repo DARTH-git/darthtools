@@ -615,4 +615,17 @@ add_common_aes <- function(gplot, txtsize, scale_name = waiver(),
   return(p)
 }
 
+#' used to automatically label continuous scales
+#' @keywords internal
+#' @param x axis breaks
+#' @return  a character vector giving a label for each input value
+#' @export
+labfun <- function(x) {
+  if (any(x > 999, na.rm = TRUE)) {
+    comma(x)
+  } else {
+    x
+  }
+}
+
 
