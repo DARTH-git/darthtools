@@ -390,9 +390,9 @@ update_param_list <- function(l_params_all, params_updated){
 #'
 #' @return a ggplot2 object which can be modified by adding additional geoms
 #'
-#' @export
 #' @importFrom stringr str_sub
 #' @importFrom ggrepel geom_label_repel
+#' @export
 plot.icers <- function(x,
                        txtsize = 12,
                        currency = "$",
