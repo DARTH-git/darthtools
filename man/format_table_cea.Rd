@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_cea_table.R
 \name{format_table_cea}
 \alias{format_table_cea}
-\title{Format table of cost-effectiveness analysis results}
+\title{Format CEA table}
 \usage{
 format_table_cea(table_cea)
 }
