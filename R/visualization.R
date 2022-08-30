@@ -951,7 +951,7 @@ plot_exp_loss <- function(x,
 #' @import ggplot2
 #' @importFrom scales comma
 #' @export
-plot.evpi <- function(x,
+plot_evpi <- function(x,
                       txtsize = 12,
                       currency = "$",
                       effect_units = "QALY",
