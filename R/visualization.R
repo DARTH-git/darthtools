@@ -629,3 +629,347 @@ labfun <- function(x) {
 }
 
 
+#' Plot the psa object
+#'
+#' @param x the psa object
+#' @param center plot the mean cost and effectiveness for each strategy. defaults to TRUE
+#' @param ellipse plot an ellipse around each strategy. defaults to TRUE
+#' @param alpha opacity of the scatterplot points.
+#' 0 is completely transparent, 1 is completely opaque
+#' @inheritParams add_common_aes
+#'
+#' @importFrom ellipse ellipse
+#' @import dplyr
+#' @import ggplot2
+#' @importFrom scales dollar_format
+#' @return A \code{ggplot2} plot of the PSA, showing the distribution of each PSA sample and strategy
+#' on the cost-effectiveness plane.
+#' @importFrom tidyr pivot_longer
+#' @export
+plot_psa <- function(x,
+                     center = TRUE, ellipse = TRUE,
+                     alpha = 0.2, txtsize = 12, col = c("full", "bw"),
+                     n_x_ticks = 6, n_y_ticks = 6,
+                     xbreaks = NULL,
+                     ybreaks = NULL,
+                     xlim = NULL,
+                     ylim = NULL,
+                     ...) {
+
+  effectiveness <- x$effectiveness
+  cost <- x$cost
+  strategies <- x$strategies
+  currency <- x$currency
+
+  # expect that effectiveness and costs have strategy column names
+  # removes confusing 'No id variables; using all as measure variables'
+  df_cost <- suppressMessages(
+    pivot_longer(cost,
+                 everything(),
+                 names_to = "Strategy",
+                 values_to = "Cost")
+  )
+  df_effect <- suppressMessages(
+    pivot_longer(effectiveness,
+                 cols = everything(),
+                 names_to = "Strategy",
+                 values_to = "Effectiveness")
+  )
+  ce_df <- data.frame("Strategy" = df_cost$Strategy,
+                      "Cost" = df_cost$Cost,
+                      "Effectiveness" = df_effect$Effectiveness)
+
+  # make strategies in psa object into ordered factors
+  ce_df$Strategy <- factor(ce_df$Strategy, levels = strategies, ordered = TRUE)
+
+  psa_plot <- ggplot(ce_df, aes_string(x = "Effectiveness", y = "Cost", color = "Strategy")) +
+    geom_point(size = 0.7, alpha = alpha, shape = 21) +
+    ylab(paste("Cost (", currency, ")", sep = ""))
+
+  # define strategy-specific means for the center of the ellipse
+  if (center) {
+    strat_means <- ce_df %>%
+      group_by(.data$Strategy) %>%
+      summarize(Cost.mean = mean(.data$Cost),
+                Eff.mean = mean(.data$Effectiveness))
+    # make strategies in psa object into ordered factors
+    strat_means$Strategy <- factor(strat_means$Strategy, levels = strategies, ordered = TRUE)
+    psa_plot <- psa_plot +
+      geom_point(data = strat_means,
+                 aes_string(x = "Eff.mean", y = "Cost.mean", fill = "Strategy"),
+                 size = 8, shape = 21, color = "black")
+  }
+
+  if (ellipse) {
+    # make points for ellipse plotting
+    df_list_ell <- lapply(strategies, function(s) {
+      strat_specific_df <- ce_df[ce_df$Strategy == s, ]
+      els <-  with(strat_specific_df,
+                   ellipse::ellipse(cor(Effectiveness, Cost),
+                                    scale = c(sd(Effectiveness), sd(Cost)),
+                                    centre = c(mean(Effectiveness), mean(Cost))))
+      data.frame(els, group = s, stringsAsFactors = FALSE)
+    })
+    df_ell <- bind_rows(df_list_ell)
+    # draw ellipse lines
+    psa_plot <- psa_plot + geom_path(data = df_ell,
+                                     aes_string(x = "x", y = "y", colour = "group"),
+                                     size = 1, linetype = 2, alpha = 1)
+  }
+
+  # add common theme
+  col <- match.arg(col)
+  add_common_aes(psa_plot, txtsize, col = col, col_aes = c("color", "fill"),
+                 continuous = c("x", "y"),
+                 n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                 xbreaks = xbreaks, ybreaks = ybreaks,
+                 xlim = xlim, ylim = ylim)
+}
+
+
+#' Plot of Cost-Effectiveness Acceptability Curves (CEAC)
+#'
+#' Plots the CEAC, using the object created by \code{\link{ceac}}.
+#'
+#' @param x object of class \code{ceac}.
+#' @param frontier whether to plot acceptability frontier (TRUE) or not (FALSE)
+#' @param points whether to plot points (TRUE) or not (FALSE)
+#' @param currency string with currency used in the cost-effectiveness analysis (CEA).
+#'Defaults to \code{$}, but can be any currency symbol or word (e.g., Â£, â¬, peso)
+#' @param min_prob minimum probability to show strategy in plot.
+#' For example, if the min_prob is 0.05, only strategies that ever
+#' exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
+#' with many strategies.
+#' @inheritParams add_common_aes
+#'
+#' @keywords internal
+#'
+#' @details
+#' \code{ceac} computes the probability of each of the strategies being
+#' cost-effective at each \code{wtp} value.
+#' @return A \code{ggplot2} plot of the CEAC.
+#'
+#' @import ggplot2
+#' @import dplyr
+#'
+#' @export
+plot_ceac <- function(x,
+                      frontier = TRUE,
+                      points = TRUE,
+                      currency = "$",
+                      min_prob = 0,
+                      txtsize = 12,
+                      n_x_ticks = 10,
+                      n_y_ticks = 8,
+                      xbreaks = NULL,
+                      ybreaks = NULL,
+                      ylim = NULL,
+                      xlim = c(0, NA),
+                      col = c("full", "bw"),
+                      ...) {
+  wtp_name <- "WTP"
+  prop_name <- "Proportion"
+  strat_name <- "Strategy"
+  x$WTP_thou <- x[, wtp_name] / 1000
+
+  # removing strategies with probabilities always below `min_prob`
+  # get group-wise max probability
+  if (min_prob > 0) {
+    max_prob <- x %>%
+      group_by(.data$Strategy) %>%
+      summarize(maxpr = max(.data$Proportion)) %>%
+      filter(.data$maxpr >= min_prob)
+    strat_to_keep <- max_prob$Strategy
+    if (length(strat_to_keep) == 0) {
+      stop(
+        paste("no strategies remaining. you may want to lower your min_prob value (currently ",
+              min_prob, ")", sep = "")
+      )
+    }
+    # report filtered out strategies
+    old_strat <- unique(x$Strategy)
+    diff_strat <- setdiff(old_strat, strat_to_keep)
+    n_diff_strat <- length(diff_strat)
+    if (n_diff_strat > 0) {
+      # report strategies filtered out
+      cat("filtered out ", n_diff_strat, " strategies with max prob below ", min_prob, ":\n",
+          paste(diff_strat, collapse = ","), "\n", sep = "")
+
+      # report if any filtered strategies are on the frontier
+      df_filt <- filter(x, .data$Strategy %in% diff_strat & .data$On_Frontier)
+      if (nrow(df_filt) > 0) {
+        cat(paste0("WARNING - some strategies that were filtered out are on the frontier:\n",
+                   paste(unique(df_filt$Strategy), collapse = ","), "\n"))
+      }
+    }
+
+    # filter dataframe
+    x <- filter(x, .data$Strategy %in% strat_to_keep)
+  }
+
+  # Drop unused strategy names
+  x$Strategy <- droplevels(x$Strategy)
+
+  p <- ggplot(data = x, aes_(x = as.name("WTP_thou"),
+                             y = as.name(prop_name),
+                             color = as.name(strat_name))) +
+    geom_line() +
+    xlab(paste("Willingness to Pay (Thousand ", currency, " / QALY)", sep = "")) +
+    ylab("Pr Cost-Effective")
+
+  if (points) {
+    p <- p + geom_point(aes_(color = as.name(strat_name)))
+  }
+
+  if (frontier) {
+    front <- x[x$On_Frontier, ]
+    p <- p + geom_point(data = front, aes_(x = as.name("WTP_thou"),
+                                           y = as.name(prop_name),
+                                           shape = as.name("On_Frontier")),
+                        size = 3, stroke = 1, color = "black") +
+      scale_shape_manual(name = NULL, values = 0, labels = "Frontier") +
+      guides(color = guide_legend(order = 1),
+             shape = guide_legend(order = 2))
+  }
+  col <- match.arg(col)
+  add_common_aes(p, txtsize, col = col, col_aes = "color",
+                 continuous = c("x", "y"), n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                 xbreaks = xbreaks, ybreaks = ybreaks,
+                 ylim = ylim, xlim = xlim)
+}
+
+#' Plot of Expected Loss Curves (ELC)
+#'
+#' @param x object of class \code{exp_loss}, produced by function
+#'  \code{\link{calc_exp_loss}}
+#' @param currency string with currency used in the cost-effectiveness analysis (CEA).
+#'  Default: $, but it could be any currency symbol or word (e.g., Â£, â¬, peso)
+#' @param effect_units units of effectiveness. Default: QALY
+#' @param log_y take the base 10 log of the y axis
+#' @param frontier indicate the frontier (also the expected value of perfect information).
+#' To only plot the EVPI see \code{\link{calc_evpi}}.
+#' @param points whether to plot points on the curve (TRUE) or not (FALSE)
+#' @param lsize line size. defaults to 1.
+#' @inheritParams add_common_aes
+#'
+#' @return A \code{ggplot2} object with the expected loss
+#' @import ggplot2
+#' @importFrom scales comma
+#' @export
+plot_exp_loss <- function(x,
+                          log_y = TRUE,
+                          frontier = TRUE,
+                          points = TRUE,
+                          lsize = 1,
+                          txtsize = 12,
+                          currency = "$",
+                          effect_units = "QALY",
+                          n_y_ticks = 8,
+                          n_x_ticks = 20,
+                          xbreaks = NULL,
+                          ybreaks = NULL,
+                          xlim = c(0, NA),
+                          ylim = NULL,
+                          col = c("full", "bw"),
+                          ...) {
+  wtp_name <- "WTP_thou"
+  loss_name <- "Expected_Loss"
+  strat_name <- "Strategy"
+  x[, wtp_name] <- x$WTP / 1000
+
+  # split into on frontier and not on frontier
+  nofront <- x
+  front <- x[x$On_Frontier, ]
+
+  # Drop unused levels from strategy names
+  nofront$Strategy <- droplevels(nofront$Strategy)
+  front$Strategy <- droplevels(front$Strategy)
+  # formatting if logging the y axis
+  if (log_y) {
+    tr <- "log10"
+  } else {
+    tr <- "identity"
+  }
+
+  p <- ggplot(data = nofront, aes_(x = as.name(wtp_name),
+                                   y = as.name(loss_name))) +
+    xlab(paste0("Willingness to Pay (Thousand ", currency, "/", effect_units, ")")) +
+    ylab(paste0("Expected Loss (", currency, ")"))
+
+  # color
+  col <- match.arg(col)
+  ## change linetype too if color is black and white
+  if (col == "full") {
+    if (points) {
+      p <- p + geom_point(aes_(color = as.name(strat_name)))
+    }
+    p <- p +
+      geom_line(size = lsize, aes_(color = as.name(strat_name)))
+
+  }
+  if (col == "bw") {
+    if (points) {
+      p <- p + geom_point()
+    }
+    p <- p +
+      geom_line(aes_(linetype = as.name(strat_name)))
+  }
+
+  p <- add_common_aes(p, txtsize, col = col, col_aes = c("color", "line"),
+                      continuous = c("x", "y"),
+                      n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                      xbreaks = xbreaks, ybreaks = ybreaks,
+                      xlim = xlim, ylim = ylim,
+                      ytrans = tr)
+  if (frontier) {
+    p <- p + geom_point(data = front, aes_(x = as.name(wtp_name),
+                                           y = as.name(loss_name),
+                                           shape = as.name("On_Frontier")),
+                        size = 3, stroke = 1, color = "black") +
+      scale_shape_manual(name = NULL, values = 0, labels = "Frontier & EVPI") +
+      guides(color = guide_legend(order = 1),
+             linetype = guide_legend(order = 1),
+             shape = guide_legend(order = 2))
+  }
+  return(p)
+}
+
+#' Plot of Expected Value of Perfect Information (EVPI)
+#'
+#' @description
+#' Plots the \code{evpi} object created by \code{\link{calc_evpi}}.
+#'
+#' @param x object of class \code{evpi}, produced by function
+#'  \code{\link{calc_evpi}}
+#' @param currency string with currency used in the cost-effectiveness analysis (CEA).
+#'  Default: $, but it could be any currency symbol or word (e.g., Â£, â¬, peso)
+#' @param effect_units units of effectiveness. Default: QALY
+#' @inheritParams add_common_aes
+#' @keywords expected value of perfect information
+#' @return A \code{ggplot2} plot with the EVPI
+#' @seealso \code{\link{calc_evpi}}
+#' @import ggplot2
+#' @importFrom scales comma
+#' @export
+plot.evpi <- function(x,
+                      txtsize = 12,
+                      currency = "$",
+                      effect_units = "QALY",
+                      n_y_ticks = 8,
+                      n_x_ticks = 20,
+                      xbreaks = NULL,
+                      ybreaks = NULL,
+                      xlim = c(0, NA),
+                      ylim = NULL,
+                      ...) {
+  x$WTP_thou <- x$WTP / 1000
+  g <- ggplot(data = x,
+              aes_(x = as.name("WTP_thou"), y = as.name("EVPI"))) +
+    geom_line() +
+    xlab(paste("Willingness to Pay (Thousand ", currency, "/", effect_units, ")", sep = "")) +
+    ylab(paste("EVPI (", currency, ")", sep = ""))
+  add_common_aes(g, txtsize, continuous = c("x", "y"),
+                 n_x_ticks = n_x_ticks, n_y_ticks = n_y_ticks,
+                 xbreaks = xbreaks, ybreaks = ybreaks,
+                 xlim = xlim, ylim = ylim)
+}
