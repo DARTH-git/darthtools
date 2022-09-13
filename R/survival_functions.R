@@ -1571,8 +1571,8 @@ model.dist <- function(dist.v, d.data, t){
   # save parameters as pars and coefficients as beta
 
   v_par1 <- c("Exponential")
-  v_par2 <- c("Gamma", "Weibull", "log-Normal", "log-Logistic", "Gompertz", "Exponential Cure")
-  v_par3 <- c("Gamma Cure", "Weibull Cure", "log-Normal Cure", "log-Logistic Cure", "Gompertz Cure")
+  v_par2 <- c("Gamma", "Weibull (AFT)", "log-Normal", "log-Logistic", "Gompertz", "Exponential Cure")
+  v_par3 <- c("Gamma Cure", "Weibull (AFT) Cure", "log-Normal Cure", "log-Logistic Cure", "Gompertz Cure")
 
   if (dist.v %in% v_par1){
     pars <- d.data[1]
@@ -1656,7 +1656,7 @@ model.dist <- function(dist.v, d.data, t){
     # p.res.1 <- pmixsurv(pexp, t - step, theta = pars[1], rate = pred, lower.tail = F)
 
     ############################ Weibull ############################
-  } else if (dist.v == "Weibull") {
+  } else if (dist.v == "Weibull (AFT)") {
     for (i in 1:length(pars)) {
       if(i == 2) {
         # print("scale") # Beta affects the scale
@@ -1670,8 +1670,8 @@ model.dist <- function(dist.v, d.data, t){
       }
       # else{print("Weibull (AFT)")}
     }
-    p.res   <- pWeibull (AFT)(t,        shape = pars[1], scale = pred, lower.tail = F)
-    # p.res.1 <- pWeibull (AFT)(t - step, shape = pars[1], scale = pred, lower.tail = F)
+    p.res   <- pweibull(t,        shape = pars[1], scale = pred, lower.tail = F)
+    # p.res.1 <- pWeibull(t - step, shape = pars[1], scale = pred, lower.tail = F)
 
     ############################ Weibull Cure ############################
   } else if (dist.v == "Weibull (AFT) Cure") {
@@ -1688,7 +1688,7 @@ model.dist <- function(dist.v, d.data, t){
       }
       # else{print("Weibull (AFT) Cure")}
     }
-    p.res   <- pmixsurv(pWeibull (AFT), t,        theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
+    p.res   <- pmixsurv(pweibull(t,        theta = pars[1], shape = pars[2], scale = pred, lower.tail = F))
     # p.res.1 <- pmixsurv(pWeibull (AFT), t - step, theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
 
     ############################ log-Normal ############################
