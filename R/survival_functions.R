@@ -349,11 +349,13 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' Default = 100.
 #' @param seed seed for random number generation.
 #' Default = 421.
+#' @param warn prints a warning message whenever PFS > OS
 #' @return
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
 #' @export
 partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE, chol = FALSE,
-                     choose_PFS = NULL, choose_OS = NULL, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421){
+                     choose_PFS = NULL, choose_OS = NULL, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421,
+                     warn = TRUE){
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
 
@@ -460,7 +462,7 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
   }
 
   # if PFS > OS, make PFS = OS
-  check_PFS_OS(os.surv - pfs.surv)                            # print warning message if PFS > OS
+  if (warn == T) {check_PFS_OS(os.surv - pfs.surv)}                           # print warning message if PFS > OS
   if (deter == 0) { # probabilistic
     pfs.surv <- as.matrix(pfs.surv)
     os.surv  <- as.matrix(os.surv)
@@ -560,6 +562,7 @@ surv_prob <- function(model, times = NULL, PA = FALSE, rx = 1) {
 #' @export
 trans_prob <- function(surv){
   d_surv <- surv[-1]/(surv[-length(surv)])
+  d_surv[is.na(d_surv)] <- 0
   t.p <- 1 - d_surv
   if (sum(t.p < 0) > 0) {
     message("Negative transition probabilities were set to 0.")

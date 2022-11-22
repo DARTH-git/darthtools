@@ -17,7 +17,8 @@ partsurv(
   v_names_states,
   PA = FALSE,
   n_sim = 100,
-  seed = 421
+  seed = 421,
+  warn = TRUE
 )
 }
 \arguments{
@@ -51,6 +52,8 @@ Default = 100.}
 
 \item{seed}{seed for random number generation.
 Default = 421.}
+
+\item{warn}{prints a warning message whenever PFS > OS}
 }
 \value{
 a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
