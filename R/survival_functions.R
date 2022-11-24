@@ -350,6 +350,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' @param seed seed for random number generation.
 #' Default = 421.
 #' @param warn prints a warning message whenever PFS > OS
+#' Default = F.
 #' @return
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
 #' @export

@@ -53,7 +53,8 @@ Default = 100.}
 \item{seed}{seed for random number generation.
 Default = 421.}
 
-\item{warn}{prints a warning message whenever PFS > OS}
+\item{warn}{prints a warning message whenever PFS > OS
+Default = F.}
 }
 \value{
 a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
