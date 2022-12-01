@@ -48,6 +48,8 @@ check_transition_probability <- function(a_P,
       warning("Not valid transition probabilities\n",
               paste(capture.output(df_notvalid), collapse = "\n"))
     }
+  } else if (verbose) {
+      print("Valid transition probabilities")
   }
 }
 
@@ -88,6 +90,8 @@ check_sum_of_transition_array <- function(a_P,
 
   a_P <- as.array(a_P)
   d <- length(dim(a_P))
+  val = T
+
   # For matrix
   if (d == 2) {
     valid <- sum(rowSums(a_P))
@@ -99,6 +103,7 @@ check_sum_of_transition_array <- function(a_P,
       if(verbose){
         warning("This is not a valid transition matrix")
       }
+      val = F
     }
   } else {
     # For array
@@ -111,6 +116,12 @@ check_sum_of_transition_array <- function(a_P,
       if(verbose){
         warning("This is not a valid transition array")
       }
+      val = F
     }
+  }
+  if (val & d == 2) {
+    print("This is a valid transition matrix")
+  } else if (val & d > 2) {
+    print("This is a valid transition array")
   }
 }
