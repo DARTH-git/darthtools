@@ -370,8 +370,8 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
   }
 
   if (!choose_OS %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
-                         "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
-                         "log-Logistic Cure", "Gompertz Cure")) {
+                        "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
+                        "log-Logistic Cure", "Gompertz Cure")) {
     stop(paste0("Incorrect distribution name for OS, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
                  log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
                  log-Logistic Cure, Gompertz Cure."))
@@ -402,11 +402,13 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
       param_draws_PFS <- model.rmvnorm(dist.v  = dist_PFS,
                                        d.data  = l_d.data$PFS,
                                        vc.data = l_vc.data$PFS,
-                                       n_sim   = n_sim)
+                                       n_sim   = n_sim,
+                                       seed    = seed)
       param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
                                        d.data  = l_d.data$OS,
                                        vc.data = l_vc.data$OS,
-                                       n_sim   = n_sim)
+                                       n_sim   = n_sim,
+                                       seed    = seed)
       # obtain survival probabilities
       pfs.surv <- os.surv <- matrix(NA, nrow = length(time), ncol = n_sim)
       for (j in 1:n_sim) {
@@ -438,17 +440,17 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
   } else { # deterministic
     if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
       # randomly draw parameter values from multivariate normal distribution
-      param_draws_PFS <- model.rmvnorm(dist.v  = dist_PFS,
-                                       d.data  = l_d.data[[1]],
-                                       vc.data = l_vc.data[[1]],
-                                       n_sim   = 1)
-      param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
-                                       d.data  = l_d.data[[2]],
-                                       vc.data = l_vc.data[[2]],
-                                       n_sim   = 1)
+      # param_draws_PFS <- model.rmvnorm(dist.v  = dist_PFS,
+      #                                  d.data  = l_d.data[[1]],
+      #                                  vc.data = l_vc.data[[1]],
+      #                                  n_sim   = 1)
+      # param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
+      #                                  d.data  = l_d.data[[2]],
+      #                                  vc.data = l_vc.data[[2]],
+      #                                  n_sim   = 1)
       # obtain survival probabilities
-      pfs.surv <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[1, ], t = time)
-      os.surv  <- model.dist(dist.v = dist_OS,  d.data =  param_draws_OS[1, ], t = time)
+      pfs.surv <- model.dist(dist.v = dist_PFS, d.data =  l_d.data[[1]], t = time)
+      os.surv  <- model.dist(dist.v = dist_OS,  d.data =  l_d.data[[2]], t = time)
     } else { # use survival models
       # Model-setup
       # model objects
@@ -1236,7 +1238,7 @@ runMLE.cure <- function (x, exArgs)
 #' @export
 model.rmvnorm <- function(dist.v, d.data, vc.data, n_sim, seed = 421) {
 
-  set.seed(seed) #
+  set.seed(seed)
 
   if (!dist.v %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
                      "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
