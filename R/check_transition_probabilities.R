@@ -121,7 +121,7 @@ check_sum_of_transition_array <- function(a_P,
   }
   if ((val & d == 2) & verbose == T) {
     print("This is a valid transition matrix")
-  } else if ((val & d > 2) & verbose == T {
+  } else if ((val & d > 2) & verbose == T) {
     print("This is a valid transition array")
   }
 }
