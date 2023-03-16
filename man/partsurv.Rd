@@ -18,7 +18,10 @@ partsurv(
   PA = FALSE,
   n_sim = 100,
   seed = 421,
-  warn = TRUE
+  warn = TRUE,
+  surv_prob = FALSE,
+  pfs_surv = NULL,
+  os_surv = NULL
 )
 }
 \arguments{
@@ -55,6 +58,13 @@ Default = 421.}
 
 \item{warn}{prints a warning message whenever PFS > OS
 Default = F.}
+
+\item{surv_prob}{set to TRUE if survival probabilities are directly supplied to the user.
+Default = F.}
+
+\item{pfs_surv}{(only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of PFS survival probabilities.}
+
+\item{os_surv}{(only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of OS survival probabilities.}
 }
 \value{
 a list containing Markov trace, expected survival, survival probabilities, transition probabilities.

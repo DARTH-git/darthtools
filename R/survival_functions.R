@@ -351,118 +351,128 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' Default = 421.
 #' @param warn prints a warning message whenever PFS > OS
 #' Default = F.
+#' @param surv_prob set to TRUE if survival probabilities are directly supplied to the user.
+#' Default = F.
+#' @param pfs_surv (only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of PFS survival probabilities.
+#' @param os_surv (only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of OS survival probabilities.
 #' @return
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
 #' @export
 partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE, chol = FALSE,
                      choose_PFS = NULL, choose_OS = NULL, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421,
-                     warn = TRUE){
+                     warn = TRUE, surv_prob = FALSE, pfs_surv = NULL, os_surv = NULL){
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
 
-  # make sure distribution names for PFS and OS are correct
-  if (!choose_PFS %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
-                         "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
-                         "log-Logistic Cure", "Gompertz Cure")) {
-    stop(paste0("Incorrect distribution name for PFS, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
+  if (surv_prob == T) { # if directly supplying survival probs
+    pfs.surv <- pfs_surv
+    os.surv  <- os_surv
+  } else { # below are code for not directly supplying survival probs
+
+    # make sure distribution names for PFS and OS are correct
+    if (!choose_PFS %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
+                           "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
+                           "log-Logistic Cure", "Gompertz Cure")) {
+      stop(paste0("Incorrect distribution name for PFS, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
                  log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
                  log-Logistic Cure, Gompertz Cure."))
-  }
+    }
 
-  if (!choose_OS %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
-                        "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
-                        "log-Logistic Cure", "Gompertz Cure")) {
-    stop(paste0("Incorrect distribution name for OS, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
+    if (!choose_OS %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
+                          "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
+                          "log-Logistic Cure", "Gompertz Cure")) {
+      stop(paste0("Incorrect distribution name for OS, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
                  log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
                  log-Logistic Cure, Gompertz Cure."))
-  }
+    }
 
 
-  if (par == TRUE) {
-    dist_PFS <- choose_PFS
-    dist_OS  <- choose_OS
-    # deal with Cholesky decomposition
-    if (chol == TRUE) {
-      for (i in 1:length(l_vc.data)) {
-        l_vc.data[[i]][lower.tri(l_vc.data[[i]])] <- 0  # make sure the lower triangle of the Cholesky decomposition is 0
-        l_vc.data[[i]] <- crossprod(l_vc.data[[i]])     # transform Cholesky decomposition into the original variance-covariance matrix
+    if (par == TRUE) {
+      dist_PFS <- choose_PFS
+      dist_OS  <- choose_OS
+      # deal with Cholesky decomposition
+      if (chol == TRUE) {
+        for (i in 1:length(l_vc.data)) {
+          l_vc.data[[i]][lower.tri(l_vc.data[[i]])] <- 0  # make sure the lower triangle of the Cholesky decomposition is 0
+          l_vc.data[[i]] <- crossprod(l_vc.data[[i]])     # transform Cholesky decomposition into the original variance-covariance matrix
+        }
+      }
+    } else {
+      dist_PFS <- choose_PFS
+      dist_OS  <- choose_OS
+    }
+
+    chosen_models <- paste0("PFS: ", dist_PFS, ", ", "OS: ", dist_OS) # chosen model names
+
+    # Calculate survival probabilities
+    if (deter == 0) { # probabilistic
+      if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
+        # randomly draw parameter values from multivariate normal distribution
+        param_draws_PFS <- model.rmvnorm(dist.v  = dist_PFS,
+                                         d.data  = l_d.data$PFS,
+                                         vc.data = l_vc.data$PFS,
+                                         n_sim   = n_sim,
+                                         seed    = seed)
+        param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
+                                         d.data  = l_d.data$OS,
+                                         vc.data = l_vc.data$OS,
+                                         n_sim   = n_sim,
+                                         seed    = seed)
+        # obtain survival probabilities
+        pfs.surv <- os.surv <- matrix(NA, nrow = length(time), ncol = n_sim)
+        for (j in 1:n_sim) {
+          pfs.surv[, j] <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[j, ], t = time)
+          os.surv [, j] <- model.dist(dist.v = dist_OS,  d.data = param_draws_OS[j, ],  t = time)
+        }
+      } else { # use survival models
+        # Model-setup
+        # model objects
+        pfs_survHE <- pfs_survHE$model.objects
+        os_survHE <-  os_survHE$model.objects
+        # model names
+        mod.pfs <- names(pfs_survHE$models)
+        mod.os <- names(os_survHE$models)
+        # chosen model index based on name
+        mod.pfs.chosen <- which(mod.pfs == dist_PFS)
+        mod.os.chosen  <- which(mod.os == dist_OS)
+        fit_PFS <- make.surv(pfs_survHE,
+                             mod = mod.pfs.chosen,
+                             nsim = n_sim,
+                             t = times)
+        fit_OS  <- make.surv(os_survHE,
+                             mod = mod.os.chosen,
+                             nsim = n_sim,
+                             t = times)
+        pfs.surv <- surv_prob(fit_PFS, PA = TRUE)
+        os.surv  <- surv_prob( fit_OS, PA = TRUE)
+      }
+    } else { # deterministic
+      if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
+        # randomly draw parameter values from multivariate normal distribution
+        # param_draws_PFS <- model.rmvnorm(dist.v  = dist_PFS,
+        #                                  d.data  = l_d.data[[1]],
+        #                                  vc.data = l_vc.data[[1]],
+        #                                  n_sim   = 1)
+        # param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
+        #                                  d.data  = l_d.data[[2]],
+        #                                  vc.data = l_vc.data[[2]],
+        #                                  n_sim   = 1)
+        # obtain survival probabilities
+        pfs.surv <- model.dist(dist.v = dist_PFS, d.data =  l_d.data[[1]], t = time)
+        os.surv  <- model.dist(dist.v = dist_OS,  d.data =  l_d.data[[2]], t = time)
+      } else { # use survival models
+        # Model-setup
+        # model objects
+        pfs_survHE <- pfs_survHE$model.objects
+        os_survHE <-  os_survHE$model.objects
+        # model names
+        mod.pfs <- names(pfs_survHE$models)
+        mod.os <- names(os_survHE$models)
+        pfs.surv <- surv_prob(pfs_survHE$models[[which(mod.pfs == dist_PFS)]], time = times)
+        os.surv  <- surv_prob( os_survHE$models[[which(mod.os  ==  dist_OS)]], time = times)
       }
     }
-  } else {
-    dist_PFS <- choose_PFS
-    dist_OS  <- choose_OS
-  }
-
-  chosen_models <- paste0("PFS: ", dist_PFS, ", ", "OS: ", dist_OS) # chosen model names
-
-  # Calculate survival probabilities
-  if (deter == 0) { # probabilistic
-    if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
-      # randomly draw parameter values from multivariate normal distribution
-      param_draws_PFS <- model.rmvnorm(dist.v  = dist_PFS,
-                                       d.data  = l_d.data$PFS,
-                                       vc.data = l_vc.data$PFS,
-                                       n_sim   = n_sim,
-                                       seed    = seed)
-      param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
-                                       d.data  = l_d.data$OS,
-                                       vc.data = l_vc.data$OS,
-                                       n_sim   = n_sim,
-                                       seed    = seed)
-      # obtain survival probabilities
-      pfs.surv <- os.surv <- matrix(NA, nrow = length(time), ncol = n_sim)
-      for (j in 1:n_sim) {
-        pfs.surv[, j] <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[j, ], t = time)
-        os.surv [, j] <- model.dist(dist.v = dist_OS,  d.data = param_draws_OS[j, ],  t = time)
-      }
-    } else { # use survival models
-      # Model-setup
-      # model objects
-      pfs_survHE <- pfs_survHE$model.objects
-      os_survHE <-  os_survHE$model.objects
-      # model names
-      mod.pfs <- names(pfs_survHE$models)
-      mod.os <- names(os_survHE$models)
-      # chosen model index based on name
-      mod.pfs.chosen <- which(mod.pfs == dist_PFS)
-      mod.os.chosen  <- which(mod.os == dist_OS)
-      fit_PFS <- make.surv(pfs_survHE,
-                           mod = mod.pfs.chosen,
-                           nsim = n_sim,
-                           t = times)
-      fit_OS  <- make.surv(os_survHE,
-                           mod = mod.os.chosen,
-                           nsim = n_sim,
-                           t = times)
-      pfs.surv <- surv_prob(fit_PFS, PA = TRUE)
-      os.surv  <- surv_prob( fit_OS, PA = TRUE)
-    }
-  } else { # deterministic
-    if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
-      # randomly draw parameter values from multivariate normal distribution
-      # param_draws_PFS <- model.rmvnorm(dist.v  = dist_PFS,
-      #                                  d.data  = l_d.data[[1]],
-      #                                  vc.data = l_vc.data[[1]],
-      #                                  n_sim   = 1)
-      # param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
-      #                                  d.data  = l_d.data[[2]],
-      #                                  vc.data = l_vc.data[[2]],
-      #                                  n_sim   = 1)
-      # obtain survival probabilities
-      pfs.surv <- model.dist(dist.v = dist_PFS, d.data =  l_d.data[[1]], t = time)
-      os.surv  <- model.dist(dist.v = dist_OS,  d.data =  l_d.data[[2]], t = time)
-    } else { # use survival models
-      # Model-setup
-      # model objects
-      pfs_survHE <- pfs_survHE$model.objects
-      os_survHE <-  os_survHE$model.objects
-      # model names
-      mod.pfs <- names(pfs_survHE$models)
-      mod.os <- names(os_survHE$models)
-      pfs.surv <- surv_prob(pfs_survHE$models[[which(mod.pfs == dist_PFS)]], time = times)
-      os.surv  <- surv_prob( os_survHE$models[[which(mod.os  ==  dist_OS)]], time = times)
-    }
-  }
+  } # end of code for if not directly supplying survival probs
 
   # if PFS > OS, make PFS = OS
   if (warn == T) {check_PFS_OS(os.surv - pfs.surv)}                           # print warning message if PFS > OS
