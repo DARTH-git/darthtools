@@ -59,7 +59,7 @@ Default = 421.}
 \item{warn}{prints a warning message whenever PFS > OS
 Default = F.}
 
-\item{surv_prob}{set to TRUE if survival probabilities are directly supplied to the user.
+\item{surv_prob}{set to TRUE if survival probabilities are directly supplied by the user.
 Default = F.}
 
 \item{pfs_surv}{(only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of PFS survival probabilities.}

@@ -351,7 +351,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' Default = 421.
 #' @param warn prints a warning message whenever PFS > OS
 #' Default = F.
-#' @param surv_prob set to TRUE if survival probabilities are directly supplied to the user.
+#' @param surv_prob set to TRUE if survival probabilities are directly supplied by the user.
 #' Default = F.
 #' @param pfs_surv (only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of PFS survival probabilities.
 #' @param os_surv (only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of OS survival probabilities.
