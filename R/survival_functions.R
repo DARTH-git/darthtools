@@ -158,7 +158,8 @@ fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = 
   # Store and return results
   res <- list(model.objects = fit.survHE,
               AIC           = AIC,
-              BIC           = BIC)
+              BIC           = BIC,
+              plot          = S_superimpose)
   return(res)
 }
 
