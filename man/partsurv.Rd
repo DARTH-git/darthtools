@@ -21,7 +21,10 @@ partsurv(
   warn = TRUE,
   surv_prob = FALSE,
   pfs_surv = NULL,
-  os_surv = NULL
+  os_surv = NULL,
+  os_model = 0,
+  GPM = FALSE,
+  os.surv.genpop = NULL
 )
 }
 \arguments{
@@ -65,9 +68,14 @@ Default = F.}
 \item{pfs_surv}{(only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of PFS survival probabilities.}
 
 \item{os_surv}{(only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of OS survival probabilities.}
+
+\item{GPM}{Adjust for GPM (General Population Mortality).}
+
+\item{os.surv.genpop}{(only supply when GPM = TRUE): a vector of GPM survival probabilities.}
 }
 \value{
 a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
+Default = F.
 }
 \description{
 \code{partsurv} fits partitioned survival model to survival data.

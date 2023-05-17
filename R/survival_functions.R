@@ -356,12 +356,16 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' Default = F.
 #' @param pfs_surv (only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of PFS survival probabilities.
 #' @param os_surv (only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of OS survival probabilities.
+#' @param GPM Adjust for GPM (General Population Mortality).
+#' @param os.surv.genpop (only supply when GPM = TRUE): a vector of GPM survival probabilities.
 #' @return
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
+#' Default = F.
 #' @export
 partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE, chol = FALSE,
                      choose_PFS = NULL, choose_OS = NULL, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421,
-                     warn = TRUE, surv_prob = FALSE, pfs_surv = NULL, os_surv = NULL){
+                     warn = TRUE, surv_prob = FALSE, pfs_surv = NULL, os_surv = NULL, os_model=0,
+                     GPM = FALSE, os.surv.genpop = NULL){
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
 
@@ -475,16 +479,34 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
     }
   } # end of code for if not directly supplying survival probs
 
-  # if PFS > OS, make PFS = OS
-  if (warn == T) {check_PFS_OS(os.surv - pfs.surv)}                           # print warning message if PFS > OS
-  if (deter == 0) { # probabilistic
-    pfs.surv <- as.matrix(pfs.surv)
-    os.surv  <- as.matrix(os.surv)
-    for (i in 1:ncol(pfs.surv)) {
-      pfs.surv[,i][pfs.surv[,i] > os.surv[,i]] <- os.surv[,i][pfs.surv[,i] > os.surv[,i]]
+  if (GPM == FALSE) { # not adjust for GPM (General Population Mortality)
+    # if PFS > OS, make PFS = OS
+    if (warn == T) {check_PFS_OS(os.surv - pfs.surv)}     # print warning message if PFS > OS
+    if (deter == 0) { # probabilistic
+      pfs.surv <- as.matrix(pfs.surv)
+      os.surv  <- as.matrix(os.surv)
+      for (i in 1:ncol(pfs.surv)) {
+        pfs.surv[,i][pfs.surv[,i] > os.surv[,i]] <- os.surv[,i][pfs.surv[,i] > os.surv[,i]]
+      }
+    } else { # deterministic
+      pfs.surv[pfs.surv > os.surv] <- os.surv[pfs.surv > os.surv]
     }
-  } else { # deterministic
-    pfs.surv[pfs.surv > os.surv] <- os.surv[pfs.surv > os.surv]
+  } else { # adjust for GPM
+    # if PFS > OS, make PFS = OS
+    os.surv.rel <- os.surv
+    check_PFS_OS(os.surv.rel * os.surv.genpop - pfs.surv) # print warning message if PFS > OS
+    if (deter == 0) { # probabilistic
+      pfs.surv <- as.matrix(pfs.surv)
+      os.surv.rel  <- as.matrix(os.surv.rel)
+      os.surv <- os.surv.rel
+      for (i in 1:ncol(pfs.surv)) {
+        os.surv[,i] <- os.surv.rel[,i]*os.surv.genpop
+        pfs.surv[,i][pfs.surv[,i] > os.surv[,i]] <- os.surv[,i][pfs.surv[,i] > os.surv[,i]]
+      }
+    } else { # deterministic
+      os.surv <- os.surv.rel * os.surv.genpop
+      pfs.surv[pfs.surv > os.surv] <- os.surv[pfs.surv > os.surv]
+    }
   }
 
   # Calculate state occupation proportions
