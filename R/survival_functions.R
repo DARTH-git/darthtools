@@ -354,8 +354,8 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' Default = F.
 #' @param surv_prob set to TRUE if survival probabilities are directly supplied by the user.
 #' Default = F.
-#' @param pfs_surv (only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of PFS survival probabilities.
-#' @param os_surv (only supply when surv_prob = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of OS survival probabilities.
+#' @param pfs_surv (only supply when surv_probs = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of PFS survival probabilities.
+#' @param os_surv (only supply when surv_probs = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of OS survival probabilities.
 #' @param GPM Adjust for GPM (General Population Mortality).
 #' @param os.surv.genpop (only supply when GPM = TRUE): a vector of GPM survival probabilities.
 #' @return
@@ -364,14 +364,17 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' @export
 partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE, chol = FALSE,
                      choose_PFS = NULL, choose_OS = NULL, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421,
-                     warn = TRUE, surv_prob = FALSE, pfs_surv = NULL, os_surv = NULL, os_model=0,
+                     warn = TRUE, surv_probs = FALSE, pfs_surv = NULL, os_surv = NULL, os_model=0,
                      GPM = FALSE, os.surv.genpop = NULL){
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
 
-  if (surv_prob == T) { # if directly supplying survival probs
+  if (surv_probs == T) { # if directly supplying survival probs
     pfs.surv <- pfs_surv
     os.surv  <- os_surv
+    dist_PFS <- choose_PFS
+    dist_OS  <- choose_OS
+    chosen_models <- paste0("PFS: ", dist_PFS, ", ", "OS: ", dist_OS) # chosen model names
   } else { # below are code for not directly supplying survival probs
 
     # make sure distribution names for PFS and OS are correct
