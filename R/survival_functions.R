@@ -357,15 +357,18 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' @param pfs_surv (only supply when surv_probs = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of PFS survival probabilities.
 #' @param os_surv (only supply when surv_probs = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of OS survival probabilities.
 #' @param GPM Adjust for GPM (General Population Mortality).
+#' @param baseline.model (only supply when GPM = TRUE): set to FALSE if your survival model is not a baseline model
+#' Default = T.
 #' @param os.surv.genpop (only supply when GPM = TRUE): a vector of GPM survival probabilities.
+#' @param os.haz.genpop (only supply when GPM = TRUE and baseline.model = FALSE): a vector of GPM hazard rates.
 #' @return
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
 #' Default = F.
 #' @export
 partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE, chol = FALSE,
                      choose_PFS = NULL, choose_OS = NULL, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421,
-                     warn = TRUE, surv_probs = FALSE, pfs_surv = NULL, os_surv = NULL, os_model=0,
-                     GPM = FALSE, os.surv.genpop = NULL){
+                     warn = TRUE, surv_probs = FALSE, pfs_surv = NULL, os_surv = NULL,
+                     GPM = FALSE, baseline.model = TRUE, os.surv.genpop = NULL, os.haz.genpop = NULL){
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
 
@@ -499,16 +502,45 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
     os.surv.rel <- os.surv
     check_PFS_OS(os.surv.rel * os.surv.genpop - pfs.surv) # print warning message if PFS > OS
     if (deter == 0) { # probabilistic
-      pfs.surv <- as.matrix(pfs.surv)
-      os.surv.rel  <- as.matrix(os.surv.rel)
-      os.surv <- os.surv.rel
-      for (i in 1:ncol(pfs.surv)) {
-        os.surv[,i] <- os.surv.rel[,i]*os.surv.genpop
-        pfs.surv[,i][pfs.surv[,i] > os.surv[,i]] <- os.surv[,i][pfs.surv[,i] > os.surv[,i]]
+      if (baseline.model==T) {
+        pfs.surv <- as.matrix(pfs.surv)
+        os.surv.rel  <- as.matrix(os.surv.rel)
+        os.surv <- os.surv.rel
+        for (i in 1:ncol(pfs.surv)) {
+          os.surv[,i] <- os.surv.rel[,i]*os.surv.genpop
+          pfs.surv[,i][pfs.surv[,i] > os.surv[,i]] <- os.surv[,i][pfs.surv[,i] > os.surv[,i]]
+        }
+      } else if (baseline.model==F & surv_probs==F) {
+        # Extract hazard and adjust for GPM
+        os_haz_flexsurv <- apply(os.surv, 2, surv_to_haz)
+        os_haz <- os_haz_flexsurv + os.haz.genpop
+        os.surv <- apply(os_haz, 2, function(x) exp(-cumsum(x)))
+      } else if (baseline.model==F & surv_probs==T) {
+        # Extract transition probabilities and adjust for GPM
+        os_trans <- apply(os.surv, 2, trans_prob)
+        os_trans_genpop <- trans_prob(os.surv.genpop)
+        for (i in 1:ncol(os_trans)) {
+          os_trans[,i][os_trans[,i] < os_trans_genpop] <- os_trans_genpop
+        }
+        os.surv <- apply(os_trans, 2, trans_to_surv)
       }
     } else { # deterministic
-      os.surv <- os.surv.rel * os.surv.genpop
-      pfs.surv[pfs.surv > os.surv] <- os.surv[pfs.surv > os.surv]
+      if (baseline.model==T) {
+        os.surv <- os.surv.rel * os.surv.genpop
+        pfs.surv[pfs.surv > os.surv] <- os.surv[pfs.surv > os.surv]
+      } else if (baseline.model==F & surv_probs==F) {
+        # Extract hazard and adjust for GPM
+        os_flexsurv <- os_survHE$models[[which(mod.os  ==  dist_OS)]]
+        os_haz_flexsurv <- summary(os_flexsurv, type="hazard", t=times)[[1]][,2]
+        os_haz <- os_haz_flexsurv + os.haz.genpop
+        os.surv <- exp(-cumsum(os_haz))
+      } else if (baseline.model==F & surv_probs==T) {
+        # Extract transition probabilities and adjust for GPM
+        os_trans <- trans_prob(os.surv)
+        os_trans_genpop <- trans_prob(os.surv.genpop)
+        os_trans[os_trans < os_trans_genpop] <- os_trans_genpop
+        os.surv <- trans_to_surv(os_trans)
+      }
     }
   }
 
@@ -597,7 +629,7 @@ surv_prob <- function(model, times = NULL, PA = FALSE, rx = 1) {
 #'
 #' @param surv vector of survival probabilities.
 #' @return
-#' matrix of transition probabilities
+#' vector of transition probabilities
 #' @export
 trans_prob <- function(surv){
   d_surv <- surv[-1]/(surv[-length(surv)])
@@ -609,6 +641,45 @@ trans_prob <- function(surv){
   d_surv[d_surv > 1] <- 1
   t.p <- 1 - d_surv
   return(t.p = t.p)
+}
+
+#' Convert transition probabilities back to survival probabilities.
+#'
+#' \code{trans_to_surv} convert transition probabilities back to survival probabilities.
+#'
+#' @param t.p vector of transition probabilities.
+#' @return
+#' vector of survival probabilities
+#' @export
+trans_to_surv <- function(t.p) {
+  surv <- numeric(length(t.p) + 1)
+  surv[1] <- 1
+  for (i in 1:length(t.p)) {
+    surv[i + 1] <- surv[i] * (1 - t.p[i])
+  }
+  return(surv)
+}
+
+#' Convert survival probabilities to hazard rates.
+#'
+#' \code{surv_to_haz} convert survival probabilities to hazard rates.
+#'
+#' @param surv vector of survival probabilities.
+#' @return
+#' vector of hazard rates
+#' @export
+surv_to_haz <- function(surv) {
+  # Calculate the log survival probabilities
+  log_survival_probabilities <- log(surv)
+  # Calculate differences in log survival probabilities
+  diff_log_survival <- diff(log_survival_probabilities)
+  # Calculate differences in times
+  diff_times <- diff(times)
+  # Divide differences in log survival probabilities by differences in times
+  hazard_rates <- -diff_log_survival / diff_times
+  # Add NA to the start to make 'hazard_rates' the same length as 'times' and 'survival_probabilities'
+  hazard_rates <- c(0, hazard_rates)
+  return(hazard_rates)
 }
 
 #' Calculate expected survival.

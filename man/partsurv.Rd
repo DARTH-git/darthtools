@@ -22,9 +22,10 @@ partsurv(
   surv_probs = FALSE,
   pfs_surv = NULL,
   os_surv = NULL,
-  os_model = 0,
   GPM = FALSE,
-  os.surv.genpop = NULL
+  baseline.model = TRUE,
+  os.surv.genpop = NULL,
+  os.haz.genpop = NULL
 )
 }
 \arguments{
@@ -68,7 +69,12 @@ Default = F.}
 
 \item{GPM}{Adjust for GPM (General Population Mortality).}
 
+\item{baseline.model}{(only supply when GPM = TRUE): set to FALSE if your survival model is not a baseline model
+Default = T.}
+
 \item{os.surv.genpop}{(only supply when GPM = TRUE): a vector of GPM survival probabilities.}
+
+\item{os.haz.genpop}{(only supply when GPM = TRUE and baseline.model = FALSE): a vector of GPM hazard rates.}
 
 \item{surv_prob}{set to TRUE if survival probabilities are directly supplied by the user.
 Default = F.}

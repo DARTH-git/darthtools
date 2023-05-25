@@ -10,7 +10,7 @@ trans_prob(surv)
 \item{surv}{vector of survival probabilities.}
 }
 \value{
-matrix of transition probabilities
+vector of transition probabilities
 }
 \description{
 \code{trans_prob} calculates transition probabilities using survival probabilities.
