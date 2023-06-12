@@ -1801,7 +1801,7 @@ model.dist <- function(dist.v, d.data, t){
       }
       # else{print("Weibull (AFT) Cure")}
     }
-    p.res   <- pmixsurv(pweibull(t,        theta = pars[1], shape = pars[2], scale = pred, lower.tail = F))
+    p.res   <- pmixsurv(pweibull, t,        theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
     # p.res.1 <- pmixsurv(pWeibull (AFT), t - step, theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
 
     ############################ log-Normal ############################
