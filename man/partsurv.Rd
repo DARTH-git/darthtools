@@ -18,14 +18,7 @@ partsurv(
   PA = FALSE,
   n_sim = 100,
   seed = 421,
-  warn = TRUE,
-  surv_probs = FALSE,
-  pfs_surv = NULL,
-  os_surv = NULL,
-  GPM = FALSE,
-  baseline.model = TRUE,
-  os.surv.genpop = NULL,
-  os.haz.genpop = NULL
+  warn = TRUE
 )
 }
 \arguments{
@@ -33,9 +26,9 @@ partsurv(
 
 \item{os_survHE}{survHE obj fitting OS.}
 
-\item{l_d.data}{list of mean parameter estimates (list containing 2 numerical estimates, 1 for PFS and 1 for OS).}
+\item{l_d.data}{list of mean parameter estimates (list containing 2 numerical estimates, 1st being for PFS and 2nd being for OS).}
 
-\item{l_vc.data}{list of variance-covariance matrices (or their Cholesky decomposition) of parameter estimates (list containing 2 matrices, 1 for PFS and 1 for OS).}
+\item{l_vc.data}{list of variance-covariance matrices (or their Cholesky decomposition) of parameter estimates (list containing 2 matrices, 1st being for PFS and 2nd being for OS).}
 
 \item{par}{set to TRUE if parameter mean estimates and their variance-covariance matrices are used instead of survHE objects.
 Default = FALSE}
@@ -60,28 +53,10 @@ Default = 100.}
 \item{seed}{seed for random number generation.
 Default = 421.}
 
-\item{warn}{prints a warning message whenever PFS > OS
-Default = F.}
-
-\item{pfs_surv}{(only supply when surv_probs = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of PFS survival probabilities.}
-
-\item{os_surv}{(only supply when surv_probs = TRUE): a vector (deterministic) or a matrix (probabilistic: row = time, column = simulation) of OS survival probabilities.}
-
-\item{GPM}{Adjust for GPM (General Population Mortality).}
-
-\item{baseline.model}{(only supply when GPM = TRUE): set to FALSE if your survival model is not a baseline model
-Default = T.}
-
-\item{os.surv.genpop}{(only supply when GPM = TRUE): a vector of GPM survival probabilities.}
-
-\item{os.haz.genpop}{(only supply when GPM = TRUE and baseline.model = FALSE): a vector of GPM hazard rates.}
-
-\item{surv_prob}{set to TRUE if survival probabilities are directly supplied by the user.
-Default = F.}
+\item{warn}{prints a warning message whenever PFS > OS}
 }
 \value{
 a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
-Default = F.
 }
 \description{
 \code{partsurv} fits partitioned survival model to survival data.
