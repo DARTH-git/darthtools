@@ -1642,9 +1642,8 @@ model.dist <- function(dist.v, d.data, t){
     for (i in 1:length(pars)) {
       if(i == 2){
         # print("rate") # beta affects the rate
-
-        if(length(beta) == 0){beta.raw = 0 # if no covariates
-        }else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+        # if(length(beta) == 0){beta.raw = 0 # if no covariates
+        # }else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
         beta.raw <- 0
         pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
         pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
@@ -1660,8 +1659,8 @@ model.dist <- function(dist.v, d.data, t){
       if (i == 3){
         print("rate") # beta affects the rate
 
-        if(length(beta) == 0){beta.raw = 0}
-        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+        #if(length(beta) == 0){beta.raw = 0}
+        #else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
         beta.raw <- 0
         pred.raw <- log(pars[i]) + beta.raw # fit$dlist$transforms + beta.raw
         pred     <- exp(pred.raw)           # fit$dlist$inv.transforms
@@ -1676,8 +1675,8 @@ model.dist <- function(dist.v, d.data, t){
     for (i in 1:length(pars)) {
       # print("rate") # beta affects the rate
 
-      if(length(beta) ==0){beta.raw = 0}
-      else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+      #if(length(beta) ==0){beta.raw = 0}
+      #else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
       beta.raw <- 0
       pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
       pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
@@ -1692,8 +1691,8 @@ model.dist <- function(dist.v, d.data, t){
       if (i == 2){
         # print("rate") # Beta affects the rate
 
-        if(length(beta) ==0){beta.raw = 0}
-        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+        #if(length(beta) ==0){beta.raw = 0}
+        #else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
         beta.raw <- 0
         pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
         pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
@@ -1709,8 +1708,8 @@ model.dist <- function(dist.v, d.data, t){
       if(i == 2) {
         # print("scale") # Beta affects the scale
 
-        if(length(beta) ==0){beta.raw = 0}
-        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+        #if(length(beta) ==0){beta.raw = 0}
+        #else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
         beta.raw <- 0
         pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
         pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
@@ -1727,8 +1726,8 @@ model.dist <- function(dist.v, d.data, t){
       if(i == 3) {
         # print("scale") # Beta affects the scale
 
-        if(length(beta) ==0){beta.raw = 0}
-        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+        #if(length(beta) ==0){beta.raw = 0}
+        #else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
         beta.raw <- 0
         pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
         pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
@@ -1745,8 +1744,8 @@ model.dist <- function(dist.v, d.data, t){
       if(i == 1) {
         # print("meanlog")
 
-        if(length(beta) ==0){beta.raw = 0}
-        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+        #if(length(beta) ==0){beta.raw = 0}
+        #else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
         beta.raw <- 0
         pred.raw <- pars[i] + beta.raw    # fit$dlist$transforms + beta.raw
         pred     <- pred.raw              # fit$dlist$inv.transforms
@@ -1762,8 +1761,8 @@ model.dist <- function(dist.v, d.data, t){
       if(i == 2) {
         # print("meanlog")
 
-        if(length(beta) ==0){beta.raw = 0}
-        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+        #if(length(beta) ==0){beta.raw = 0}
+        #else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
         beta.raw <- 0
         pred.raw <- pars[i] + beta.raw    # fit$dlist$transforms + beta.raw
         pred     <- pred.raw              # fit$dlist$inv.transforms
@@ -1779,8 +1778,8 @@ model.dist <- function(dist.v, d.data, t){
       if(i == 2) {
         # print("rate")
 
-        if(length(beta) ==0){beta.raw = 0}
-        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+        #if(length(beta) ==0){beta.raw = 0}
+        #else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
         beta.raw <- 0
         pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
         pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
@@ -1797,8 +1796,8 @@ model.dist <- function(dist.v, d.data, t){
       if(i == 3) {
         # print("rate")
 
-        if(length(beta) ==0){beta.raw = 0}
-        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+        #if(length(beta) ==0){beta.raw = 0}
+        #else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
         beta.raw <- 0
         pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
         pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
@@ -1814,8 +1813,8 @@ model.dist <- function(dist.v, d.data, t){
       if(i == 2) {
         # print("scale")
 
-        if(length(beta) ==0){beta.raw = 0}
-        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+        #if(length(beta) ==0){beta.raw = 0}
+        #else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
         beta.raw <- 0
         pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
         pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
@@ -1831,8 +1830,8 @@ model.dist <- function(dist.v, d.data, t){
       if(i == 3) {
         # print("scale")
 
-        if(length(beta) ==0){beta.raw = 0}
-        else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
+        #if(length(beta) ==0){beta.raw = 0}
+        #else{beta.raw <- t(as.matrix(beta)) %*% t(dat.x)}
         beta.raw <- 0
         pred.raw <- log(pars[i]) + beta.raw    # fit$dlist$transforms + beta.raw
         pred     <- exp(pred.raw)              # fit$dlist$inv.transforms
