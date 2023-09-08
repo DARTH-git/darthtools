@@ -18,7 +18,8 @@ partsurv(
   PA = FALSE,
   n_sim = 100,
   seed = 421,
-  warn = TRUE
+  warn = TRUE,
+  d.x = 0
 )
 }
 \arguments{

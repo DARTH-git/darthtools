@@ -356,7 +356,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' @export
 partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE, chol = FALSE,
                      choose_PFS = NULL, choose_OS = NULL, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421,
-                     warn = TRUE){
+                     warn = TRUE, d.x = 0){
   require(abind)
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
@@ -415,8 +415,8 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
       # obtain survival probabilities
       pfs.surv <- os.surv <- matrix(NA, nrow = length(time), ncol = n_sim)
       for (j in 1:n_sim) {
-        pfs.surv[, j] <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[j, ], t = time)
-        os.surv [, j] <- model.dist(dist.v = dist_OS,  d.data = param_draws_OS[j, ],  t = time)
+        pfs.surv[, j] <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[j, ], t = time, d.x = d.x)
+        os.surv [, j] <- model.dist(dist.v = dist_OS,  d.data = param_draws_OS[j, ],  t = time, d.x = d.x)
       }
     } else { # use survival models
       # Model-setup
@@ -452,8 +452,8 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
                                        vc.data = l_vc.data[[2]],
                                        n_sim   = 1)
       # obtain survival probabilities
-      pfs.surv <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[1, ], t = time)
-      os.surv  <- model.dist(dist.v = dist_OS,  d.data =  param_draws_OS[1, ], t = time)
+      pfs.surv <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[1, ], t = time, d.x = d.x)
+      os.surv  <- model.dist(dist.v = dist_OS,  d.data =  param_draws_OS[1, ], t = time, d.x = d.x)
     } else { # use survival models
       # Model-setup
       # model objects
@@ -1616,7 +1616,7 @@ model.rmvnorm <- function(dist.v, d.data, vc.data, n_sim, seed = 421) {
 #' @return
 #' A vector of survival probabilities.
 #' @export
-model.dist <- function(dist.v, d.data, d.x=0, t){
+model.dist <- function(dist.v, d.data, d.x = 0, t){
 
   # save parameters as pars and coefficients as beta
 
