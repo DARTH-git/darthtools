@@ -19,7 +19,7 @@ partsurv(
   n_sim = 100,
   seed = 421,
   warn = TRUE,
-  d.x = 0
+  dat.x = 0
 )
 }
 \arguments{

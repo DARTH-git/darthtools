@@ -4,14 +4,14 @@
 \alias{model.dist}
 \title{Calculate survival probabilities given a survival distribution and its parameter values.}
 \usage{
-model.dist(dist.v, d.data, d.x = 0, t)
+model.dist(dist.v, d.data, dat.x = 0, t)
 }
 \arguments{
 \item{dist.v}{a character string specifying the name of the survival distribution.}
 
 \item{d.data}{a vector of parameter values of the survival distribution.}
 
-\item{d.x}{a vector of covariate values that multiply the coefficients of the survival model.
+\item{dat.x}{a vector of covariate values that multiply the coefficients of the survival model.
 Default = 0 (baseline model i.e beta=0).}
 
 \item{t}{a vector of time points to calculate the survival probabilities at.}
