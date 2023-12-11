@@ -34,7 +34,7 @@ plot_trace_microsim <- function(m_M) {
   # count the number of individuals in each health state at each cycle
   m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_names_states, ordered = TRUE))))
   # m_TR <- m_TR / n_i                                 # calculate the proportion of individuals
-  m_TR <- m_TR / nrow(m_TR)
+  m_TR <- m_TR / nrow(m_M)
   colnames(m_TR) <- v_names_states                   # name the rows of the matrix
   rownames(m_TR) <- paste("Cycle", 0:(ncol(m_M)-1), sep = " ") # name the columns of the matrix
   # Plot trace of first health state
