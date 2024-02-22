@@ -97,7 +97,7 @@ check_sum_of_transition_array <- function(a_P,
     #valid <- sum(rowSums(a_P))
     valid <- all.equal(rowSums(a_P), rep(1, n_states))
     #if (abs(valid - n_states) > 0.01) {
-    if (!valid)
+    if (!valid) {
       if(err_stop) {
         stop("This is not a valid transition matrix")
       }
