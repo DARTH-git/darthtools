@@ -363,21 +363,22 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
 
   # make sure distribution names for PFS and OS are correct
   if (!choose_PFS %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
-                         "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
+                         "log-Logistic", "Gompertz", "Gen. Gamma", "Exponential Cure", "Weibull (AFT) Cure",
+                         "Gamma Cure", "log-Normal Cure",
                          "log-Logistic Cure", "Gompertz Cure")) {
     stop(paste0("Incorrect distribution name for PFS, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
-                 log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
+                 log-Logistic, Gompertz, Gen. Gamma, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
                  log-Logistic Cure, Gompertz Cure."))
   }
 
   if (!choose_OS %in% c("Exponential", "Weibull (AFT)", "Gamma", "log-Normal",
-                        "log-Logistic", "Gompertz", "Exponential Cure", "Weibull (AFT) Cure", "Gamma Cure", "log-Normal Cure",
+                        "log-Logistic", "Gompertz", "Gen. Gamma", "Exponential Cure", "Weibull (AFT) Cure",
+                        "Gamma Cure", "log-Normal Cure",
                         "log-Logistic Cure", "Gompertz Cure")) {
     stop(paste0("Incorrect distribution name for OS, select from: Exponential, Weibull (AFT), Gamma, log-Normal,
-                 log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
+                 log-Logistic, Gompertz, Gen. Gamma, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure,
                  log-Logistic Cure, Gompertz Cure."))
   }
-
 
   if (par == TRUE) {
     dist_PFS <- choose_PFS

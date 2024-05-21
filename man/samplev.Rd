@@ -7,12 +7,14 @@
 samplev(m_Probs, m = 1)
 }
 \arguments{
-\item{m_Probs}{matrix with probabilities (n_i * n_states)}
+\item{m_Probs}{matrix with probabilities for n_i individual and n_states
+states}
 
 \item{m}{number of time cycles to sample}
 }
 \value{
-n_i x 1 matrix filled with sampled health state(s) per individual
+v_cat: An n_i x 1 matrix filled with sampled health state(s) per
+individual
 }
 \description{
 \code{samplev} sample states for multiple individuals simultaneously.
