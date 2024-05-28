@@ -406,13 +406,13 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
                                        #vc.data = l_vc.data$PFS,
                                        d.data  = l_d.data[[1]],
                                        vc.data = l_vc.data[[1]],
-                                       n_sim   = n_sim)
+                                       n_sim   = n_sim, seed = seed)
       param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
                                        #d.data  = l_d.data$OS,
                                        #vc.data = l_vc.data$OS,
                                        d.data  = l_d.data[[2]],
                                        vc.data = l_vc.data[[2]],
-                                       n_sim   = n_sim)
+                                       n_sim   = n_sim, seed = seed)
       # obtain survival probabilities
       pfs.surv <- os.surv <- matrix(NA, nrow = length(time), ncol = n_sim)
       for (j in 1:n_sim) {
@@ -447,11 +447,11 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
       param_draws_PFS <- model.rmvnorm(dist.v  = dist_PFS,
                                        d.data  = l_d.data[[1]],
                                        vc.data = l_vc.data[[1]],
-                                       n_sim   = 1)
+                                       n_sim   = 1, seed = seed)
       param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
                                        d.data  = l_d.data[[2]],
                                        vc.data = l_vc.data[[2]],
-                                       n_sim   = 1)
+                                       n_sim   = 1, seed = seed)
       # obtain survival probabilities
       pfs.surv <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[1, ], t = time, dat.x = dat.x)
       os.surv  <- model.dist(dist.v = dist_OS,  d.data =  param_draws_OS[1, ], t = time, dat.x = dat.x)
