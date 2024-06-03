@@ -444,11 +444,11 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
   } else { # deterministic
     if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
       # use user-supplied values (no need to draw randomly)
-      param_draws_PFS[1,] <- l_d.data[[1]]
-      param_draws_OS[1,]  <- l_d.data[[2]]
+      param_draws_PFS <- l_d.data[[1]]
+      param_draws_OS  <- l_d.data[[2]]
       # obtain survival probabilities
-      pfs.surv <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[1, ], t = time, dat.x = dat.x)
-      os.surv  <- model.dist(dist.v = dist_OS,  d.data =  param_draws_OS[1, ], t = time, dat.x = dat.x)
+      pfs.surv <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS, t = time, dat.x = dat.x)
+      os.surv  <- model.dist(dist.v = dist_OS,  d.data =  param_draws_OS, t = time, dat.x = dat.x)
     } else { # use survival models
       # Model-setup
       # model objects
