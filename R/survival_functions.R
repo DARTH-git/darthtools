@@ -443,15 +443,9 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
     }
   } else { # deterministic
     if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
-      # randomly draw parameter values from multivariate normal distribution
-      param_draws_PFS <- model.rmvnorm(dist.v  = dist_PFS,
-                                       d.data  = l_d.data[[1]],
-                                       vc.data = l_vc.data[[1]],
-                                       n_sim   = 1, seed = seed)
-      param_draws_OS  <- model.rmvnorm(dist.v  = dist_OS,
-                                       d.data  = l_d.data[[2]],
-                                       vc.data = l_vc.data[[2]],
-                                       n_sim   = 1, seed = seed)
+      # use user-supplied values (no need to draw randomly)
+      param_draws_PFS[1,] <- l_d.data[[1]]
+      param_draws_OS[1,]  <- l_d.data[[2]]
       # obtain survival probabilities
       pfs.surv <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[1, ], t = time, dat.x = dat.x)
       os.surv  <- model.dist(dist.v = dist_OS,  d.data =  param_draws_OS[1, ], t = time, dat.x = dat.x)
