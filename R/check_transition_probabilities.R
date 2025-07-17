@@ -100,25 +100,38 @@ check_sum_of_transition_array <- function(a_P,
     valid <- all.equal(rowSums(a_P),target)
     #if (abs(valid - n_states) > 0.01) {
     if (!valid) {
-      if(err_stop) {
+      if (err_stop) {
         stop("This is not a valid transition matrix")
       }
 
-      if(verbose){
+      if (verbose) {
         warning("This is not a valid transition matrix")
       }
       val = F
     }
   } else {
     # For array
-    valid <- (apply(a_P, d, function(x) sum(rowSums(x))) == n_states)
+    # valid <- (apply(a_P, d, function(x) sum(rowSums(x))) == n_states)
+    valid <- apply(a_P, d, function(x) isTRUE(all.equal(sum(rowSums(x)),
+                                                        n_states)))
     if (!isTRUE(all.equal(as.numeric(sum(valid)), as.numeric(n_cycles)))) {
-      if(err_stop) {
-        stop("This is not a valid transition array")
+      invalid_entries <- which(!valid) # find invalid entries
+      if (err_stop) {
+        stop(paste("This is not a valid transition array",
+                   "\n",
+                   "Invalid entries at cycles: ",
+                   paste(invalid_entries, collapse = ", "),
+                   "\n",
+                   "The sum of transition probabilities for these cycles does not equal to 1"))
       }
 
-      if(verbose){
-        warning("This is not a valid transition array")
+      if (verbose) {
+        warning(paste("This is not a valid transition array",
+                      "\n",
+                      "Invalid entries at cycles: ",
+                      paste(invalid_entries, collapse = ", "),
+                      "\n",
+                      "The sum of transition probabilities for these cycles does not equal to 1"))
       }
       val = F
     }
