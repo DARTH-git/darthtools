@@ -46,7 +46,14 @@ Depends:
     R (>= 3.5.0)
 Suggests: 
 Imports:
-    survHE
+    survHE,
+    dplyr,
+    ellipse,
+    ggplot2,
+    ggrepel,
+    scales,
+    stringr,
+    tidyr
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
