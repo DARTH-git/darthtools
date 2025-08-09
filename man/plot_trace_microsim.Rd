@@ -15,3 +15,4 @@ a plot of the cohort trace
 \description{
 \code{plot_trace_microsim} plots cohort trace of a microsimulation model.
 }
+

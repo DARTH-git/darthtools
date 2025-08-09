@@ -25,7 +25,7 @@ plot_evpi(
 \item{txtsize}{base text size}
 
 \item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
-Default: $, but it could be any currency symbol or word (e.g., Â£, â¬, peso)}
+Default: $, but it could be any currency symbol or word (e.g., pound, euro, peso)}
 
 \item{effect_units}{units of effectiveness. Default: QALY}
 
@@ -53,3 +53,4 @@ Plots the \code{evpi} object created by \code{\link{calc_evpi}}.
 \keyword{of}
 \keyword{perfect}
 \keyword{value}
+

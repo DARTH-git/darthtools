@@ -15,3 +15,4 @@ a ggplot object - plot of the survival curve
 \description{
 \code{plot_surv} plots the survival probability curve.
 }
+

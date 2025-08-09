@@ -12,3 +12,4 @@ A string with the operating system.
 \description{
 \code{get_os} gets the operating system.
 }
+

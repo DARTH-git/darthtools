@@ -15,3 +15,4 @@ a plot of the density of total QALYs
 \description{
 \code{plot_te} plots density of total QALYs
 }
+

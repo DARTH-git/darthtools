@@ -69,3 +69,4 @@ a list containing all survival model objects.
 \description{
 \code{fit.fun} fits multiple survival models to survival data using survHE.
 }
+

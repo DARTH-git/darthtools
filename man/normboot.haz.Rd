@@ -9,3 +9,4 @@ normboot.haz(x, t, start, newdata = NULL, X = NULL, fn, B)
 \description{
 Bootstrap hazards
 }
+

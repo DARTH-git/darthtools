@@ -29,7 +29,7 @@ plot_ceac(
 \item{points}{whether to plot points (TRUE) or not (FALSE)}
 
 \item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
-Defaults to \code{$}, but can be any currency symbol or word (e.g., Â£, â¬, peso)}
+Defaults to \code{$}, but can be any currency symbol or word (e.g., pound, euro, peso)}
 
 \item{min_prob}{minimum probability to show strategy in plot.
 For example, if the min_prob is 0.05, only strategies that ever
@@ -61,3 +61,4 @@ Plots the CEAC, using the object created by \code{\link{ceac}}.
 cost-effective at each \code{wtp} value.
 }
 \keyword{internal}
+

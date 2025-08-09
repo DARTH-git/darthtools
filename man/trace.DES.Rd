@@ -21,3 +21,4 @@ Matrix of Markov trace
 \description{
 \code{trace.DES} computes Markov trace out of a multi-state model using DES.
 }
+

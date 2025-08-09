@@ -15,3 +15,4 @@ vector of survival probabilities
 \description{
 \code{trans_to_surv} convert transition probabilities back to survival probabilities.
 }
+

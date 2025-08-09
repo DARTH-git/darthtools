@@ -15,3 +15,4 @@ matrix of limits.
 \description{
 \code{find_interval_limits} determines which rows the upper and lower values of each interval are (in the survival data set).
 }
+

@@ -15,3 +15,4 @@ a plot of the cohort trace for Shiny App
 \description{
 \code{plot_trace_microsim_shiny} plots cohort trace of a microsimulatoin model for the Shiny App.
 }
+

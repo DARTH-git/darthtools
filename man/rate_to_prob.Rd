@@ -23,3 +23,4 @@ r_year  <- 0.3
 r_month <- rate_to_prob(r = r_year, t = 1/12)
 r_month
 }
+

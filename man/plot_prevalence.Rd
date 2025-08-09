@@ -15,3 +15,4 @@ a ggplot object - plot of the prevalence curve
 \description{
 \code{plot_prevalence} plots the prevalence curve for specified health states.
 }
+

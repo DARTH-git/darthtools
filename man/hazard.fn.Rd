@@ -9,3 +9,4 @@ hazard.fn(x, t, start, ...)
 \description{
 Calculates hazards
 }
+

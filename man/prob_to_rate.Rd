@@ -23,3 +23,4 @@ p_year  <- 0.3
 r_month <- prob_to_rate(p = p_year, t = 1/12)
 r_month
 }
+

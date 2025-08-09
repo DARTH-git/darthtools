@@ -37,3 +37,4 @@ Multi-state model fit.
 \description{
 \code{fit.mstate} fits multi-state model.
 }
+

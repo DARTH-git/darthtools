@@ -15,3 +15,4 @@ a ggplot object - plot of the cohort trace for each strategy split by health sta
 \description{
 \code{plot_trace} plots the cohort trace for each strategy, split by health state.
 }
+

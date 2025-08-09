@@ -15,3 +15,4 @@ a ggplot object - plot of state-in-state proportion curve
 \description{
 \code{plot_prevalence} plots the
 }
+

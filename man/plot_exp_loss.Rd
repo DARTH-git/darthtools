@@ -39,7 +39,7 @@ To only plot the EVPI see \code{\link{calc_evpi}}.}
 \item{txtsize}{base text size}
 
 \item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
-Default: $, but it could be any currency symbol or word (e.g., Â£, â¬, peso)}
+Default: $, but it could be any currency symbol or word (e.g., pound, euro, peso)}
 
 \item{effect_units}{units of effectiveness. Default: QALY}
 
@@ -61,3 +61,4 @@ A \code{ggplot2} object with the expected loss
 \description{
 Plot of Expected Loss Curves (ELC)
 }
+

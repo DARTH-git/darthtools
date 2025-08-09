@@ -15,3 +15,4 @@ a dataframe containing survival probabilities for each strategy
 \description{
 \code{calc_surv} calculates the survival probabilities.
 }
+

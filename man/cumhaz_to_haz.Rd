@@ -15,3 +15,4 @@ vector of hazard rates
 \description{
 \code{cumhaz_to_haz} converts cumulative hazards to hazard rates across time points.
 }
+

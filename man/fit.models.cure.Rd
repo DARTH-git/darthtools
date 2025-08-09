@@ -19,3 +19,4 @@ A model object.
 \description{
 \code{fit.models.cure} fits parametric mixture cure survival models for health economic evaluations.
 }
+

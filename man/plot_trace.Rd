@@ -15,3 +15,4 @@ a ggplot object - plot of the cohort trace
 \description{
 \code{plot_trace} plots the cohort trace.
 }
+

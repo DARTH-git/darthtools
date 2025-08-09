@@ -15,3 +15,4 @@ vector of hazard rates
 \description{
 \code{surv_to_haz} convert survival probabilities to hazard rates.
 }
+

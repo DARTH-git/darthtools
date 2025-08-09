@@ -41,3 +41,4 @@ a list containing Markov trace, expected survival, survival probabilities, trans
 \description{
 \code{all_partsurv} fits partitioned survival model on all combinations of chosen PFS and OS parametric survival functions.
 }
+

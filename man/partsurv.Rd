@@ -62,3 +62,4 @@ a list containing Markov trace, expected survival, survival probabilities, trans
 \description{
 \code{partsurv} fits partitioned survival model to survival data.
 }
+

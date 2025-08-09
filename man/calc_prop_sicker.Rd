@@ -15,3 +15,4 @@ a dataframe containing state-in-state proportions of specified health states for
 \description{
 \code{plot_prevalence} calculates the proportion of a speciefied subset of states among a set of specified states
 }
+

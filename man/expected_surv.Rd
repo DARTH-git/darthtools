@@ -17,3 +17,4 @@ expected survival.
 \description{
 \code{expected_surv} calculates expected survival (area under survival curve).
 }
+

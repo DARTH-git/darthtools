@@ -67,3 +67,4 @@ a ggplot2 object which can be modified by adding additional geoms
 \description{
 \code{plot.icers} plots the cost-effectiveness plane for a ICER object, calculated with \code{\link{calculate_icers}}
 }
+

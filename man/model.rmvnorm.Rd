@@ -31,3 +31,4 @@ A matrix of drawn parameter values.
 
 \code{model.rmvnorm} randomly draws parameter values of survival models from multivariate normal distribution.
 }
+

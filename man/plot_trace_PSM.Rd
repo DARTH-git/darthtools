@@ -22,3 +22,4 @@ a plot of the cohort trace.
 \description{
 \code{plot_trace_PSM} plots Markov trace from a partitioned survival model.
 }
+

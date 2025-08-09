@@ -23,3 +23,4 @@ p_year  <- 0.3
 p_month <- prob_to_prob(p = p_year, t = 1/12)
 p_month
 }
+

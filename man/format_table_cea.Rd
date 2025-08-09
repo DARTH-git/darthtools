@@ -15,3 +15,4 @@ a dataframe object - formatted CEA table
 \description{
 \code{format_table_cea} formats the CEA table.
 }
+

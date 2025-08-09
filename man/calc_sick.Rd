@@ -15,3 +15,4 @@ a dataframe containing proportions in specified states for each strategy
 \description{
 \code{calc_surv} calculates the proportions of the cohort in specified states
 }
+

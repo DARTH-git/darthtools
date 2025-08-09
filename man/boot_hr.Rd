@@ -41,3 +41,4 @@ dataframe of hazard ratio statistics (2.5\% percnetile, median, 97.5\% percentil
 Bootstrap hazards ratios of two survival models
 \code{boot_hr} computes bootstrap hazard ratios (HR) of two survival models (model 1 vs. 2) or one survival model with multiple treatments (rx 1 vs. 2)
 }
+

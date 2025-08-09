@@ -9,3 +9,4 @@ boot.haz(x, t, start = 0, X = NULL, newdata = NULL, B = 1000)
 \description{
 Bootstrap hazards
 }
+

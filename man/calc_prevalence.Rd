@@ -15,3 +15,4 @@ a dataframe containing prevalence of specified health states for each strategy
 \description{
 \code{plot_prevalence} calculate the prevalence for different health states.
 }
+
