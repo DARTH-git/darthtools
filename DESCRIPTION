@@ -1,7 +1,7 @@
 Package: darthtools
 Type: Package
 Title: darthtools: Decision Analysis Helper Tools for the 'DARTH' Workgroup
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: 
     c(person(given = "Fernando",
              family = "Alarid-Escudero",
