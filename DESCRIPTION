@@ -1,8 +1,6 @@
 Package: darthtools
 Type: Package
-Title: darthtools is an R package that contains tools developed by the 
-       Decision Analysis in R for Technologies in Health (DARTH) workgroup to 
-       construct model-based cost-effectiveness analysis in R
+Title: darthtools: Decision Analysis Helper Tools for the 'DARTH' Workgroup
 Version: 0.2.0
 Authors@R: 
     c(person(given = "Fernando",
@@ -35,13 +33,17 @@ Authors@R:
              role = "aut",
              email = "eenns@umn.edu",
              comment = c(ORCID = "0000-0003-0693-7358")),
-      person(given = "DARTH workgroup", 
+      person(given = "DARTH Workgroup", 
              email = "darth.workgroup@gmail.com",
              role = "cph"))
 Maintainer: Fernando Alarid-Escudero <falarid@stanford.edu>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: file LICENSE
+Description: 'darthtools' provides tools developed by the Decision Analysis in R
+    for Technologies in Health ('DARTH') Workgroup to build and analyze model-based
+    cost-effectiveness analyses, including cohort Markov, partitioned survival,
+    and microsimulation models. It also includes utilities for survival modeling,
+    probabilistic sensitivity analysis (PSA), and visualization (CEAC, EVPI, ELC).
+    See <https://darth-git.github.io/darthtools/>.
+License: MIT + file LICENSE
 Depends:
     R (>= 3.5.0)
 Imports:
@@ -82,6 +84,5 @@ Language: en-US
 LazyData: true
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
-URL: https://darth-git.github.io/darthtools, https://github.com/DARTH-git/darthtools/
+URL: https://darth-git.github.io/darthtools/, https://github.com/DARTH-git/darthtools/
 BugReports: https://github.com/DARTH-git/darthtools/issues
-Author: Fernando Alarid-Escudero, Eline Krijkamp, Petros Pechlivanoglou, Hawre Jalal, Alan Yang, Eva Enns, and the DARTH workgroup
