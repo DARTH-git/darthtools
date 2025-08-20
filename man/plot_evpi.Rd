@@ -20,12 +20,12 @@ plot_evpi(
 }
 \arguments{
 \item{x}{object of class \code{evpi}, produced by function
-\code{\link{calc_evpi}}}
+\code{calc_evpi}}
 
 \item{txtsize}{base text size}
 
 \item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
-Default: $, but it could be any currency symbol or word (e.g., pound, euro, peso)}
+Default: $, but it could be any currency symbol or word (e.g., Â£, â¬, peso)}
 
 \item{effect_units}{units of effectiveness. Default: QALY}
 
@@ -43,14 +43,13 @@ This is not used by \code{dampack} but required for generic consistency.}
 A \code{ggplot2} plot with the EVPI
 }
 \description{
-Plots the \code{evpi} object created by \code{\link{calc_evpi}}.
+Plots the \code{evpi} object created by \code{calc_evpi}.
 }
 \seealso{
-\code{\link{calc_evpi}}
+\code{calc_evpi}
 }
 \keyword{expected}
 \keyword{information}
 \keyword{of}
 \keyword{perfect}
 \keyword{value}
-

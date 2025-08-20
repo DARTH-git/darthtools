@@ -6,7 +6,21 @@
 \usage{
 normboot.haz(x, t, start, newdata = NULL, X = NULL, fn, B)
 }
+\arguments{
+\item{x}{Fitted model object or input data used to estimate the hazard.}
+
+\item{t}{Numeric vector of times at which to compute the hazard.}
+
+\item{start}{Optional start time for interval-based calculations.}
+
+\item{newdata}{Optional data.frame used for out-of-sample predictions.}
+
+\item{X}{Optional design (covariate) matrix used for predictions.}
+
+\item{fn}{Function or character string; statistic to compute within each bootstrap draw.}
+
+\item{B}{Integer; number of bootstrap replications.}
+}
 \description{
 Bootstrap hazards
 }
-

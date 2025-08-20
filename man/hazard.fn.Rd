@@ -6,7 +6,15 @@
 \usage{
 hazard.fn(x, t, start, ...)
 }
+\arguments{
+\item{x}{Fitted model object or function describing the hazard.}
+
+\item{t}{Numeric vector of times at which to evaluate the hazard.}
+
+\item{start}{Optional start time for interval-based calculations.}
+
+\item{...}{Additional arguments passed to underlying methods.}
+}
 \description{
 Calculates hazards
 }
-

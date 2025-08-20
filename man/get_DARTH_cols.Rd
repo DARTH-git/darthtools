@@ -12,4 +12,3 @@ a string containing DARTH color codes
 \description{
 \code{get_DARTH_cols} retrieves the color codes for DARTH colors.
 }
-

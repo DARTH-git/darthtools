@@ -1,2 +1,7 @@
-^.*\.Rproj$
+^darthtools\.Rproj$
 ^\.Rproj\.user$
+^README\.Rmd$
+^docs$
+^doc$
+^Meta$
+^data_hund_icers\.rds$

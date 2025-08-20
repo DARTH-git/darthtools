@@ -29,13 +29,12 @@
 #' Choose from = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma").
 #' @return
 #' a list containing all survival model objects.
+#' @importFrom survHE fit.models
+#' @importFrom survminer ggsurvplot
 #' @export
 fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = FALSE, times, k = 2,
                     legend_position = "bottom", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
                     mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "rps", "gengamma")) {
-  require(survHE)
-  require(survminer)
-  require(tm)
 
   ## Set up
   # Extract the right data columns
@@ -192,14 +191,17 @@ fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = 
 #' Default = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "gengamma").
 #' @return
 #' a list containing all survival model objects.
+#' @importFrom survival Surv
+#' @importFrom survival Surv survfit
+#' @importFrom flexsurv flexsurvreg normboot.flexsurvreg
+#' @importFrom flexsurvcure flexsurvcure
+#' @importFrom survHE fit.models
+#' @importFrom survminer ggsurvplot
 #' @export
 fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, extrapolate = FALSE, times,
                          legend_position = "bottom", xlow = min(times), xhigh = max(times), ylow = 0, yhigh = 1, risktable = F,
                          mods = c("exp", "weibull", "gamma", "lnorm", "llogis", "gompertz", "gengamma")) {
-  require(flexsurvcure)
-  require(survHE)
-  require(survminer)
-  # require(tm)
+
 
   ## Set up
   # Extract the right data columns
@@ -342,7 +344,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' Default = FALSE
 #' @param choose_PFS chosen PFS distribution. Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.
 #' @param choose_OS chosen OS distribution. Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.
-#' @param time numeric vector of time to estimate probabilities.
+#' @param times numeric vector of time to estimate probabilities.
 #' @param v_names_states vector of state names.
 #' @param PA run probabilistic analysis.
 #' Default = FALSE.
@@ -351,13 +353,14 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' @param seed seed for random number generation.
 #' Default = 421.
 #' @param warn prints a warning message whenever PFS > OS
+#' @param dat.x Optional data (e.g., cut points, knots, or interval mapping) defining the piecewise survival structure.
 #' @return
 #' a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
+#' @importFrom abind abind
 #' @export
 partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE, chol = FALSE,
-                     choose_PFS = NULL, choose_OS = NULL, time = times, v_names_states, PA = FALSE, n_sim = 100, seed = 421,
+                     choose_PFS = NULL, choose_OS = NULL, times = time, v_names_states, PA = FALSE, n_sim = 100, seed = 421,
                      warn = TRUE, dat.x = 0){
-  require(abind)
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
 
@@ -430,16 +433,12 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
       # chosen model index based on name
       mod.pfs.chosen <- which(mod.pfs == dist_PFS)
       mod.os.chosen  <- which(mod.os == dist_OS)
-      fit_PFS <- make.surv(pfs_survHE,
-                           mod = mod.pfs.chosen,
-                           nsim = n_sim,
-                           t = times)
-      fit_OS  <- make.surv(os_survHE,
-                           mod = mod.os.chosen,
-                           nsim = n_sim,
-                           t = times)
-      pfs.surv <- surv_prob(fit_PFS, PA = TRUE)
-      os.surv  <- surv_prob( fit_OS, PA = TRUE)
+      mod.pfs <- names(pfs_survHE$models)
+      mod.os  <- names(os_survHE$models)
+      pfs_idx <- match(dist_PFS, mod.pfs)
+      os_idx  <- match(dist_OS,  mod.os)
+      pfs.surv <- surv_prob(pfs_survHE$models[[pfs_idx]], times = times)
+      os.surv  <- surv_prob(os_survHE$models[[os_idx ]], times = times)
     }
   } else { # deterministic
     if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
@@ -457,8 +456,8 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
       # model names
       mod.pfs <- names(pfs_survHE$models)
       mod.os <- names(os_survHE$models)
-      pfs.surv <- surv_prob(pfs_survHE$models[[which(mod.pfs == dist_PFS)]], time = times)
-      os.surv  <- surv_prob( os_survHE$models[[which(mod.os  ==  dist_OS)]], time = times)
+      pfs.surv <- surv_prob(pfs_survHE$models[[which(mod.pfs == dist_PFS)]], times = times)
+      os.surv  <- surv_prob( os_survHE$models[[which(mod.os  ==  dist_OS)]], times = times)
     }
   }
 
@@ -620,9 +619,9 @@ surv_to_haz <- function(surv) {
 #' @param surv vector of survival probabilities.
 #' @return
 #' expected survival.
+#' @importFrom zoo rollmean
 #' @export
 expected_surv <- function(time, surv) {
-  require(zoo)
   sum(diff(time[order(time)])*rollmean(surv[order(time)],2))
 }
 
@@ -656,9 +655,9 @@ all_partsurv <- function(pfs_survHE, os_survHE, choose_PFS, choose_OS, time = ti
                           os_survHE  = os_survHE,
                           choose_PFS = model_names[i],
                           choose_OS  = model_names[j],
-                          time = time, PA = PA, v_names_states = v_names_states, n_sim = n_sim, seed = seed)
+                          times = time, PA = PA, v_names_states = v_names_states, n_sim = n_sim, seed = seed)
       # store model outputs
-      all_m_M_PSM <- list.append(all_m_M_PSM, m_M_PSM)
+      all_m_M_PSM <- c(all_m_M_PSM, list(m_M_PSM))
     }
   }
   # Name the outputs
@@ -875,6 +874,10 @@ cumhaz_to_haz <- function(cumhaz) {
 }
 
 #' Calculates hazards
+#' @param x Fitted model object or function describing the hazard.
+#' @param t Numeric vector of times at which to evaluate the hazard.
+#' @param start Optional start time for interval-based calculations.
+#' @param ... Additional arguments passed to underlying methods.
 #' @export
 hazard.fn = function( x, t, start, ...) {
   ret <- x$dfns$h(t, ...) * (1 - x$dfns$p(start, ...))
@@ -883,6 +886,13 @@ hazard.fn = function( x, t, start, ...) {
 }
 
 #' Bootstrap hazards
+#' @param x Fitted model object or input data used to estimate the hazard.
+#' @param t Numeric vector of times at which to compute the hazard.
+#' @param start Optional start time for interval-based calculations.
+#' @param newdata Optional data.frame used for out-of-sample predictions.
+#' @param X Optional design (covariate) matrix used for predictions.
+#' @param fn Function or character string; statistic to compute within each bootstrap draw.
+#' @param B Integer; number of bootstrap replications.
 #' @export
 normboot.haz <- function (x, t, start, newdata = NULL, X = NULL, fn, B) {
   sim <- normboot.flexsurvreg(x, B, newdata = newdata, X = X)
@@ -907,6 +917,12 @@ normboot.haz <- function (x, t, start, newdata = NULL, X = NULL, fn, B) {
 }
 
 #' Bootstrap hazards
+#' @param x Fitted model object or input data used to estimate the hazard.
+#' @param t Numeric vector of times at which to compute the hazard.
+#' @param start Optional start time for interval-based calculations.
+#' @param X Optional design (covariate) matrix used for predictions.
+#' @param newdata Optional data.frame used for out-of-sample predictions.
+#' @param B Integer; number of bootstrap replications.
 #' @export
 boot.haz <- function (x, t, start = 0 ,X = NULL, newdata =NULL, B = 1000) {
   dat <- x$data
@@ -952,7 +968,7 @@ boot.haz <- function (x, t, start = 0 ,X = NULL, newdata =NULL, B = 1000) {
     }
   }
 
-  hazard.fn <- flexsurv:::expand.summfn.args(hazard.fn)
+  hazard.fn <- getFromNamespace("expand.summfn.args", "flexsurv")(hazard.fn)
   fncall <- list( t, start)
   beta <- if (x$ncovs == 0) {
     0
@@ -966,8 +982,9 @@ boot.haz <- function (x, t, start = 0 ,X = NULL, newdata =NULL, B = 1000) {
   }else covnames <- rownames(X)
   names(ret) <- covnames
   for (i in 1:nrow(X)) {
-    basepars.mat <- flexsurv:::add.covs(x, x$res.t[dlist$pars, "est"],
-                                        beta, X[i, , drop = FALSE], transform = FALSE)
+    basepars.mat <- getFromNamespace("add.covs", "flexsurv")(
+      x, x$res.t[dlist$pars, "est"], beta = beta, X = X, transform = TRUE
+    )
     basepars <- as.list(as.data.frame(basepars.mat))
     fncall[dlist$pars] <- basepars
     for (j in seq_along(x$aux)) {
@@ -1058,9 +1075,9 @@ boot_hr <- function(surv_model1 = NULL, surv_model2 = NULL, rx1 = NULL, rx2 = NU
 #' @param Rx treatment arm.
 #' @return
 #' list of objects (time points, hazard, hazard CI, bootstrapped time points).
+#' @importFrom muhaz muhaz
 #' @export
 boot_haz_np <- function(surv_data, time, status, Rx, B){
-  require(muhaz)
   surv_data <- surv_data %>% filter(rx == Rx)
   fit      <- muhaz(surv_data[,time], surv_data[,status])
   max_time <- max(fit$est.grid)
@@ -1106,7 +1123,7 @@ check_PFS_OS <- function(Sick){
 #' \code{find_interval_limits} determines which rows the upper and lower values of each interval are (in the survival data set).
 #'
 #' @param start_time start time.
-#' @param start_time survival times.
+#' @param surv_time survival times.
 #' @return
 #' matrix of limits.
 #' @export
@@ -1141,9 +1158,11 @@ find_interval_limits <- function(start_time,
 #' @param AtRisk vector of number of patients at risk.
 #' @return
 #' at-risk table (dataframe).
+#' @importFrom dplyr filter select arrange pull
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
 #' @export
 create_at_risk_table <- function(survival_time, Years, AtRisk) {
-  require(dplyr)
   time_interval <- c(Years, max(Years)+diff(Years)[1])
   df_nrisk <- as.data.frame(find_interval_limits(start_time = time_interval,
                                                  surv_time = survival_time))
@@ -1159,9 +1178,11 @@ create_at_risk_table <- function(survival_time, Years, AtRisk) {
 #'
 #' \code{fit.models.cure} fits parametric mixture cure survival models for health economic evaluations.
 #'
-#' @param formula a formula specifying the model to be used, in the form Surv(time,event)~treatment[+covariates] for flexsurv.
+#' @param formula a formula specifying the model to be used, in the form Surv(time,event)~treatment\code{+covariates} for flexsurv.
 #' @param data A data frame containing the data to be used for the analysis. This must contain data for the 'event' variable. In case there is no censoring, then event is a column of 1s.
 #' @param distr a (vector of) string(s) containing the name(s) of the model(s) to be fitted. Available options are: flexsurv: "exponential","gamma","genf","gengamma","gompertz","weibull", "weibullPH","loglogistic","lognormal" INLA: "exponential","weibull","lognormal","loglogistic" hmc: "exponential","gamma","genf","gengamma","gompertz","weibull","weibullPH", "loglogistic","lognormal".
+#' @param method Character string specifying the fitting method (e.g., "mle").
+#' @param ... Further arguments passed to the underlying cure-model fitting functions.
 #' @return
 #' A model object.
 #' @export
@@ -1178,23 +1199,26 @@ fit.models.cure <- function (formula = NULL, data, distr = NULL, method = "mle",
   if (!method %in% c("mle")) {
     stop("Methods available for use are 'mle'")
   }
-  survHE:::check_distributions(method, distr)
+  getFromNamespace("check_distributions", "survHE")(method, distr)
   if (method == "mle") {
-    res <- survHE:::format_output_fit.models(lapply(distr, function(x) runMLE.cure(x,
-                                                                                   exArgs)), method, distr, formula, data)
+    res <- getFromNamespace("format_output_fit.models", "survHE")(
+      lapply(distr, function(d) runMLE.cure(d, ...)), method = "mle", data = data
+    )
   }
   return(res)
 }
 
 #' run MLE on cure models
+#' @param x Data or model object used to estimate the cure model by MLE.
+#' @param exArgs Named list of additional arguments passed to the optimizer/fitting routine.
 #' @export
 runMLE.cure <- function (x, exArgs)
 {
   formula <- exArgs$formula
   data = exArgs$data
-  availables <- survHE:::load_availables()
-  d3 <- survHE:::manipulate_distributions(x)$distr3
-  x <- survHE:::manipulate_distributions(x)$distr
+  availables <- getFromNamespace("load_availables", "survHE")()
+  d3         <- getFromNamespace("manipulate_distributions", "survHE")(x)$distr3
+  x          <- getFromNamespace("manipulate_distributions", "survHE")(x)$distr
   tic <- proc.time()
   if (x == "survspline") {
     if (exists("bhazard", where = exArgs)) {
@@ -1662,8 +1686,8 @@ model.dist <- function(dist.v, d.data, dat.x = 0, t){
       }
       # else{print("Gamma Cure")}
     }
-    p.res   <- pmixsurv(pgamma, t,        theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
-    # p.res.1 <- pmixsurv(pgamma, t - step, theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
+    p.res   <- .gems_pmixsurv(pgamma, t,        theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
+    # p.res.1 <- .gems_pmixsurv(pgamma, t - step, theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
 
     ############################ Exponential ############################
   } else if (dist.v == "Exponential") {
@@ -1692,8 +1716,8 @@ model.dist <- function(dist.v, d.data, dat.x = 0, t){
       }
       # else{print("Exponential Cure")}
     }
-    p.res   <- pmixsurv(pexp, t,        theta = pars[1], rate = pred, lower.tail = F)
-    # p.res.1 <- pmixsurv(pexp, t - step, theta = pars[1], rate = pred, lower.tail = F)
+    p.res   <- .gems_pmixsurv(pexp, t,        theta = pars[1], rate = pred, lower.tail = F)
+    # p.res.1 <- .gems_pmixsurv(pexp, t - step, theta = pars[1], rate = pred, lower.tail = F)
 
     ############################ Weibull ############################
   } else if (dist.v == "Weibull (AFT)") {
@@ -1726,8 +1750,8 @@ model.dist <- function(dist.v, d.data, dat.x = 0, t){
       }
       # else{print("Weibull (AFT) Cure")}
     }
-    p.res   <- pmixsurv(pweibull, t,        theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
-    # p.res.1 <- pmixsurv(pWeibull (AFT), t - step, theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
+    p.res   <- .gems_pmixsurv(pweibull, t,        theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
+    # p.res.1 <- .gems_pmixsurv(pWeibull (AFT), t - step, theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
 
     ############################ log-Normal ############################
   } else if (dist.v == "log-Normal") {
@@ -1759,8 +1783,8 @@ model.dist <- function(dist.v, d.data, dat.x = 0, t){
       # else{print("log-Normal Cure")}
     }
 
-    p.res   <- pmixsurv(plnorm, t       , theta = pars[1], meanlog = pred, sdlog = pars[3], lower.tail = F)
-    # p.res.1 <- pmixsurv(plnorm, t - step, theta = pars[1], meanlog = pred, sdlog = pars[3], lower.tail = F)
+    p.res   <- .gems_pmixsurv(plnorm, t       , theta = pars[1], meanlog = pred, sdlog = pars[3], lower.tail = F)
+    # p.res.1 <- .gems_pmixsurv(plnorm, t - step, theta = pars[1], meanlog = pred, sdlog = pars[3], lower.tail = F)
     ############################ Gompertz ############################
   } else if (dist.v == "Gompertz") {
     for (i in 1:length(pars)) {
@@ -1791,8 +1815,8 @@ model.dist <- function(dist.v, d.data, dat.x = 0, t){
       }
       # else{print("Gompertz Cure")}
     }
-    p.res   <- pmixsurv(pgompertz, t,        theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
-    # p.res.1 <- pmixsurv(pgompertz, t - step, theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
+    p.res   <- .gems_pmixsurv(pgompertz, t,        theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
+    # p.res.1 <- .gems_pmixsurv(pgompertz, t - step, theta = pars[1], shape = pars[2], rate = pred, lower.tail = F)
 
     ############################ log-Logistic ############################
   } else if (dist.v == "log-Logistic") {
@@ -1824,8 +1848,8 @@ model.dist <- function(dist.v, d.data, dat.x = 0, t){
       # else{print("log-Logistic Cure")}
     }
 
-    p.res   <- pmixsurv(pllogis, t,        theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
-    # p.res.1 <- pmixsurv(pllogis, t - step, theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
+    p.res   <- .gems_pmixsurv(pllogis, t,        theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
+    # p.res.1 <- .gems_pmixsurv(pllogis, t - step, theta = pars[1], shape = pars[2], scale = pred, lower.tail = F)
 
     ############################ No Distribution ############################
   } else {

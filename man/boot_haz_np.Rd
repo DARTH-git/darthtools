@@ -25,4 +25,3 @@ list of objects (time points, hazard, hazard CI, bootstrapped time points).
 Non-parametric hazard bootstrap
 \code{boot_haz_np} computes non-parametric bootstrap hazards from time-to-event data.
 }
-

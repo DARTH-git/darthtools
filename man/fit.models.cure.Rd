@@ -7,11 +7,15 @@
 fit.models.cure(formula = NULL, data, distr = NULL, method = "mle", ...)
 }
 \arguments{
-\item{formula}{a formula specifying the model to be used, in the form Surv(time,event)~treatment\link{+covariates} for flexsurv.}
+\item{formula}{a formula specifying the model to be used, in the form Surv(time,event)~treatment\code{+covariates} for flexsurv.}
 
 \item{data}{A data frame containing the data to be used for the analysis. This must contain data for the 'event' variable. In case there is no censoring, then event is a column of 1s.}
 
 \item{distr}{a (vector of) string(s) containing the name(s) of the model(s) to be fitted. Available options are: flexsurv: "exponential","gamma","genf","gengamma","gompertz","weibull", "weibullPH","loglogistic","lognormal" INLA: "exponential","weibull","lognormal","loglogistic" hmc: "exponential","gamma","genf","gengamma","gompertz","weibull","weibullPH", "loglogistic","lognormal".}
+
+\item{method}{Character string specifying the fitting method (e.g., "mle").}
+
+\item{...}{Further arguments passed to the underlying cure-model fitting functions.}
 }
 \value{
 A model object.
@@ -19,4 +23,3 @@ A model object.
 \description{
 \code{fit.models.cure} fits parametric mixture cure survival models for health economic evaluations.
 }
-

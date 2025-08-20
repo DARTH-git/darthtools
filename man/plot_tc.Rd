@@ -15,4 +15,3 @@ a plot of the density of total cost
 \description{
 \code{plot_tc} plots density of total cost.
 }
-

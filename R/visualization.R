@@ -14,7 +14,7 @@ plot_tc <- function(tc) {
 #'
 #' \code{plot_te} plots density of total QALYs
 #'
-#' @param tc total QALYs
+#' @param te total QALYs
 #' @return a plot of the density of total QALYs
 #' @export
 plot_te <- function(te) {
@@ -54,6 +54,7 @@ plot_trace_microsim <- function(m_M) {
 #' \code{plot_trace_microsim_shiny} plots cohort trace of a microsimulatoin model for the Shiny App.
 #'
 #' @param m_M a cohort trace matrix
+#' @param input_list List of Shiny inputs controlling the microsimulation trace plot.
 #' @return a plot of the cohort trace for Shiny App
 #' @export
 plot_trace_microsim_shiny <- function(m_M, input_list = NULL) {
@@ -180,6 +181,7 @@ plot_trace_strategy <- function(l_m_M) {
 #' \code{calc_surv} calculates the survival probabilities.
 #'
 #' @param l_m_M a list containing cohort trace matrices
+#' @param v_names_death_states Character vector of state names considered as “dead”.
 #' @return a dataframe containing survival probabilities for each strategy
 #' @export
 calc_surv <- function(l_m_M, v_names_death_states) {
@@ -206,6 +208,7 @@ calc_surv <- function(l_m_M, v_names_death_states) {
 #' \code{calc_surv} calculates the proportions of the cohort in specified states
 #'
 #' @param l_m_M a list containing cohort trace matrices
+#' @param v_names_sick_states Character vector of state names considered as “sick”.
 #' @return a dataframe containing proportions in specified states for each strategy
 #' @export
 calc_sick <- function(l_m_M, v_names_sick_states) {
@@ -237,6 +240,8 @@ calc_sick <- function(l_m_M, v_names_sick_states) {
 #' \code{plot_prevalence} calculate the prevalence for different health states.
 #'
 #' @param l_m_M a list containing cohort trace matrices
+#' @param v_names_sick_states Character vector of state names considered as “sick”.
+#' @param v_names_dead_states Character vector of state names considered as “dead”.
 #' @return a dataframe containing prevalence of specified health states for each strategy
 #' @export
 calc_prevalence <- function(l_m_M, v_names_sick_states, v_names_dead_states) {
@@ -256,6 +261,8 @@ calc_prevalence <- function(l_m_M, v_names_sick_states, v_names_dead_states) {
 #' \code{plot_prevalence} calculates the proportion of a speciefied subset of states among a set of specified states
 #'
 #' @param l_m_M a list containing cohort trace matrices
+#' @param v_names_sick_states Character vector of state names considered as “sick”.
+#' @param v_names_sicker_states Character vector of state names considered “sicker” (more severe) than the base sick states.
 #' @return a dataframe containing state-in-state proportions of specified health states for each strategy
 #' @export
 calc_prop_sicker <- function(l_m_M, v_names_sick_states, v_names_sicker_states) {
@@ -278,6 +285,7 @@ calc_prop_sicker <- function(l_m_M, v_names_sick_states, v_names_sicker_states) 
 #' \code{plot_surv} plots the survival probability curve.
 #'
 #' @param l_m_M a list containing cohort trace matrices
+#' @param v_names_death_states Character vector of state names considered as “dead”.
 #' @return a ggplot object - plot of the survival curve
 #' @export
 plot_surv <- function(l_m_M, v_names_death_states) {
@@ -306,6 +314,8 @@ plot_surv <- function(l_m_M, v_names_death_states) {
 #' \code{plot_prevalence} plots the prevalence curve for specified health states.
 #'
 #' @param l_m_M a list containing cohort trace matrices
+#' @param v_names_sick_states Character vector of state names considered as “sick”.
+#' @param v_names_dead_states Character vector of state names considered as “dead”.
 #' @return a ggplot object - plot of the prevalence curve
 #' @export
 plot_prevalence <- function(l_m_M, v_names_sick_states, v_names_dead_states) {
@@ -334,6 +344,8 @@ plot_prevalence <- function(l_m_M, v_names_sick_states, v_names_dead_states) {
 #' \code{plot_prevalence} plots the
 #'
 #' @param l_m_M a list containing cohort trace matrices
+#' @param v_names_sick_states Character vector of state names considered as “sick”.
+#' @param v_names_sicker_states Character vector of state names considered “sicker” (more severe) than the base sick states.
 #' @return a ggplot object - plot of state-in-state proportion curve
 #' @export
 plot_proportion_sicker <- function(l_m_M, v_names_sick_states, v_names_sicker_states) {
@@ -376,7 +388,7 @@ update_param_list <- function(l_params_all, params_updated){
 
 #' Plot of ICERs
 #'
-#' \code{plot.icers} plots the cost-effectiveness plane for a ICER object, calculated with \code{\link{calculate_icers}}
+#' \code{plot.icers} plots the cost-effectiveness plane for a ICER object, calculated with \code{calculate_icers}
 #' @param x Object of class \code{icers}.
 #' @inheritParams add_common_aes
 #' @param currency string. with currency used in the cost-effectiveness analysis (CEA).
@@ -730,7 +742,7 @@ plot_psa <- function(x,
 
 #' Plot of Cost-Effectiveness Acceptability Curves (CEAC)
 #'
-#' Plots the CEAC, using the object created by \code{\link{ceac}}.
+#' Plots the CEAC, using the object created by \code{ceac}.
 #'
 #' @param x object of class \code{ceac}.
 #' @param frontier whether to plot acceptability frontier (TRUE) or not (FALSE)
@@ -842,13 +854,13 @@ plot_ceac <- function(x,
 #' Plot of Expected Loss Curves (ELC)
 #'
 #' @param x object of class \code{exp_loss}, produced by function
-#'  \code{\link{calc_exp_loss}}
+#'  \code{calc_exp_loss}
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: $, but it could be any currency symbol or word (e.g., Â£, â¬, peso)
 #' @param effect_units units of effectiveness. Default: QALY
 #' @param log_y take the base 10 log of the y axis
 #' @param frontier indicate the frontier (also the expected value of perfect information).
-#' To only plot the EVPI see \code{\link{calc_evpi}}.
+#' To only plot the EVPI see \code{calc_evpi}.
 #' @param points whether to plot points on the curve (TRUE) or not (FALSE)
 #' @param lsize line size. defaults to 1.
 #' @inheritParams add_common_aes
@@ -938,17 +950,17 @@ plot_exp_loss <- function(x,
 #' Plot of Expected Value of Perfect Information (EVPI)
 #'
 #' @description
-#' Plots the \code{evpi} object created by \code{\link{calc_evpi}}.
+#' Plots the \code{evpi} object created by \code{calc_evpi}.
 #'
 #' @param x object of class \code{evpi}, produced by function
-#'  \code{\link{calc_evpi}}
+#'  \code{calc_evpi}
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
 #'  Default: $, but it could be any currency symbol or word (e.g., Â£, â¬, peso)
 #' @param effect_units units of effectiveness. Default: QALY
 #' @inheritParams add_common_aes
 #' @keywords expected value of perfect information
 #' @return A \code{ggplot2} plot with the EVPI
-#' @seealso \code{\link{calc_evpi}}
+#' @seealso \code{calc_evpi}
 #' @import ggplot2
 #' @importFrom scales comma
 #' @export

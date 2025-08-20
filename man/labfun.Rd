@@ -16,4 +16,3 @@ a character vector giving a label for each input value
 used to automatically label continuous scales
 }
 \keyword{internal}
-

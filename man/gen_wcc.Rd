@@ -47,4 +47,3 @@ applications of within-cycle correction methods. Med Decis Mak.
 2016;36(1):115-131.
 }
 }
-

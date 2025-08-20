@@ -25,12 +25,12 @@ plot_exp_loss(
 }
 \arguments{
 \item{x}{object of class \code{exp_loss}, produced by function
-\code{\link{calc_exp_loss}}}
+\code{calc_exp_loss}}
 
 \item{log_y}{take the base 10 log of the y axis}
 
 \item{frontier}{indicate the frontier (also the expected value of perfect information).
-To only plot the EVPI see \code{\link{calc_evpi}}.}
+To only plot the EVPI see \code{calc_evpi}.}
 
 \item{points}{whether to plot points on the curve (TRUE) or not (FALSE)}
 
@@ -39,7 +39,7 @@ To only plot the EVPI see \code{\link{calc_evpi}}.}
 \item{txtsize}{base text size}
 
 \item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
-Default: $, but it could be any currency symbol or word (e.g., pound, euro, peso)}
+Default: $, but it could be any currency symbol or word (e.g., Â£, â¬, peso)}
 
 \item{effect_units}{units of effectiveness. Default: QALY}
 
@@ -61,4 +61,3 @@ A \code{ggplot2} object with the expected loss
 \description{
 Plot of Expected Loss Curves (ELC)
 }
-

@@ -65,4 +65,3 @@ a list containing all survival model objects.
 \description{
 \code{fit.fun.cure} fits multiple mixture cure models to survival data using flexsurv.
 }
-

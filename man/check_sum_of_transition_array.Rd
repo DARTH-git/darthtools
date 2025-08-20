@@ -35,4 +35,3 @@ The transition probability array and the cohort trace matrix.
 \code{check_sum_of_transition_array} checks if each of the rows of the
 transition matrices sum to one.
 }
-

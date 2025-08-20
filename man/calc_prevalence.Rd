@@ -8,6 +8,10 @@ calc_prevalence(l_m_M, v_names_sick_states, v_names_dead_states)
 }
 \arguments{
 \item{l_m_M}{a list containing cohort trace matrices}
+
+\item{v_names_sick_states}{Character vector of state names considered as “sick”.}
+
+\item{v_names_dead_states}{Character vector of state names considered as “dead”.}
 }
 \value{
 a dataframe containing prevalence of specified health states for each strategy
@@ -15,4 +19,3 @@ a dataframe containing prevalence of specified health states for each strategy
 \description{
 \code{plot_prevalence} calculate the prevalence for different health states.
 }
-

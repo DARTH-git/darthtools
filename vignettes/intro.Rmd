@@ -1,0 +1,18 @@
+---
+title: "darthtools: Introduction"
+author: "Fernando Alarid-Escudero, Eline Krijkamp, Petros Pechlivanoglou, Hawre Jalal, Alan Yang, Eva Enns, and the DARTH workgroup"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{darthtools: Introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r}
+# a tiny example to prove vignette builds
+packageVersion("darthtools")
+```

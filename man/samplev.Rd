@@ -19,4 +19,3 @@ individual
 \description{
 \code{samplev} sample states for multiple individuals simultaneously.
 }
-

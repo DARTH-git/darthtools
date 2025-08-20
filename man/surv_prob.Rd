@@ -22,4 +22,3 @@ vector of survival probabilities.
 \description{
 \code{surv_prob} calculates survival probabilities from survival models.
 }
-

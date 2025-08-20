@@ -44,21 +44,44 @@ Description: More about what it does (maybe more than one line)
 License: file LICENSE
 Depends:
     R (>= 3.5.0)
-Suggests:knitr
 Imports:
-    survHE,
+    abind,
     dplyr,
+    flexsurv,
+    flexsurvcure,
     ellipse,
     ggplot2,
     ggrepel,
+    muhaz,
+    data.table,
+    matrixStats,
+    mvtnorm,
+    msm,
     scales,
     stringr,
-    tidyr
-VignetteBuilder:knitr
+    survHE,
+    survminer,
+    survival,
+    tidyr,
+    zoo,
+    magrittr,
+    rlang,
+    stats,
+    utils,
+    graphics
+Suggests:
+    knitr,
+    gems,
+    rmarkdown,
+    spelling,
+    urlchecker,
+    rhub
+VignetteBuilder: knitr
 Encoding: UTF-8
+Language: en-US
 LazyData: true
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
-URL: https://darth-git.github.io/darthtools, https://github.com/DARTH-git/darthtools
+URL: https://darth-git.github.io/darthtools, https://github.com/DARTH-git/darthtools/
 BugReports: https://github.com/DARTH-git/darthtools/issues
 Author: Fernando Alarid-Escudero, Eline Krijkamp, Petros Pechlivanoglou, Hawre Jalal, Alan Yang, Eva Enns, and the DARTH workgroup

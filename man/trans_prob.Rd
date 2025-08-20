@@ -15,4 +15,3 @@ vector of transition probabilities
 \description{
 \code{trans_prob} calculates transition probabilities using survival probabilities.
 }
-

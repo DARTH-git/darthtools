@@ -8,6 +8,8 @@ plot_trace_microsim_shiny(m_M, input_list = NULL)
 }
 \arguments{
 \item{m_M}{a cohort trace matrix}
+
+\item{input_list}{List of Shiny inputs controlling the microsimulation trace plot.}
 }
 \value{
 a plot of the cohort trace for Shiny App
@@ -15,4 +17,3 @@ a plot of the cohort trace for Shiny App
 \description{
 \code{plot_trace_microsim_shiny} plots cohort trace of a microsimulatoin model for the Shiny App.
 }
-

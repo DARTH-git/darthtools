@@ -21,4 +21,3 @@ Information about the validity of the list
 \description{
 \code{check_list_elements} checks if item in the list contains a value
 }
-

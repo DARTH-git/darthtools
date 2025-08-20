@@ -6,7 +6,19 @@
 \usage{
 boot.haz(x, t, start = 0, X = NULL, newdata = NULL, B = 1000)
 }
+\arguments{
+\item{x}{Fitted model object or input data used to estimate the hazard.}
+
+\item{t}{Numeric vector of times at which to compute the hazard.}
+
+\item{start}{Optional start time for interval-based calculations.}
+
+\item{X}{Optional design (covariate) matrix used for predictions.}
+
+\item{newdata}{Optional data.frame used for out-of-sample predictions.}
+
+\item{B}{Integer; number of bootstrap replications.}
+}
 \description{
 Bootstrap hazards
 }
-

@@ -51,4 +51,3 @@ on the cost-effectiveness plane.
 \description{
 Plot the psa object
 }
-

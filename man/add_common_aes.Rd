@@ -72,4 +72,3 @@ a \code{ggplot2} plot updated with a common aesthetic
 Adds aesthetics to all plots to reduce code duplication
 }
 \keyword{internal}
-

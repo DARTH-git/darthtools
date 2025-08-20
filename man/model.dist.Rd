@@ -22,4 +22,3 @@ A vector of survival probabilities.
 \description{
 \code{model.dist} calculates survival probabilities given a survival distribution and its parameter values.
 }
-

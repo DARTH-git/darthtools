@@ -15,4 +15,3 @@ a scalar or vector of odds
 \description{
 \code{prob_to_odds} convert a probability to an odds.
 }
-

@@ -29,7 +29,7 @@ plot_ceac(
 \item{points}{whether to plot points (TRUE) or not (FALSE)}
 
 \item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
-Defaults to \code{$}, but can be any currency symbol or word (e.g., pound, euro, peso)}
+Defaults to \code{$}, but can be any currency symbol or word (e.g., Â£, â¬, peso)}
 
 \item{min_prob}{minimum probability to show strategy in plot.
 For example, if the min_prob is 0.05, only strategies that ever
@@ -54,11 +54,10 @@ This is not used by \code{dampack} but required for generic consistency.}
 A \code{ggplot2} plot of the CEAC.
 }
 \description{
-Plots the CEAC, using the object created by \code{\link{ceac}}.
+Plots the CEAC, using the object created by \code{ceac}.
 }
 \details{
 \code{ceac} computes the probability of each of the strategies being
 cost-effective at each \code{wtp} value.
 }
 \keyword{internal}
-

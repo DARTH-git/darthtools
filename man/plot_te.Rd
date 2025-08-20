@@ -7,7 +7,7 @@
 plot_te(te)
 }
 \arguments{
-\item{tc}{total QALYs}
+\item{te}{total QALYs}
 }
 \value{
 a plot of the density of total QALYs
@@ -15,4 +15,3 @@ a plot of the density of total QALYs
 \description{
 \code{plot_te} plots density of total QALYs
 }
-

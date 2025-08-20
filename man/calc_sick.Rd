@@ -8,6 +8,8 @@ calc_sick(l_m_M, v_names_sick_states)
 }
 \arguments{
 \item{l_m_M}{a list containing cohort trace matrices}
+
+\item{v_names_sick_states}{Character vector of state names considered as “sick”.}
 }
 \value{
 a dataframe containing proportions in specified states for each strategy
@@ -15,4 +17,3 @@ a dataframe containing proportions in specified states for each strategy
 \description{
 \code{calc_surv} calculates the proportions of the cohort in specified states
 }
-

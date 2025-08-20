@@ -13,7 +13,7 @@ partsurv(
   chol = FALSE,
   choose_PFS = NULL,
   choose_OS = NULL,
-  time = times,
+  times = time,
   v_names_states,
   PA = FALSE,
   n_sim = 100,
@@ -41,7 +41,7 @@ Default = FALSE}
 
 \item{choose_OS}{chosen OS distribution. Choose from: Exponential, Weibull (AFT), Gamma, log-Normal, log-Logistic, Gompertz, Exponential Cure, Weibull (AFT) Cure, Gamma Cure, log-Normal Cure, log-Logistic Cure, Gompertz Cure.}
 
-\item{time}{numeric vector of time to estimate probabilities.}
+\item{times}{numeric vector of time to estimate probabilities.}
 
 \item{v_names_states}{vector of state names.}
 
@@ -55,6 +55,8 @@ Default = 100.}
 Default = 421.}
 
 \item{warn}{prints a warning message whenever PFS > OS}
+
+\item{dat.x}{Optional data (e.g., cut points, knots, or interval mapping) defining the piecewise survival structure.}
 }
 \value{
 a list containing Markov trace, expected survival, survival probabilities, transition probabilities.
@@ -62,4 +64,3 @@ a list containing Markov trace, expected survival, survival probabilities, trans
 \description{
 \code{partsurv} fits partitioned survival model to survival data.
 }
-

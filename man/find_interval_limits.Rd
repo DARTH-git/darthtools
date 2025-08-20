@@ -7,7 +7,9 @@
 find_interval_limits(start_time, surv_time)
 }
 \arguments{
-\item{start_time}{survival times.}
+\item{start_time}{start time.}
+
+\item{surv_time}{survival times.}
 }
 \value{
 matrix of limits.
@@ -15,4 +17,3 @@ matrix of limits.
 \description{
 \code{find_interval_limits} determines which rows the upper and lower values of each interval are (in the survival data set).
 }
-

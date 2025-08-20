@@ -19,4 +19,3 @@ at-risk table (dataframe).
 \description{
 \code{create_at_risk_table} creates at-risk table.
 }
-

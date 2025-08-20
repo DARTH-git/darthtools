@@ -6,7 +6,11 @@
 \usage{
 runMLE.cure(x, exArgs)
 }
+\arguments{
+\item{x}{Data or model object used to estimate the cure model by MLE.}
+
+\item{exArgs}{Named list of additional arguments passed to the optimizer/fitting routine.}
+}
 \description{
 run MLE on cure models
 }
-

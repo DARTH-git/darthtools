@@ -21,4 +21,3 @@ what are the entries that are not valid
 \description{
 \code{check_transition_probability} checks if transition probabilities are in [0, 1].
 }
-

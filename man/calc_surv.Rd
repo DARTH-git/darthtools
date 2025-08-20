@@ -8,6 +8,8 @@ calc_surv(l_m_M, v_names_death_states)
 }
 \arguments{
 \item{l_m_M}{a list containing cohort trace matrices}
+
+\item{v_names_death_states}{Character vector of state names considered as “dead”.}
 }
 \value{
 a dataframe containing survival probabilities for each strategy
@@ -15,4 +17,3 @@ a dataframe containing survival probabilities for each strategy
 \description{
 \code{calc_surv} calculates the survival probabilities.
 }
-
