@@ -1,9 +1,11 @@
 ^darthtools\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
+^\.github$
 ^docs$
 ^doc$
 ^Meta$
 ^data_hund_icers\.rds$
 ^cran-comments\.md$
 cran-comments.md
+^^\\.github$$
