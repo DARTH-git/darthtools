@@ -7,4 +7,6 @@
 0 errors | 0 warnings | 0 notes
 
 ## Notes for CRAN
-First submission of 'darthtools'.
+- New submission.
+- License set to MIT + file LICENSE.
+- URLs normalized (https, trailing slash).
