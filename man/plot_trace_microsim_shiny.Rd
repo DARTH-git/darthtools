@@ -15,5 +15,5 @@ plot_trace_microsim_shiny(m_M, input_list = NULL)
 a plot of the cohort trace for Shiny App
 }
 \description{
-\code{plot_trace_microsim_shiny} plots cohort trace of a microsimulatoin model for the Shiny App.
+\code{plot_trace_microsim_shiny} plots cohort trace of a microsimulation model for the Shiny App.
 }

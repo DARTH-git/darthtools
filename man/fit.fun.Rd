@@ -27,10 +27,10 @@ fit.fun(
 
 \item{status}{numeric vector of event status.}
 
-\item{covariate}{logical value indicating whether treatment is being used as a covariate in parameteric survival models.
+\item{covariate}{logical value indicating whether treatment is being used as a covariate in parametric survival models.
 Default = FALSE.}
 
-\item{rx}{character value indicating the treatment variable used as as covariate in parameteric survival models.}
+\item{rx}{character value indicating the treatment variable used as a covariate in parametric survival models.}
 
 \item{data}{dataframe containing the time and status variables.}
 

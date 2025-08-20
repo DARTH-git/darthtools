@@ -51,7 +51,7 @@ plot_trace_microsim <- function(m_M) {
 
 #' Plot cohort trace of a microsimulation model for the Shiny App
 #'
-#' \code{plot_trace_microsim_shiny} plots cohort trace of a microsimulatoin model for the Shiny App.
+#' \code{plot_trace_microsim_shiny} plots cohort trace of a microsimulation model for the Shiny App.
 #'
 #' @param m_M a cohort trace matrix
 #' @param input_list List of Shiny inputs controlling the microsimulation trace plot.
@@ -258,7 +258,7 @@ calc_prevalence <- function(l_m_M, v_names_sick_states, v_names_dead_states) {
 #----------------------------------------------------------------------------#
 #' Calculate state-in-state proportions
 #'
-#' \code{plot_prevalence} calculates the proportion of a speciefied subset of states among a set of specified states
+#' \code{plot_prevalence} calculates the proportion of a specified subset of states among a set of specified states
 #'
 #' @param l_m_M a list containing cohort trace matrices
 #' @param v_names_sick_states Character vector of state names considered as “sick”.
@@ -748,7 +748,7 @@ plot_psa <- function(x,
 #' @param frontier whether to plot acceptability frontier (TRUE) or not (FALSE)
 #' @param points whether to plot points (TRUE) or not (FALSE)
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
-#'Defaults to \code{$}, but can be any currency symbol or word (e.g., Â£, â¬, peso)
+#' Defaults to \code{$}, but can be any currency symbol or word (e.g., GBP, EUR, peso)
 #' @param min_prob minimum probability to show strategy in plot.
 #' For example, if the min_prob is 0.05, only strategies that ever
 #' exceed Pr(Cost Effective) = 0.05 will be plotted. Most useful in situations
@@ -856,7 +856,7 @@ plot_ceac <- function(x,
 #' @param x object of class \code{exp_loss}, produced by function
 #'  \code{calc_exp_loss}
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
-#'  Default: $, but it could be any currency symbol or word (e.g., Â£, â¬, peso)
+#'  Default: $, but it could be any currency symbol or word (e.g., GBP, EUR, peso)
 #' @param effect_units units of effectiveness. Default: QALY
 #' @param log_y take the base 10 log of the y axis
 #' @param frontier indicate the frontier (also the expected value of perfect information).
@@ -955,7 +955,7 @@ plot_exp_loss <- function(x,
 #' @param x object of class \code{evpi}, produced by function
 #'  \code{calc_evpi}
 #' @param currency string with currency used in the cost-effectiveness analysis (CEA).
-#'  Default: $, but it could be any currency symbol or word (e.g., Â£, â¬, peso)
+#'  Default: $, but it could be any currency symbol or word (e.g., GBP, EUR, peso)
 #' @param effect_units units of effectiveness. Default: QALY
 #' @inheritParams add_common_aes
 #' @keywords expected value of perfect information

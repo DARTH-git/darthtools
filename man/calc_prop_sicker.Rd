@@ -17,5 +17,5 @@ calc_prop_sicker(l_m_M, v_names_sick_states, v_names_sicker_states)
 a dataframe containing state-in-state proportions of specified health states for each strategy
 }
 \description{
-\code{plot_prevalence} calculates the proportion of a speciefied subset of states among a set of specified states
+\code{plot_prevalence} calculates the proportion of a specified subset of states among a set of specified states
 }

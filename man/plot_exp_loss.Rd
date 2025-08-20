@@ -39,7 +39,7 @@ To only plot the EVPI see \code{calc_evpi}.}
 \item{txtsize}{base text size}
 
 \item{currency}{string with currency used in the cost-effectiveness analysis (CEA).
-Default: $, but it could be any currency symbol or word (e.g., Â£, â¬, peso)}
+Default: $, but it could be any currency symbol or word (e.g., GBP, EUR, peso)}
 
 \item{effect_units}{units of effectiveness. Default: QALY}
 

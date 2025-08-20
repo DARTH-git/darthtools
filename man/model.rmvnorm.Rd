@@ -27,7 +27,7 @@ A matrix of drawn parameter values.
 A matrix of drawn parameter values.
 }
 \description{
-\code{model.rmvnorm} randomly draws parameter values of survival models from multivariate normal distributio.
+\code{model.rmvnorm} randomly draws parameter values of survival models from multivariate normal distribution.
 
 \code{model.rmvnorm} randomly draws parameter values of survival models from multivariate normal distribution.
 }

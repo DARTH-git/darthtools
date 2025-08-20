@@ -4,9 +4,9 @@
 #'
 #' @param time numeric vector of time to estimate probabilities.
 #' @param status numeric vector of event status.
-#' @param covariate logical value indicating whether treatment is being used as a covariate in parameteric survival models.
+#' @param covariate logical value indicating whether treatment is being used as a covariate in parametric survival models.
 #' Default = FALSE.
-#' @param rx character value indicating the treatment variable used as as covariate in parameteric survival models.
+#' @param rx character value indicating the treatment variable used as a covariate in parametric survival models.
 #' @param data dataframe containing the time and status variables.
 #' @param extrapolate extrapolate beyond model time horizon.
 #' Default = FALSE.
@@ -169,9 +169,9 @@ fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = 
 #' @param time numeric vector of time to estimate probabilities.
 #' @param status numeric vector of event status.
 #' @param data dataframe containing the time and status variables.
-#' @param covariate logical value indicating whether treatment is being used as a covariate in parameteric survival models.
+#' @param covariate logical value indicating whether treatment is being used as a covariate in parametric survival models.
 #' Default = FALSE.
-#' @param rx numerical value indicating the treatment variable used as as covariate in parameteric survival models.
+#' @param rx numerical value indicating the treatment variable used as a covariate in parametric survival models.
 #' @param extrapolate extrapolate beyond model time horizon.
 #' Default = FALSE.
 #' @param times time horizon the extrapolation is done over.
@@ -1015,7 +1015,7 @@ boot.haz <- function (x, t, start = 0 ,X = NULL, newdata =NULL, B = 1000) {
 #' @param B number of bootstrap samples.
 #' @param times time horizon the extrapolation of the survival model is done over.
 #' @return
-#' dataframe of hazard ratio statistics (2.5% percnetile, median, 97.5% percentile, time points)
+#' dataframe of hazard ratio statistics (2.5% percentile, median, 97.5% percentile, time points)
 #' @export
 boot_hr <- function(surv_model1 = NULL, surv_model2 = NULL, rx1 = NULL, rx2 = NULL, rx = F, surv_model_rx = NULL, times, B = 100){
   if (rx == F) { # use separate models
@@ -1285,7 +1285,7 @@ runMLE.cure <- function (x, exArgs)
 
 #' Randomly draw parameter values of survival models from multivariate normal distribution.
 #'
-#' \code{model.rmvnorm} randomly draws parameter values of survival models from multivariate normal distributio.
+#' \code{model.rmvnorm} randomly draws parameter values of survival models from multivariate normal distribution.
 #'
 #' @param dist.v a character string specifying the name of the survival model.
 #' @param d.data a vector of mean parameter estimates of the survival model.

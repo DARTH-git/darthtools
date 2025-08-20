@@ -35,7 +35,7 @@ Default = FALSE.}
 \item{B}{number of bootstrap samples.}
 }
 \value{
-dataframe of hazard ratio statistics (2.5\% percnetile, median, 97.5\% percentile, time points)
+dataframe of hazard ratio statistics (2.5\% percentile, median, 97.5\% percentile, time points)
 }
 \description{
 Bootstrap hazards ratios of two survival models
