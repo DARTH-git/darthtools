@@ -9,7 +9,7 @@ construct model-based cost-effectiveness analysis in R.
 # Preliminaries
 
   - Install
-    [RStudio](https://www.rstudio.com/products/rstudio/download/)
+    [RStudio](https://posit.co/download/rstudio-desktop/)
   - Install `devtools` to install `darthtools` as a package and modify
     it to generate your own package
 

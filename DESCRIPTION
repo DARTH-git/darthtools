@@ -1,6 +1,6 @@
 Package: darthtools
 Type: Package
-Title: darthtools: Decision Analysis Helper Tools for the 'DARTH' Workgroup
+Title: Decision Analysis Helper Tools for the 'DARTH' Workgroup
 Version: 0.2.1
 Authors@R: 
     c(person(given = "Fernando",
@@ -36,13 +36,14 @@ Authors@R:
       person(given = "DARTH Workgroup", 
              email = "darth.workgroup@gmail.com",
              role = "cph"))
-Maintainer: Fernando Alarid-Escudero <falarid@stanford.edu>
-Description: 'darthtools' provides tools developed by the Decision Analysis in R
-    for Technologies in Health ('DARTH') Workgroup to build and analyze model-based
-    cost-effectiveness analyses, including cohort Markov, partitioned survival,
-    and microsimulation models. It also includes utilities for survival modeling,
-    probabilistic sensitivity analysis (PSA), and visualization (CEAC, EVPI, ELC).
-    See <https://darth-git.github.io/darthtools/>.
+Description: Tools for decision-analytic cost-effectiveness modeling in R.
+  Provides functions to build and analyze cohort Markov, partitioned survival,
+  and microsimulation models; utilities for survival modeling and probabilistic
+  sensitivity analysis (PSA); and visualization of cost-effectiveness
+  acceptability curves (CEAC), expected value of perfect information (EVPI),
+  and expected loss curves (ELC). Developed by the Decision Analysis in R for
+  Technologies in Health ('DARTH') workgroup. See
+  <https://darth-git.github.io/darthtools/>.
 License: MIT + file LICENSE
 Depends:
     R (>= 3.5.0)
