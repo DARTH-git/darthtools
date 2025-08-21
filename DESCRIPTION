@@ -1,89 +1,72 @@
-Package: darthtools
 Type: Package
+Package: darthtools
 Title: Decision Analysis Helper Tools for the 'DARTH' Workgroup
-Version: 0.2.1
-Authors@R: 
-    c(person(given = "Fernando",
-             family = "Alarid-Escudero",
-             role = c("aut", "cre"),
-             email = "falarid@stanford.edu",
-             comment = c(ORCID = "0000-0001-5076-1172")),
-      person(given = "Eline",
-             family = "Krijkamp",
-             role = "aut",
-             email = "e.krijkamp@erasmusmc.com",
-             comment = c(ORCID = "0000-0003-3970-2205")),
-      person(given = "Petros",
-             family = "Pechlivanoglou",
-             role = "aut",
-             email = "petros.pechlivanoglou@sickkids.ca",
-             comment = c(ORCID = "0000-0001-5090-7936")),
-      person(given = "Hawre",
-             family = "Jalal",
-             role = "aut",
-             email = "hjalal@pitt.edu",
-             comment = c(ORCID = "0000-0002-8224-6834")),
-      person(given = "Alan",
-             family = "Yang",
-             role = "aut",
-             email = "alan.yang@sickkids.ca",
-             comment = c(ORCID = "0000-0002-0344-6812")),
-      person(given = "Eva",
-             family = "Enns",
-             role = "aut",
-             email = "eenns@umn.edu",
-             comment = c(ORCID = "0000-0003-0693-7358")),
-      person(given = "DARTH Workgroup", 
-             email = "darth.workgroup@gmail.com",
-             role = "cph"))
+Version: 0.2.2
+Authors@R: c(
+    person("Fernando", "Alarid-Escudero", , "falarid@stanford.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-5076-1172")),
+    person("Eline", "Krijkamp", , "e.krijkamp@erasmusmc.com", role = "aut",
+           comment = c(ORCID = "0000-0003-3970-2205")),
+    person("Petros", "Pechlivanoglou", , "petros.pechlivanoglou@sickkids.ca", role = "aut",
+           comment = c(ORCID = "0000-0001-5090-7936")),
+    person("Hawre", "Jalal", , "hjalal@pitt.edu", role = "aut",
+           comment = c(ORCID = "0000-0002-8224-6834")),
+    person("Alan", "Yang", , "alan.yang@sickkids.ca", role = "aut",
+           comment = c(ORCID = "0000-0002-0344-6812")),
+    person("Eva", "Enns", , "eenns@umn.edu", role = "aut",
+           comment = c(ORCID = "0000-0003-0693-7358")),
+    person("DARTH Workgroup", , , "darth.workgroup@gmail.com", role = "cph")
+  )
 Description: Tools for decision-analytic cost-effectiveness modeling in R.
-  Provides functions to build and analyze cohort Markov, partitioned survival,
-  and microsimulation models; utilities for survival modeling and probabilistic
-  sensitivity analysis (PSA); and visualization of cost-effectiveness
-  acceptability curves (CEAC), expected value of perfect information (EVPI),
-  and expected loss curves (ELC). Developed by the Decision Analysis in R for
-  Technologies in Health ('DARTH') workgroup. See
-  <https://darth-git.github.io/darthtools/>.
+    Provides functions to build and analyze cohort Markov, partitioned
+    survival, and microsimulation models; utilities for survival modeling
+    and probabilistic sensitivity analysis (PSA); and visualization of
+    cost-effectiveness acceptability curves (CEAC), expected value of
+    perfect information (EVPI), and expected loss curves (ELC). Developed
+    by the Decision Analysis in R for Technologies in Health ('DARTH')
+    workgroup. See <https://darth-git.github.io/darthtools/>.
 License: MIT + file LICENSE
+URL: https://darth-git.github.io/darthtools/,
+    https://github.com/DARTH-git/darthtools/
+BugReports: https://github.com/DARTH-git/darthtools/issues
 Depends:
     R (>= 3.5.0)
 Imports:
     abind,
+    data.table,
     dplyr,
+    ellipse,
     flexsurv,
     flexsurvcure,
-    ellipse,
     ggplot2,
     ggrepel,
-    muhaz,
-    data.table,
+    graphics,
+    magrittr,
     matrixStats,
-    mvtnorm,
     msm,
+    muhaz,
+    mvtnorm,
+    rlang,
     scales,
+    stats,
     stringr,
     survHE,
-    survminer,
     survival,
+    survminer,
     tidyr,
-    zoo,
-    magrittr,
-    rlang,
-    stats,
     utils,
-    graphics
+    zoo
 Suggests:
-    knitr,
     gems,
+    knitr,
+    rhub,
     rmarkdown,
     spelling,
-    urlchecker,
-    rhub
-VignetteBuilder: knitr
+    urlchecker
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
 Language: en-US
 LazyData: true
-RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
-URL: https://darth-git.github.io/darthtools/, https://github.com/DARTH-git/darthtools/
-BugReports: https://github.com/DARTH-git/darthtools/issues
+RoxygenNote: 7.3.2
