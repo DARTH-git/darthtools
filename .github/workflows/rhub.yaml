@@ -24,6 +24,17 @@ on:
         type: string
 
 jobs:
+  rhub-check:
+    strategy:
+      matrix:
+        include:
+          - platform: windows
+            runs-on: windows-2022
+          - platform: macos-arm64
+            runs-on: macos-15
+          - platform: linux
+            runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runs-on }}
 
   setup:
     runs-on: ubuntu-latest
