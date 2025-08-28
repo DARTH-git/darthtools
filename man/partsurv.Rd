@@ -13,7 +13,7 @@ partsurv(
   chol = FALSE,
   choose_PFS = NULL,
   choose_OS = NULL,
-  times = time,
+  times = NULL,
   v_names_states,
   PA = FALSE,
   n_sim = 100,

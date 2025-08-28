@@ -9,17 +9,17 @@ prob_to_prob(p, t = 1)
 \arguments{
 \item{p}{probability}
 
-\item{t}{time/ frequency}
+\item{t}{number of cycles per base time unit (frequency)}
 }
 \value{
 a scalar or vector of probabilities converted to a different frequency
 }
 \description{
-\code{rate_to_prob} convert a probability to a probability with a different frequency.
+\code{prob_to_prob} convert a probability to a probability with a different frequency.
 }
 \examples{
 # Annual probability to monthly probability
 p_year  <- 0.3
-p_month <- prob_to_prob(p = p_year, t = 1/12)
+p_month <- prob_to_prob(p = p_year, t = 12)
 p_month
 }

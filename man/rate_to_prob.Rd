@@ -9,7 +9,7 @@ rate_to_prob(r, t = 1)
 \arguments{
 \item{r}{rate}
 
-\item{t}{time/ frequency}
+\item{t}{number of cycles per base time unit (frequency)}
 }
 \value{
 a scalar or vector with probabilities
@@ -20,6 +20,6 @@ a scalar or vector with probabilities
 \examples{
 # Annual rate to monthly probability
 r_year  <- 0.3
-r_month <- rate_to_prob(r = r_year, t = 1/12)
-r_month
+p_month <- rate_to_prob(r = r_year, t = 12)
+p_month
 }
