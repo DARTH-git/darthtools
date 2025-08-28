@@ -359,7 +359,7 @@ fit.fun.cure <- function(time, status, covariate = F, rx = "rx", data = data, ex
 #' @importFrom abind abind
 #' @export
 partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.data = NULL, par = FALSE, chol = FALSE,
-                     choose_PFS = NULL, choose_OS = NULL, times = time, v_names_states, PA = FALSE, n_sim = 100, seed = 421,
+                     choose_PFS = NULL, choose_OS = NULL, times = NULL, v_names_states, PA = FALSE, n_sim = 100, seed = 421,
                      warn = TRUE, dat.x = 0){
   set.seed(seed)
   deter <- ifelse(PA == 1, 0, 1) # determine if analysis is deterministic or probabilistic
@@ -417,10 +417,10 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
                                        vc.data = l_vc.data[[2]],
                                        n_sim   = n_sim, seed = seed)
       # obtain survival probabilities
-      pfs.surv <- os.surv <- matrix(NA, nrow = length(time), ncol = n_sim)
+      pfs.surv <- os.surv <- matrix(NA, nrow = length(times), ncol = n_sim)
       for (j in 1:n_sim) {
-        pfs.surv[, j] <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[j, ], t = time, dat.x = dat.x)
-        os.surv [, j] <- model.dist(dist.v = dist_OS,  d.data = param_draws_OS[j, ],  t = time, dat.x = dat.x)
+        pfs.surv[, j] <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS[j, ], t = times, dat.x = dat.x)
+        os.surv [, j] <- model.dist(dist.v = dist_OS,  d.data = param_draws_OS[j, ],  t = times, dat.x = dat.x)
       }
     } else { # use survival models
       # Model-setup
@@ -446,8 +446,8 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
       param_draws_PFS <- l_d.data[[1]]
       param_draws_OS  <- l_d.data[[2]]
       # obtain survival probabilities
-      pfs.surv <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS, t = time, dat.x = dat.x)
-      os.surv  <- model.dist(dist.v = dist_OS,  d.data =  param_draws_OS, t = time, dat.x = dat.x)
+      pfs.surv <- model.dist(dist.v = dist_PFS, d.data = param_draws_PFS, t = times, dat.x = dat.x)
+      os.surv  <- model.dist(dist.v = dist_OS,  d.data =  param_draws_OS, t = times, dat.x = dat.x)
     } else { # use survival models
       # Model-setup
       # model objects

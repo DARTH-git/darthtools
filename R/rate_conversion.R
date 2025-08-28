@@ -29,8 +29,8 @@ prob_to_rate <- function(p, t = 1){
 #' @examples
 #' # Annual rate to monthly probability
 #' r_year  <- 0.3
-#' r_month <- rate_to_prob(r = r_year, t = 12)
-#' r_month
+#' p_month <- rate_to_prob(r = r_year, t = 12)
+#' p_month
 #' @export
 rate_to_prob <- function(r, t = 1){
   if (any(r < 0, na.rm = TRUE)){
