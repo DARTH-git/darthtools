@@ -6,6 +6,7 @@ Decis
 ELC
 EVPI
 Elbasha
+GBP
 Gompertz
 ICER
 ICERs
@@ -21,7 +22,7 @@ RStudio
 Royston
 Surv
 WCC
-distributio
+Workgroup
 flexsurv
 genf
 gengamma
@@ -35,18 +36,12 @@ llogis
 lnorm
 loglogistic
 microsimulation
-microsimulatoin
 mle
 nd
-parameteric
-percnetile
 psa
 rx
-speciefied
 survHE
 vc
 weibull
 weibullPH
 workgroup
-Â
-â

@@ -1,3 +1,6 @@
+
+if (getRversion() >= "2.15.1") utils::globalVariables(c("Parameter", ".med", "Group"))
+
 #' Plot sampled PSA parameter distributions
 #'
 #' \code{plot_psa_distributions} melts PSA draws, classifies parameters

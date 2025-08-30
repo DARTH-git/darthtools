@@ -41,6 +41,8 @@ Imports:
     ggplot2,
     ggrepel,
     graphics,
+    ggridges,
+    reshape2,
     magrittr,
     matrixStats,
     msm,
