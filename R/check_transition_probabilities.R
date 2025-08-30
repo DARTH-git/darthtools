@@ -90,24 +90,25 @@ check_sum_of_transition_array <- function(a_P,
 
   a_P <- as.array(a_P)
   d <- length(dim(a_P))
-  val = T
+
+  val = TRUE
 
   # For matrix
   if (d == 2) {
     #valid <- sum(rowSums(a_P))
     target <-  rep(1, n_states)
     names(target) <- names(rowSums(a_P))
-    valid <- all.equal(rowSums(a_P),target)
+    valid <- isTRUE(all.equal(rowSums(a_P),target))
     #if (abs(valid - n_states) > 0.01) {
     if (!valid) {
       if (err_stop) {
-        stop("This is not a valid transition matrix")
+        stop("This is not a valid transition matrix", call. = FALSE)
       }
 
       if (verbose) {
-        warning("This is not a valid transition matrix")
+        warning("This is not a valid transition matrix", call. = FALSE)
       }
-      val = F
+      val = FALSE
     }
   } else {
     # For array
@@ -133,12 +134,12 @@ check_sum_of_transition_array <- function(a_P,
                       "\n",
                       "The sum of transition probabilities for these cycles does not equal to 1"))
       }
-      val = F
+      val = FALSE
     }
   }
-  if ((val & d == 2) & verbose == T) {
+  if ((val & d == 2) & verbose == TRUE) {
     print("This is a valid transition matrix")
-  } else if ((val & d > 2) & verbose == T) {
+  } else if ((val & d > 2) & verbose == TRUE) {
     print("This is a valid transition array")
   }
 }
