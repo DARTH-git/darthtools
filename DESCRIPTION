@@ -1,7 +1,7 @@
 Type: Package
 Package: darthtools
 Title: Decision Analysis Helper Tools for the 'DARTH' Workgroup
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: c(
     person("Fernando", "Alarid-Escudero", , "falarid@stanford.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-5076-1172")),

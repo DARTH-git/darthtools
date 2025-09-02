@@ -370,21 +370,67 @@ plot_proportion_sicker <- function(l_m_M, v_names_sick_states, v_names_sicker_st
 
 #' Update parameters
 #'
-#' \code{update_param_list} is used to update list of all parameters with new
-#' values for specific parameters.
+#' \code{update_param_list} updates a model parameter list with one or more
+#' update sets. Later update sets override earlier ones on name conflicts.
 #'
 #' @param l_params_all List with all parameters of decision model
-#' @param params_updated Parameters for which values need to be updated
+#' @param ... One or more update sets (list/named vector or a data.frame
+#' with columns `name` and `value`).
 #' @return
 #' A list with all parameters updated.
 #' @export
-update_param_list <- function(l_params_all, params_updated){
+update_param_list <- function(l_params_all, ...){
+  stopifnot(is.list(l_params_all))
+  updates <- list(...)
+  if (length(updates) == 0L) return(l_params_all)
 
-  if (typeof(params_updated)!="list"){
-    params_updated <- split(unname(params_updated),names(params_updated)) #converte the named vector to a list
+  normalize_one <- function(x) {
+    # data.frame/tibble with name/value
+    if (is.data.frame(x)) {
+      needed <- c("name", "value")
+      if (!all(needed %in% names(x))) {
+        stop("For data.frame updates, must contain columns: ",
+             paste(needed, collapse = ", "))
+      }
+      # Support dotted paths e.g. "p.p_A" for nested lists
+      out <- list()
+      for (i in seq_len(nrow(x))) {
+        path <- strsplit(as.character(x$name[i]), "\\.")[[1]]
+        val  <- x$value[i]
+        cursor <- val
+        # Build nested list from deepest to top
+        for (nm in rev(path)) {
+          cursor <- stats::setNames(list(cursor), nm)
+        }
+        out <- modifyList(out, cursor)
+      }
+      return(out)
+    }
+
+    # named vector → list
+    if (is.atomic(x) && !is.null(names(x))) {
+      return(split(unname(x), names(x)))
+    }
+
+    # already a list (possibly unnamed) → ensure named at top level if possible
+    if (is.list(x)) return(x)
+
+    stop("Unsupported update set type: ", class(x)[1])
   }
-  l_params_all <- modifyList(l_params_all, params_updated) #update the values
-  return(l_params_all)
+
+  for (u in updates) {
+    u_norm <- normalize_one(u)
+    l_params_all <- modifyList(l_params_all, u_norm)
+  }
+  l_params_all
+}
+
+# Backward compatibility alias
+#' @rdname update_param_list
+#' @param params_updated Backward-compatible single update set.
+#' @export
+update_list_params <- function(l_params_all, params_updated) {
+  update_param_list(l_params_all, params_updated)
 }
 
 #' Plot of ICERs

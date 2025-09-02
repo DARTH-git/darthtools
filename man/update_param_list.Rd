@@ -2,19 +2,25 @@
 % Please edit documentation in R/visualization.R
 \name{update_param_list}
 \alias{update_param_list}
+\alias{update_list_params}
 \title{Update parameters}
 \usage{
-update_param_list(l_params_all, params_updated)
+update_param_list(l_params_all, ...)
+
+update_list_params(l_params_all, params_updated)
 }
 \arguments{
 \item{l_params_all}{List with all parameters of decision model}
 
-\item{params_updated}{Parameters for which values need to be updated}
+\item{...}{One or more update sets (list/named vector or a data.frame
+with columns \code{name} and \code{value}).}
+
+\item{params_updated}{Backward-compatible single update set.}
 }
 \value{
 A list with all parameters updated.
 }
 \description{
-\code{update_param_list} is used to update list of all parameters with new
-values for specific parameters.
+\code{update_param_list} updates a model parameter list with one or more
+update sets. Later update sets override earlier ones on name conflicts.
 }
