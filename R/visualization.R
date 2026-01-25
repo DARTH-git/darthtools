@@ -113,6 +113,7 @@ plot_trace_PSM <- function(time, partsurv.model, PA=F, v_names_states) {
 plot_trace <- function(m_M) {
   df_M      <- data.frame(Cycle = 0:n_cycles, m_M, check.names = F)
 
+  v_names_states <- colnames(m_M)
   #df_M_long <- tidyr::gather(df_M, key = `Health State`, value, 2:ncol(df_M))
 
   df_M_long <- tidyr::pivot_longer(df_M, cols = -Cycle,
@@ -123,14 +124,14 @@ plot_trace <- function(m_M) {
 
   gg_trace <- ggplot2::ggplot(df_M_long, aes(x = Cycle, y = value,
                                     color = `Health State`, linetype = `Health State`)) +
-    ggplot2::geom_line(size = 1) +
+    ggplot2::geom_line(linewidth = 1) +
     ggplot2::xlab("Cycle") +
     ggplot2::ylab("Proportion of the cohort") +
     ggplot2::scale_x_continuous(breaks = number_ticks(8)) +
     ggplot2::theme_bw(base_size = 14) +
     ggplot2::theme(legend.position  = "bottom",
           legend.background = element_rect(fill = NA))
-
+browser()
   return(gg_trace)
 }
 
