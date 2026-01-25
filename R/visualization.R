@@ -131,7 +131,6 @@ plot_trace <- function(m_M) {
     ggplot2::theme_bw(base_size = 14) +
     ggplot2::theme(legend.position  = "bottom",
           legend.background = element_rect(fill = NA))
-browser()
   return(gg_trace)
 }
 
