@@ -116,7 +116,7 @@ plot_trace <- function(m_M) {
   #df_M_long <- tidyr::gather(df_M, key = `Health State`, value, 2:ncol(df_M))
 
   df_M_long <- tidyr::pivot_longer(df_M, cols = -Cycle,
-                                    names_to = "Health States",
+                                    names_to = "Health State",
                                     value_to = "value")
 
   df_M_long$`Health State` <- factor(df_M_long$`Health State`, levels = v_names_states)
