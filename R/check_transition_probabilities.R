@@ -12,7 +12,7 @@
 #' what are the entries that are not valid
 #' @export
 check_transition_probability <- function(a_P,
-                                         err_stop = FALSE,
+                                         err_stop = TRUE,
                                          verbose = FALSE) {
 
   a_P <- as.array(a_P)
