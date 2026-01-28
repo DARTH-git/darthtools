@@ -94,12 +94,12 @@ plot_trace_microsim_shiny <- function(m_M, input_list = NULL) {
 #' @return
 #' a plot of the cohort trace.
 #' @export
-plot_trace_PSM <- function(time, partsurv.model, PA=F, v_names_states) {
+plot_trace_PSM <- function(time, partsurv.model, PA = F, v_names_states) {
   if (PA) {
     matplot(time, partsurv.model$Mean, type = 'l', lty = 1, ylab = "Markov trace")
     title(main = partsurv.model$chosen_models)
-    matlines(time, partsurv.model$CI[,,1], lty = 2)
-    matlines(time, partsurv.model$CI[,,2], lty = 2)
+    matlines(time, partsurv.model$CI[, , 1], lty = 2)
+    matlines(time, partsurv.model$CI[, , 2], lty = 2)
     legend("topright", v_names_states,
            col = 1:length(v_names_states), lty = rep(1,length(v_names_states)), bty = "n")
   } else {
@@ -165,7 +165,7 @@ number_ticks <- function(n) {
 #' @return a ggplot object - plot of the cohort trace for each strategy split by health state.
 #' @export
 plot_trace_strategy <- function(l_m_M) {
-  n_str <- length(l_m_M)
+  n_str  <- length(l_m_M)
   l_df_M <- lapply(l_m_M, as.data.frame)
   df_M_strategies <- data.table::rbindlist(l_df_M, use.names = T,
                                            idcol = "Strategy")
@@ -178,7 +178,7 @@ plot_trace_strategy <- function(l_m_M) {
   p <- ggplot(m_M_plot, aes(x = Cycle, y = value,
                             color = Strategy, linetype = Strategy)) +
     geom_line(linewidth = 1) +
-    scale_color_brewer(palette="RdBu") +
+    scale_color_brewer(palette = "RdBu") +
     xlab("Cycle") +
     ylab("Proportion of the cohort") +
     theme_bw(base_size = 14) +
@@ -312,7 +312,7 @@ plot_surv <- function(l_m_M, v_names_death_states) {
   p <- ggplot(df_surv,
               aes(x = Cycle, y = Survival, group = Strategy)) +
     geom_line(aes(linetype = Strategy, col = Strategy), size = 1.2) +
-    scale_color_brewer(palette="RdBu") +
+    scale_color_brewer(palette = "RdBu") +
     xlab("Cycle") +
     ylab("Proportion") +
     ggtitle("Survival probabilities") +
@@ -501,7 +501,7 @@ plot_icers <- function(x,
   x <- arrange(x, .data$Status)
 
   # change status text in data frame for plotting
-  d_name <- "Dominated"
+  d_name  <- "Dominated"
   ed_name <- "Weakly Dominated"
   nd_name <- "Efficient Frontier"
 
@@ -732,9 +732,9 @@ plot_psa <- function(x,
                      ...) {
 
   effectiveness <- x$effectiveness
-  cost <- x$cost
-  strategies <- x$strategies
-  currency <- x$currency
+  cost          <- x$cost
+  strategies    <- x$strategies
+  currency      <- x$currency
 
   # expect that effectiveness and costs have strategy column names
   # removes confusing 'No id variables; using all as measure variables'
@@ -750,8 +750,8 @@ plot_psa <- function(x,
                  names_to = "Strategy",
                  values_to = "Effectiveness")
   )
-  ce_df <- data.frame("Strategy" = df_cost$Strategy,
-                      "Cost" = df_cost$Cost,
+  ce_df <- data.frame("Strategy"      = df_cost$Strategy,
+                      "Cost"          = df_cost$Cost,
                       "Effectiveness" = df_effect$Effectiveness)
 
   # make strategies in psa object into ordered factors
