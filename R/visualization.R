@@ -29,31 +29,33 @@ plot_te <- function(te) {
 #' @param m_M a cohort trace matrix
 #' @return a plot of the cohort trace
 #' @export
-plot_trace_microsim <- function(m_M) {
+plot_trace_microsim <- function(m_M,  v_n_states = v_names_states) {
   # plot the distribution of the population across health states over time (trace)
   # count the number of individuals in each health state at each cycle
 
-  v_names_states <- colnames(m_M)
-  n_states <- length(v_names_states)
+  n_states <- length(v_n_states) # select number of health states
 
-  m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_names_states, ordered = TRUE))))
+  m_TR <- t(apply(m_M, 2, function(x) table(factor(x, levels = v_n_states, ordered = TRUE))))
   # m_TR <- m_TR / n_i                                 # calculate the proportion of individuals
   m_TR <- m_TR / nrow(m_M)
-  colnames(m_TR) <- v_names_states                   # name the rows of the matrix
+  colnames(m_TR) <- v_n_states                   # name the rows of the matrix
   rownames(m_TR) <- paste("Cycle", 0:(ncol(m_M)-1), sep = " ") # name the columns of the matrix
   # Plot trace of first health state
   plot(0:(ncol(m_M)-1), m_TR[, 1], type = "l",
        main = "Health state trace",
        ylim = c(0, 1), ylab = "Proportion of cohort", xlab = "Cycle")
   # add a line for each additional state
-  for (n_states in 2:length(v_names_states)) {
+  for (n_states in 2:length(v_n_states)) {
     lines(0:(ncol(m_M)-1), m_TR[, n_states], col = n_states)   # adds a line to current plot
   }
-  legend("topright", v_names_states,
-         col = 1:length(v_names_states), # add a legend to current plot
-         lty = rep(1, length(v_names_states)), bty = "n", cex = 0.65)
+  legend("topright", v_n_states,
+         col = 1:length(v_n_states), # add a legend to current plot
+         lty = rep(1, length(v_n_states)), bty = "n", cex = 0.65)
 
 }
+
+
+
 
 #' Plot cohort trace of a microsimulation model for the Shiny App
 #'
