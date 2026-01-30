@@ -120,7 +120,7 @@ fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = 
     filler_label  <- rep("", length(unique(surv_probs1$rx)))
 
     S_superimpose$plot  <- S_superimpose$plot +
-      geom_line(aes(x=time, y=est, color = Model,  linetype = rx),
+      geom_line(aes(x = time, y = est, color = Model,  linetype = rx),
                 size = 0.75, alpha = 1, key_glyph = "path",
                 data=surv_probs) +
       scale_color_manual(name = "", values = c(filler_colour, fit.fun.colors),
@@ -150,7 +150,7 @@ fit.fun <- function(time, status, covariate = F, rx = NULL, data, extrapolate = 
 
   # Compare BIC values
   BIC <- fit.survHE$model.fitting$bic
-  BIC <- round(BIC,3)
+  BIC <- round(BIC, 3)
 
   names(AIC) <- names(BIC) <- names(fit.survHE$models)
 
@@ -563,28 +563,28 @@ surv_prob <- function(model, times = NULL, PA = FALSE, rx = 1) {
 trans_prob <- function(surv){
   d_surv <- surv[-1]/(surv[-length(surv)])
   d_surv[is.na(d_surv)] <- 0
-  t.p <- 1 - d_surv
-  if (sum(t.p < 0) > 0) {
+  t_p <- 1 - d_surv
+  if (sum(t_p < 0) > 0) {
     message("Negative transition probabilities were set to 0.")
   }
   d_surv[d_surv > 1] <- 1
-  t.p <- 1 - d_surv
-  return(t.p = t.p)
+  t_p <- 1 - d_surv
+  return(t_p = t_p)
 }
 
 #' Convert transition probabilities back to survival probabilities.
 #'
 #' \code{trans_to_surv} convert transition probabilities back to survival probabilities.
 #'
-#' @param t.p vector of transition probabilities.
+#' @param t_p vector of transition probabilities.
 #' @return
 #' vector of survival probabilities
 #' @export
-trans_to_surv <- function(t.p) {
-  surv <- numeric(length(t.p) + 1)
+trans_to_surv <- function(t_p) {
+  surv <- numeric(length(t_p) + 1)
   surv[1] <- 1
-  for (i in 1:length(t.p)) {
-    surv[i + 1] <- surv[i] * (1 - t.p[i])
+  for (i in 1:length(t_p)) {
+    surv[i + 1] <- surv[i] * (1 - t_p[i])
   }
   return(surv)
 }
@@ -594,10 +594,11 @@ trans_to_surv <- function(t.p) {
 #' \code{surv_to_haz} convert survival probabilities to hazard rates.
 #'
 #' @param surv vector of survival probabilities.
+#' @param times vector of time
 #' @return
 #' vector of hazard rates
 #' @export
-surv_to_haz <- function(surv) {
+surv_to_haz <- function(surv, times) {
   # Calculate the log survival probabilities
   log_survival_probabilities <- log(surv)
   # Calculate differences in log survival probabilities
