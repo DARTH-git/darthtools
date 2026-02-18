@@ -9,7 +9,7 @@ prob_to_rate(p, t = 1)
 \arguments{
 \item{p}{probability}
 
-\item{t}{time/frequency}
+\item{t}{time length}
 }
 \value{
 a scalar or vector with rates

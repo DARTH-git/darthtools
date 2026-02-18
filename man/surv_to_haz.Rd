@@ -4,10 +4,12 @@
 \alias{surv_to_haz}
 \title{Convert survival probabilities to hazard rates.}
 \usage{
-surv_to_haz(surv)
+surv_to_haz(surv, times)
 }
 \arguments{
 \item{surv}{vector of survival probabilities.}
+
+\item{times}{vector of time}
 }
 \value{
 vector of hazard rates

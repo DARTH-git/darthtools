@@ -4,12 +4,15 @@
 \alias{rate_to_prob}
 \title{Convert a rate to a probability}
 \usage{
-rate_to_prob(r, t = 1)
+rate_to_prob(r, time = 1, t = NULL)
 }
 \arguments{
-\item{r}{rate}
+\item{r}{rate (per time step)}
 
-\item{t}{number of cycles per base time unit (frequency)}
+\item{time}{Length of the time step (default = 1)
+Use \code{time = 1/12} for monthly probabilities.}
+
+\item{t}{Deprecated. Previously represented frequency (e.g. 12 for months).}
 }
 \value{
 a scalar or vector with probabilities
@@ -17,9 +20,13 @@ a scalar or vector with probabilities
 \description{
 \code{rate_to_prob} convert a rate to a probability.
 }
+\details{
+As of January 2026, the interpretation of time has changed.
+The legacy version is archived on GitHub as version v.0.2.4
+}
 \examples{
 # Annual rate to monthly probability
 r_year  <- 0.3
-p_month <- rate_to_prob(r = r_year, t = 12)
+p_month <- rate_to_prob(r = r_year, time = 1/12)
 p_month
 }

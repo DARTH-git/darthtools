@@ -4,7 +4,7 @@
 \alias{plot_trace_microsim}
 \title{Plot cohort trace of a microsimulation model}
 \usage{
-plot_trace_microsim(m_M)
+plot_trace_microsim(m_M, v_n_states = v_names_states)
 }
 \arguments{
 \item{m_M}{a cohort trace matrix}

@@ -4,10 +4,10 @@
 \alias{trans_to_surv}
 \title{Convert transition probabilities back to survival probabilities.}
 \usage{
-trans_to_surv(t.p)
+trans_to_surv(t_p)
 }
 \arguments{
-\item{t.p}{vector of transition probabilities.}
+\item{t_p}{vector of transition probabilities.}
 }
 \value{
 vector of survival probabilities

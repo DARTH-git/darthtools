@@ -4,7 +4,7 @@
 \alias{check_transition_probability}
 \title{Check if transition array is valid}
 \usage{
-check_transition_probability(a_P, err_stop = FALSE, verbose = FALSE)
+check_transition_probability(a_P, err_stop = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{a_P}{A transition probability array/ matrix.}
