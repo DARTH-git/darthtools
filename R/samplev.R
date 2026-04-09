@@ -13,6 +13,6 @@ samplev <- function(m_Probs, m = 1) {
   n_samp <- nrow(m_Probs)
   u <- runif(n_samp, min = 0, max = 1)
   v_sum_p <- matrixStats::rowCumsums(m_Probs)
-  v_cat <- lev[max.col(v_sum_p >= u, ties.method = "first")]
+  v_cat <- lev[rowSums(v_sum_p < u) +1]
   return(v_cat)
 }
