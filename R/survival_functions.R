@@ -437,8 +437,8 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
       mod.os  <- names(os_survHE$models)
       pfs_idx <- match(dist_PFS, mod.pfs)
       os_idx  <- match(dist_OS,  mod.os)
-      pfs.surv <- surv_prob(pfs_survHE$models[[pfs_idx]], times = times, PA = PA)
-      os.surv  <- surv_prob(os_survHE$models[[os_idx ]], times = times, PA= PA)
+      pfs.surv <- surv_prob(pfs_survHE$models[[pfs_idx]], times = times, PA = PA, B=B)
+      os.surv  <- surv_prob(os_survHE$models[[os_idx ]], times = times, PA= PA, B=B)
     }
   } else { # deterministic
     if (par == TRUE) { # if choose to use parameter mean estimates and variance-covariance matrix instead of IPD
