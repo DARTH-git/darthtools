@@ -544,8 +544,34 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
 #' vector of survival probabilities.
 #' @export
 surv_prob <- function(model, times = NULL, PA = FALSE, rx = 1) {
-  if (PA) {
-    surv <- model$mat[[rx]][,-1]
+  require("MASS")
+
+   if (PA) {
+    mu    <- coef(fit)
+    Sigma <- vcov(fit)
+
+    theta_sim <- MASS::mvrnorm(B, mu = mu, Sigma = Sigma)
+
+    out <- matrix(NA, nrow = length(t), ncol = B)
+    rownames(out) <- t
+    colnames(out) <- paste0("sample_", 1:B)
+
+    for (b in 1:B) {
+      fit_b              <- fit
+      fit_b$res[, "est"] <- theta_sim[b, ]
+      fit_b$coefficients <- theta_sim[b, ]
+
+      s_b <- summary(
+        fit_b,
+        t = t,
+        type = "survival",
+        ci = FALSE
+      )
+
+      out[, b] <- s_b[[1]][, "est"]
+    }
+
+    surv <- out
   } else {
     surv <- summary(model, t = times, ci = F)[[rx]]$est
   }
