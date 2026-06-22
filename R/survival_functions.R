@@ -563,7 +563,7 @@ surv_prob <- function(model, times = NULL, PA = FALSE, rx = 1, B = NULL) {
 
       s_b <- summary(
         fit_b,
-        t = t,
+        t = times,
         type = "survival",
         ci = FALSE
       )
