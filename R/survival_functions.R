@@ -557,7 +557,7 @@ surv_prob <- function(model, times = NULL, PA = FALSE, rx = 1, B = NULL) {
 
   theta_sim <- MASS::mvrnorm(B, mu = mu, Sigma = Sigma)
 
-  S <- matrix(NA_real_, nrow = length(t), ncol = B)
+  S <- matrix(NA_real_, nrow = length(times), ncol = B)
   rownames(S) <- times
   colnames(S) <- paste0("sample_", seq_len(B))
 
