@@ -547,31 +547,45 @@ surv_prob <- function(model, times = NULL, PA = FALSE, rx = 1, B = NULL) {
   require("MASS")
 
    if (PA) {
-    mu    <- coef(model)
-    Sigma <- vcov(model)
 
-    theta_sim <- MASS::mvrnorm(B, mu = mu, Sigma = Sigma)
+  pars <- model$dlist$pars
+  inv_transforms <- model$dlist$inv.transforms
+  sfun <- model$dfns$p
 
-    out <- matrix(NA, nrow = length(times), ncol = B)
-    rownames(out) <- times
-    colnames(out) <- paste0("sample_", 1:B)
+  mu <- coef(model)
+  Sigma <- vcov(model)
 
-    for (b in 1:B) {
-      fit_b              <- model
-      fit_b$res[, "est"] <- theta_sim[b, ]
-      fit_b$coefficients <- theta_sim[b, ]
+  theta_sim <- MASS::mvrnorm(B, mu = mu, Sigma = Sigma)
 
-      s_b <- summary(
-        fit_b,
-        t = times,
-        type = "survival",
-        ci = FALSE
-      )
+  S <- matrix(NA_real_, nrow = length(t), ncol = B)
+  rownames(S) <- times
+  colnames(S) <- paste0("sample_", seq_len(B))
 
-      out[, b] <- s_b[[1]][, "est"]
-    }
+  for (b in seq_len(B)) {
+    theta_b <- theta_sim[b, ]
+    names(theta_b) <- names(mu)
 
-    surv <- out
+    # Distribution parameters only
+    theta_pars <- theta_b[pars]
+
+    # Back-transform to natural scale
+    natural_pars <- mapply(
+      FUN = function(x, invf) invf(x),
+      x = theta_pars,
+      invf = inv_transforms,
+      SIMPLIFY = TRUE
+    )
+
+    natural_pars <- as.list(natural_pars)
+    names(natural_pars) <- pars
+
+    # Evaluate survival directly
+      S[, b] <- do.call(
+        sfun,
+        c(list(q = times), natural_pars, lower.tail=F)
+    )
+  }
+    surv <- S
   } else {
     surv <- summary(model, t = times, ci = F)[[rx]]$est
   }
