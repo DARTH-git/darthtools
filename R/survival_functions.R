@@ -425,8 +425,8 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
     } else { # use survival models
       # Model-setup
       # model objects
-      pfs_survHE <- pfs_survHE$model.objects
-      os_survHE <-  os_survHE$model.objects
+      #pfs_survHE <- pfs_survHE$model.objects
+      #os_survHE <-  os_survHE$model.objects
       # model names
       mod.pfs <- names(pfs_survHE$models)
       mod.os <- names(os_survHE$models)
@@ -451,8 +451,8 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
     } else { # use survival models
       # Model-setup
       # model objects
-      pfs_survHE <- pfs_survHE$model.objects
-      os_survHE <-  os_survHE$model.objects
+     # pfs_survHE <- pfs_survHE$model.objects
+     # os_survHE <-  os_survHE$model.objects
       # model names
       mod.pfs <- names(pfs_survHE$models)
       mod.os <- names(os_survHE$models)
