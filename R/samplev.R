@@ -8,11 +8,17 @@
 #' @return v_cat: An n_i x 1 matrix filled with sampled health state(s) per
 #' individual
 #' @export
-samplev <- function(m_Probs, m = 1) {
-  lev <- dimnames(m_Probs)[[2]]  # extract the names of the health states considered for sampling
+samplev <- function(m_Probs) {
   n_samp <- nrow(m_Probs)
   u <- runif(n_samp, min = 0, max = 1)
   v_sum_p <- matrixStats::rowCumsums(m_Probs)
-  v_cat <- lev[rowSums(v_sum_p < u) +1]
+
+  if (!is.null(colnames(m_Probs))) {     
+    lev <- dimnames(m_Probs)[[2]]
+    v_cat <- lev[rowSums(v_sum_p < u) + 1]  
+  } else {
+    v_cat <-rowSums(v_sum_p < u) + 1
+  }
+
   return(v_cat)
 }
