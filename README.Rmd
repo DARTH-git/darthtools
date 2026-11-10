@@ -13,7 +13,7 @@ output: github_document
 [`darthtools`](https://github.com/DARTH-git/darthtools) is an R package that contains tools developed by the [Decision Analysis in R for Technologies in Health (DARTH)](https://darthworkgroup.com) workgroup to construct model-based cost-effectiveness analysis in R. 
 
 # Preliminaries
-- Install [RStudio](https://www.rstudio.com/products/rstudio/download/)
+- Install [RStudio](https://posit.co/download/rstudio-desktop/)
 - Install `devtools` to install `darthtools` as a package and modify it to generate your own package
 ```{r, eval=FALSE}
 # Install release version from CRAN
