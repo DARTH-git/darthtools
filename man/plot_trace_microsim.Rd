@@ -8,6 +8,8 @@ plot_trace_microsim(m_M, v_n_states = v_names_states)
 }
 \arguments{
 \item{m_M}{a cohort trace matrix}
+
+\item{v_n_states}{vector of health state names. Defaults to \code{v_names_states}.}
 }
 \value{
 a plot of the cohort trace

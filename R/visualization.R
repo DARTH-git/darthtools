@@ -27,6 +27,7 @@ plot_te <- function(te) {
 #' \code{plot_trace_microsim} plots cohort trace of a microsimulation model.
 #'
 #' @param m_M a cohort trace matrix
+#' @param v_n_states vector of health state names. Defaults to \code{v_names_states}.
 #' @return a plot of the cohort trace
 #' @export
 plot_trace_microsim <- function(m_M,  v_n_states = v_names_states) {

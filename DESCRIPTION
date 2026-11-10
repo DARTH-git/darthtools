@@ -1,7 +1,7 @@
 Type: Package
 Package: darthtools
 Title: Decision Analysis Helper Tools for the 'DARTH' Workgroup
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: c(
     person("Fernando", "Alarid-Escudero", , "falarid@stanford.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-5076-1172")),
@@ -44,6 +44,7 @@ Imports:
     ggridges,
     reshape2,
     magrittr,
+    MASS,
     matrixStats,
     msm,
     muhaz,
@@ -64,6 +65,7 @@ Suggests:
     rhub,
     rmarkdown,
     spelling,
+    testthat (>= 3.0.0),
     urlchecker
 VignetteBuilder: 
     knitr
@@ -71,4 +73,5 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

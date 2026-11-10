@@ -12,6 +12,6 @@
 #' @importFrom data.table rbindlist
 #' @importFrom msm msm prevalence.msm
 #' @importFrom graphics legend lines matlines matplot title
-#' @importFrom stats density model.frame model.matrix na.omit pexp pgamma plnorm pweibull quantile runif time
+#' @importFrom stats coef density model.frame model.matrix na.omit pexp pgamma plnorm pweibull quantile runif time vcov
 #' @importFrom utils capture.output modifyList getFromNamespace globalVariables
 NULL
