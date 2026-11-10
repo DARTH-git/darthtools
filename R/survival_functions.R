@@ -537,14 +537,14 @@ partsurv <- function(pfs_survHE = NULL, os_survHE = NULL, l_d.data = NULL, l_vc.
 #'
 #' @param model survival model.
 #' @param times time horizon to calculate survival probabilities.
-#' @param PA run probabilistic analysis.
+#' @param PA run probabilistic analysis. Default = FALSE.
 #' @param rx determines which treatment arm (same order as factor levels of treatment variable).
-#' Default = FALSE.
+#' @param B number of parameter samples to draw from the multivariate normal
+#' distribution of the model coefficients when \code{PA = TRUE}.
 #' @return
 #' vector of survival probabilities.
 #' @export
 surv_prob <- function(model, times = NULL, PA = FALSE, rx = 1, B = NULL) {
-  require("MASS")
 
    if (PA) {
 
