@@ -1,3 +1,34 @@
+# darthtools 0.4.1
+
+## Bug fixes
+
+* `gen_wcc(method = "Simpson1/3")` assigned the 4/3 and 2/3 weights by
+  position in the 1-based R vector instead of by time t = 0, 1, ..., n. It
+  returned `1/3, 2/3, 4/3, 2/3, ..., 1/3` instead of `1/3, 4/3, 2/3, 4/3, ...,
+  1/3`, and the weights summed to n - 2/3 (even n) or n - 1/3 (odd n) instead
+  of n. Weights are now indexed by time. Reported independently by Lauren N.
+  Steimle (Georgia Institute of Technology) and @ambtnhlr
+  (DARTH-git/cohort-modeling-tutorial-intro#2). Thank you both.
+
+## Changes in behaviour
+
+* For an odd number of cycles, `gen_wcc(method = "Simpson1/3")` now applies
+  the composite Simpson's 1/3 rule over the first n - 3 cycles and Simpson's
+  3/8 rule over the last three, so polynomials up to degree three are still
+  integrated exactly.
+* `gen_wcc()` now errors when `n_cycles` is not a single positive integer, and
+  when `n_cycles = 1` is used with Simpson's rule.
+
+## Infrastructure
+
+* Added unit tests with testthat (3rd edition), starting with `gen_wcc()`.
+* Added a GitHub Actions workflow that runs `R CMD check` on every push and
+  pull request to `main`.
+* Fixed pre-existing `R CMD check` warnings: `surv_prob()` no longer calls
+  `require("MASS")` (MASS is now in Imports), and the `B` argument of
+  `surv_prob()` and the `v_n_states` argument of `plot_trace_microsim()` are
+  now documented.
+
 # darthtools 0.4.0
 
 ### Breaking change (with deprecation)
